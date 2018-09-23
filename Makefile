@@ -1,5 +1,9 @@
 # Óscar Gómez Borzdynski 
 
+# Interfaz
+NC = '\033[0m'
+GREEN = '\033[0;32m'
+
 # Compilador usado
 CC = gcc
 
@@ -55,21 +59,21 @@ test: $(TEST)
 % : %.c $(CLIBS)
 	@echo Creando el ejecutable $@
 	@$(CC) $(CFLAGS) $^ -o $@ $(CFLAGS)
-	@echo [OK]
+	@echo $(GREEN)[OK]$(NC)
 
 #Compilacion de librerias
 $(LIBDIR)%.a: %.c $(INC)
 	@echo Compilando $< a $@
 	@$(CC) -c $< $(CFLAGS) -o $@
-	@echo [OK]
+	@echo $(GREEN)[OK]$(NC)
 
 #Limpieza de ejecutables 
 clean: 
-	-rm $(EXE) $(TEST)
+	-rm -f $(EXE) $(TEST)
 
 #Limpieza de librerias
 cleanlibs: 
-	-rm $(LIBDIR)*.a 
+	-rm -f $(LIBDIR)*.a 
 
 #Limpieza completa
 cleanall: clean cleanlibs
