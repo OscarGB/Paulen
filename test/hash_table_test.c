@@ -18,11 +18,11 @@ int main() {
 	int i;
 
 	for(i = 0; i < 8; i++){
-		ht_insert(ht, keys[i], values[i]);
+		ht_insert(ht, keys[i], (void *)values[i]);
 	}
 	for(i = 0; i < 8; i++){
-		char* a = ht_search(ht, keys[i]);
-		if(a != NULL && strcmp(values[i], a) != 0){
+		char* a = (char *)ht_search(ht, keys[i]);
+		if(a != NULL && values[i]!=a/* != 0*/){
 			printf("ERROR, no se ha encontrado un elemento insertado\n");
 			FREEHT
 			return -1;
