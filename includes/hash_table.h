@@ -5,7 +5,6 @@
 #define HT_PRIME_1 379 // Prime 1 for hashing
 #define HT_PRIME_2 461 // Prime 2 for hashing
 
-typedef struct _ht_item ht_item;
 typedef struct _ht_hash_table ht_hash_table;
 
 /* Create a *ht_hash_table* */

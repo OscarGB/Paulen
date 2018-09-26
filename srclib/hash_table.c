@@ -8,10 +8,10 @@
 
 
 /* Elemento de la tabla hash */
-struct _ht_item {
+typedef struct _ht_item {
 	char* key; // Clave por la que buscar
 	void* value; // Valor almacenado
-};
+}ht_item;
 
 /* Tabla hash */
 struct  _ht_hash_table {
