@@ -13,6 +13,7 @@ SRCDIR = src/
 LIBDIR = lib/
 INCDIR = includes/
 TESTDIR = test/
+EXECDIR = executables/
 
 # Flags de compilacion
 CFLAGS_AUX = $(addprefix -I, $(INCDIR) $(TESTDIR))
@@ -58,7 +59,7 @@ test: $(TEST)
 #Compilacion de ejecutables
 % : %.c $(CLIBS)
 	@echo Creando el ejecutable $@
-	@$(CC) $(CFLAGS) $^ -o $@ $(CFLAGS)
+	@$(CC) $(CFLAGS) $^ -o $(EXECDIR)$@ $(CFLAGS)
 	@echo $(GREEN)[OK]$(NC)
 
 #Compilacion de librerias
