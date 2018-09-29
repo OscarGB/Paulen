@@ -8,10 +8,10 @@
 
 
 /* Elemento de la tabla hash */
-struct _ht_item {
+typedef struct _ht_item {
 	char* key; // Clave por la que buscar
-	char* value; // Valor almacenado
-};
+	void* value; // Valor almacenado
+}ht_item;
 
 /* Tabla hash */
 struct  _ht_hash_table {
@@ -26,16 +26,20 @@ static ht_item HT_DELETED_ITEM = {NULL, NULL};
 
 /* Delete a *ht_item* */
 static void ht_del_item(ht_item* i) {
-	if(i == &HT_DELETED_ITEM) return;
+	if(i == &HT_DELETED_ITEM) 
+		return;
 	if(i!=NULL && i->key!=NULL){
-	
-	free(i->key); i->key=NULL;}
-	if(i!=NULL && i->value!=NULL){ free(i->value); i->value=NULL;}
-	if(i!=NULL){ free(i); i=NULL;}
+		free(i->key); 
+		i->key=NULL;
+	}
+	if(i!=NULL){ 
+		free(i); 
+		i=NULL;
+	}
 }
 
 /* Create a new *ht_item*, makes a copy of k and v to prevent modification */
-static ht_item* ht_new_item(const char* k, const char* v) {
+static ht_item* ht_new_item(char* k, void* v) {
 	ht_item* i = NULL;
 	i = malloc(sizeof(ht_item));
 	if(!i) return NULL; // Check errors malloc
@@ -46,18 +50,14 @@ static ht_item* ht_new_item(const char* k, const char* v) {
 		ht_del_item(i);
 		return NULL;
 	}
-	i->value = strdup(v); // Check errors strdup (inside malloc)
-	if(!i->value){
-		ht_del_item(i);
-		return NULL;
-	}
+	i->value = v;
 	return i;
 }
 
 /* Generic hash function */
-static int ht_hash(const char* s, const int a, const int m) {
+static int ht_hash(char* s, int a, int m) {
 	long hash = 0;
-	const int len_s = strlen(s);
+	int len_s = strlen(s);
 	for (int i = 0; i < len_s; i++) {
 		hash += (long)pow(a, len_s - (i+1)) * s[i];
 		hash = hash % m;
@@ -66,14 +66,14 @@ static int ht_hash(const char* s, const int a, const int m) {
 }
 
 /* Hash function for an element, performs the double hashing */
-static int ht_get_hash(const char* s, const int num_buckets, const int attempt) {
-	const int hash_a = ht_hash(s, HT_PRIME_1, num_buckets);
-	const int hash_b = ht_hash(s, HT_PRIME_2, num_buckets);
+static int ht_get_hash(char* s, int num_buckets, int attempt) {
+	int hash_a = ht_hash(s, HT_PRIME_1, num_buckets);
+	int hash_b = ht_hash(s, HT_PRIME_2, num_buckets);
 	return (hash_a + (attempt * (hash_b + 1))) % num_buckets;
 }
 
 /* Creates a *ht* of certain size */
-static ht_hash_table* ht_new_sized(const int base_size) {
+static ht_hash_table* ht_new_sized(int base_size) {
 	ht_hash_table* ht = malloc(sizeof(ht_hash_table));
 	if(!ht) return NULL;
 	ht->base_size = base_size;
@@ -87,7 +87,7 @@ static ht_hash_table* ht_new_sized(const int base_size) {
 }
 
 /* Resize a *ht* */
-static void ht_resize(ht_hash_table* ht, const int base_size) {
+static void ht_resize(ht_hash_table* ht, int base_size) {
 	if (base_size < HT_INITIAL_BASE_SIZE) {
 		return;
 	}
@@ -104,7 +104,7 @@ static void ht_resize(ht_hash_table* ht, const int base_size) {
 	ht->count = new_ht->count;
 
 	// To delete new_ht, we give it ht's size and items 
-	const int tmp_size = ht->size;
+	int tmp_size = ht->size;
 	ht->size = new_ht->size;
 	new_ht->size = tmp_size;
 
@@ -118,7 +118,7 @@ static void ht_resize(ht_hash_table* ht, const int base_size) {
 /* Resize to double the size of *ht* */
 static void ht_resize_up(ht_hash_table* ht) {
 	
-	const int new_size = ht->base_size * 2;
+	int new_size = ht->base_size * 2;
 	ht_resize(ht, new_size);
 	
 }
@@ -126,7 +126,7 @@ static void ht_resize_up(ht_hash_table* ht) {
 /* Resize to half the size of *ht* */
 static void ht_resize_down(ht_hash_table* ht) {
 	
-	const int new_size = ht->base_size / 2;
+	int new_size = ht->base_size / 2;
 	ht_resize(ht, new_size);
 	
 }
@@ -147,7 +147,7 @@ ht_hash_table* ht_new() {
 }
 
 /* Insert an element to *ht* with *key* and *value* */
-void ht_insert(ht_hash_table* ht, const char* key, const char* value) {
+void ht_insert(ht_hash_table* ht, char* key, void* value) {
 
 	
 	ht_item* item = ht_new_item(key,  value);
@@ -167,7 +167,7 @@ void ht_insert(ht_hash_table* ht, const char* key, const char* value) {
 		cur_item = ht->items[index];
 		i++;
 	}
-	const int load = ht->count * 100 / ht->size;
+	int load = ht->count * 100 / ht->size;
 	if (load > 70) {
 		ht_resize_up(ht);
 	}
@@ -177,7 +177,7 @@ void ht_insert(ht_hash_table* ht, const char* key, const char* value) {
 }
 
 /* Search for a *key* in *ht* and return its *value* */
-char* ht_search(ht_hash_table* ht, const char* key) {
+void* ht_search(ht_hash_table* ht, char* key) {
 	int index = ht_get_hash(key, ht->size, 0);
 	ht_item* item = ht->items[index];
 	int initial_index = index;
@@ -199,7 +199,7 @@ char* ht_search(ht_hash_table* ht, const char* key) {
 }
 
 /* Delete a *key* from *ht* */
-void ht_delete(ht_hash_table* ht, const char* key) {
+void ht_delete(ht_hash_table* ht, char* key) {
 	
 	int index = ht_get_hash(key, ht->size, 0);
 	int initial_index = index;
@@ -210,7 +210,7 @@ void ht_delete(ht_hash_table* ht, const char* key) {
 			
 			if (strcmp(item->key, key) == 0) {
 				
-				const int load = ht->count * 100 / ht->size;
+				int load = ht->count * 100 / ht->size;
 				if (load < 10) {
 					ht_resize_down(ht);
 				}             
@@ -239,7 +239,7 @@ void print_table(ht_hash_table* ht){
 			printf("Hueco borrado\n");
 		}
 		else if (item != NULL){
-			printf("%s, %s \n", item->key, item->value);
+			printf("Elemento con clave %s\n", item->key);
 		}
 		else{
 			printf("Hueco vacio\n");

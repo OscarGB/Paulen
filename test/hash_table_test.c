@@ -12,17 +12,17 @@ int main() {
 		return 1;
 	}
 
-	char keys[13][20] = {"a", "b", "c", "d", "e", "hola", "arbol", "arbusto", "8569", "874222", "874521", "54121318"};
-	char values[13][20] = {"va", "vb", "vc", "vd", "ve", "vhola", "varbol", "varbusto", "v8569", "v874222", "v874521", "v54121318"};
+	char keys[12][20] = {"a", "b", "c", "d", "e", "hola", "arbol", "arbusto", "8569", "874222", "874521", "54121318"};
+	char values[12][20] = {"va", "vb", "vc", "vd", "ve", "vhola", "varbol", "varbusto", "v8569", "v874222", "v874521", "v54121318"};
 
 	int i;
 
-	for(i = 0; i < 8; i++){
-		ht_insert(ht, keys[i], values[i]);
+	for(i = 0; i < 12; i++){
+		ht_insert(ht, keys[i], (void *)values[i]);
 	}
-	for(i = 0; i < 8; i++){
-		char* a = ht_search(ht, keys[i]);
-		if(a != NULL && strcmp(values[i], a) != 0){
+	for(i = 0; i < 12; i++){
+		char* a = (char *)ht_search(ht, keys[i]);
+		if(a != NULL && values[i]!=a/* != 0*/){
 			printf("ERROR, no se ha encontrado un elemento insertado\n");
 			FREEHT
 			return -1;
