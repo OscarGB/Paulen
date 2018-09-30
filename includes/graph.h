@@ -4,41 +4,54 @@
 #ifndef _GRAPH_H_
 #define _GRAPH_H_
 
-typedef enum {UNDIRECTED=0,DIRECTED} graph_type_e;
+typedef struct adjlist adjlist_t, *adjlist_p;
 
-/* Adjacency list node*/
-typedef struct adjlist_node
+/* Node*/
+typedef struct node
 {
-    int vertex;                /*Index to adjacency list array*/
-    struct adjlist_node *next; /*Pointer to the next node*/
-}adjlist_node_t, *adjlist_node_p;
+    char **name;    /*Name of the node*/
+    char **content; /*Node content*/
+    adjlist_p parents; /*List of parents*/
+    adjlist_p children; /*List of children*/
+}node_t, *node_p;
 
-/* Adjacency list */
-typedef struct adjlist
+typedef struct list_elem list_elem_t, *list_elem_p;
+
+/*Elements of and adjlist*/
+struct list_elem
+{
+	node_p node;
+	list_elem_p next;
+	list_elem_p prev;
+};
+
+/* Adjacency list: there will be 2 per node, parents and
+children */
+struct adjlist
 {
     int num_members;           /*number of members in the list (for future use)*/
-    adjlist_node_t *head;      /*head of the adjacency linked list*/
-}adjlist_t, *adjlist_p;
+    list_elem_p head;      /*head of the adjacency linked list*/
+};
+
+
 
 /* Graph structure. A graph is an array of adjacency lists.
    Size of array will be number of vertices in graph*/
-typedef struct graph
+typedef struct graph_t
 {
-    graph_type_e type;        /*Directed or undirected graph */
-    int num_vertices;         /*Number of vertices*/
-    adjlist_p adjListArr;     /*Adjacency lists' array*/
+    int num_nodes;         /*Number of vertices*/
+    adjlist_t *nodes_list;     /*List with all the nodes*/
 }graph_t, *graph_p;
 
-adjlist_node_p createNode(int v);
+node_p createNode(int v);
 
-graph_p createGraph(int n, graph_type_e type);
+graph_p createGraph();
+
+void addNode(graph_t *graph, node_p* parents, int numparents, char** name, char** content);
 
 void destroyGraph(graph_p graph);
 
-void addEdge(graph_t *graph, int src, int dest);
-
-/*Adds a node (with its edges) to the graph*/
-void addNode(graph_t *graph, int src, int dest);
+void destroyNode(node_p node);
 
 void displayGraph(graph_p graph);
 
