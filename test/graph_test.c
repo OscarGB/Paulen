@@ -54,22 +54,36 @@
 
 int main(){
 	graph_p graph;
-	node_p node, a, b, c, d, e, f;
+	node_p a, b, c, e;
 	node_p list[5];
+	char str[20];
+	char name[5];
 
 	graph = createGraph();
 
 	printf("Graph created. Displaying...\n");
 
 	displayGraph(graph);
-
 	/*Adding some nodes without parents*/
-	a = addNode(graph, NULL, "a", "a content");
-	b = addNode(graph, NULL, "b", "b content");
-	c = addNode(graph, NULL, "c", "c content");
+	strcpy(str, "a content");
+	strcpy(name, "a");
+	a = addNode(graph, NULL, 0, &name[0], &str[0]);
 
-	printf("Three nodes without parents created. Displaying...\n");
+	strcpy(str, "b content");
+	strcpy(name, "b");
+	b = addNode(graph, NULL, 0, &name[0], &str[0]);
+	
+	strcpy(str, "c content");
+	strcpy(name, "c");
+	c = addNode(graph, NULL, 0, &name[0], &str[0]);
+	
+	printf("\n");
+
+	printf("Three nodes without parents created. Displaying...\n\n");
 	displayGraph(graph);
+
+	printf("\n");
+
 
 	/*Adding children*/
 	/*
@@ -82,16 +96,26 @@ int main(){
 	   /
       /
 	c
-	*/
-	list = {a, b};
-	d = addNode(graph, list, "d", "d content");
-	list = {b,c};
-	e = addNode(graph, list, "e", "e content");
-	list = {e};
-	f = addNode(graph, list, "f", "f content");
+	*/		
+	list[0] = a;
+	list[1] = b;
+	strcpy(str, "d content");
+	strcpy(name, "d");
+	addNode(graph, list, 2, &name[0], &str[0]);
+	list[0] = b;
+	list[1] = c;
+	strcpy(str, "e content");
+	strcpy(name, "e");
+	e = addNode(graph, list, 2, &name[0], &str[0]);
+	list[0] = e;
+	strcpy(str, "f content");
+	strcpy(name, "f");
+	addNode(graph, list, 1, &name[0], &str[0]);
 
-	printf("Three more nodes added. Displaying...\n");
+	printf("Three more nodes added. Displaying...\n\n");
 	displayGraph(graph);
+
+	printf("\n");
 
 	destroyGraph(graph);
 	printf("Graph destroyed\n");

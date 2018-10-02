@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "graph.h"
+#include "string.h"
 
 /* Function to create a graph with n vertices; Creates both directed and undirected graphs*/
 graph_p createGraph()
@@ -15,6 +16,10 @@ graph_p createGraph()
         exit(1);
     }
 
+    graph -> nodes_list -> head = NULL;
+    graph -> nodes_list -> num_members = 0;
+
+
     return graph;
 }
 
@@ -22,8 +27,42 @@ graph_p createGraph()
 void destroyAdjList(adjlist_p list)
 {
     list_elem_p elem = list->head;
-    list_elem_p next = elem-> next;
+    list_elem_p next = NULL;
     int num = list->num_members;
+
+    if(elem)
+        next = elem -> next;
+
+    if(list -> num_members > 0){
+        while(next){
+            elem = next;
+            next = elem->next;
+        }
+
+        while(num > 0){
+            next = elem;
+            elem = next->prev;
+            if(next->node)
+                destroyNode(next->node);
+            free(next);
+            num--;
+        }
+        if(elem->node){
+            destroyNode(elem->node);
+        }
+        free(elem);
+        free(list);
+    }
+}
+
+void destroyRelatives(adjlist_p list){
+    list_elem_p elem = list->head;
+    list_elem_p next = NULL;
+    int num = list->num_members;
+
+    if(elem)
+        next = elem -> next;
+
     if(list -> num_members > 0){
         while(next){
             elem = next;
@@ -37,16 +76,18 @@ void destroyAdjList(adjlist_p list)
             num--;
         }
 
-        free(list);
     }
+    free(list);
 }
 
 void destroyNode(node_p node)
 {
     if(node)
     {
-        destroyAdjList(node->parents);
-        destroyAdjList(node->children);
+        if(node->parents)
+            destroyRelatives(node->parents);
+        if(node->children)
+            destroyRelatives(node->children);
         free(node);
     }
 
@@ -67,22 +108,24 @@ void destroyGraph(graph_p graph)
     }
 }
 
-void addNode(graph_t *graph, node_p* node_parents, int numparents, char** name, char** content)
+node_p addNode(graph_t *graph, node_p* node_parents, int numparents, char* name, char* content)
 {
     adjlist_p parents; /*Parents list*/
     adjlist_p children; /*Children list*/
-    list_elem_p parent_element; /*Element for the parents list*/
-    list_elem_p children_element; /*Element for the children list*/
+    list_elem_p parent_element = NULL; /*Element for the parents list*/
+    list_elem_p children_element = NULL; /*Element for the children list*/
     list_elem_p graph_element;
     node_p new_node;
     list_elem_p aux;
-    int i, jump;
+    int i, jump=0;
 
     parents = (adjlist_p)malloc(sizeof(adjlist_t));
     if(!parents){
         destroyGraph(graph);
         exit(1);
     }
+    parents -> num_members = 0;
+    parents -> head = NULL;
 
     children = (adjlist_p)malloc(sizeof(adjlist_t));
     if(!children){
@@ -90,6 +133,9 @@ void addNode(graph_t *graph, node_p* node_parents, int numparents, char** name, 
         destroyGraph(graph);
         exit(1);
     }
+
+    children -> num_members = 0;
+    children -> head = NULL;
 
     new_node = (node_p)malloc(sizeof(node_t));
     if(!new_node){
@@ -99,24 +145,7 @@ void addNode(graph_t *graph, node_p* node_parents, int numparents, char** name, 
         exit(1);
     }
 
-    parent_element = (list_elem_p)malloc(sizeof(list_elem_t));
-    if(!parent_element){
-        free(new_node);
-        free(parents);
-        free(children);
-        destroyGraph(graph);
-        exit(1);
-    }
 
-    children_element = (list_elem_p)malloc(sizeof(list_elem_t));
-    if(!children_element){
-        free(parent_element);
-        free(new_node);
-        free(parents);
-        free(children);
-        destroyGraph(graph);
-        exit(1);
-    }
 
     graph_element = (list_elem_p)malloc(sizeof(list_elem_t));
     if(!graph_element){
@@ -129,12 +158,18 @@ void addNode(graph_t *graph, node_p* node_parents, int numparents, char** name, 
         exit(1);
     }
 
+
     /*Filling the new node*/
-    new_node -> name = name;
-    new_node -> content = content;
+    strcpy(new_node->name, name);
+    strcpy(new_node->content, content);
+    new_node -> parents = parents;
+    new_node -> children = children;
     
     /*Adding the node to the graph*/
     graph_element -> node = new_node;
+
+    graph_element -> node -> parents = parents;
+    graph_element -> node -> children = children;
 
     for(i = 0; i < numparents; i++) {
         /*Adding the parents to the node's parents list*/
@@ -149,10 +184,20 @@ void addNode(graph_t *graph, node_p* node_parents, int numparents, char** name, 
         }
 
         parent_element -> node = *(node_parents + jump);
-        parent_element -> next = parents -> head;
-        parents -> head -> prev = parent_element;
-        parent_element -> prev = NULL;
-        parents -> head = parent_element;
+
+        if(!parents->head) {
+            parents->head = parent_element;
+            parent_element -> next = NULL;
+            parent_element -> prev = NULL;
+        }
+
+        else {
+            parent_element -> next = parents -> head;
+            parents -> head -> prev = parent_element;
+            parent_element -> prev = NULL;
+            parents -> head = parent_element;
+        }
+
 
         parents -> num_members ++;
 
@@ -166,30 +211,47 @@ void addNode(graph_t *graph, node_p* node_parents, int numparents, char** name, 
             destroyGraph(graph);
             exit(1);
         }
-        children_element -> node = *(node_parents + jump);
-        children_element -> next = children -> head;
-        children -> head -> prev = children_element;
-        children_element -> prev = NULL;
-        children -> head = children_element;
-        children -> num_members ++;
 
+        children_element -> node = *(node_parents + jump);
+
+        if(!children->head) {
+            children->head = children_element;
+            children_element -> next = NULL;
+            children_element -> next = NULL;
+        }
+
+        else {
+            children_element -> next = children -> head;
+            children -> head -> prev = children_element;
+            children_element -> prev = NULL;
+            children -> head = children_element;
+        }
+        children -> num_members ++;
 
         jump ++;
         
     }
 
-    aux = graph->nodes_list->head;
-    graph->nodes_list->head = graph_element;
-    graph_element -> next = aux;
-    aux -> prev = graph_element;
-    graph -> nodes_list -> num_members ++;
+    if(!graph->nodes_list->head){
+        graph->nodes_list->head = graph_element;
+        graph->nodes_list->head->next = NULL;
+        graph->nodes_list->head->prev = NULL;
+    }
+    else {
+        aux = graph->nodes_list->head;
+        graph->nodes_list->head = graph_element;
+        graph_element -> next = aux;
+        aux -> prev = graph_element;
+        graph -> nodes_list -> num_members ++;
+    }
 
-    children_element->node = new_node;
-    children_element->prev = NULL;
+
+    // children_element->node = new_node;
+    // children_element->prev = NULL;
 
     graph->num_nodes ++;
 
-    return;
+    return new_node;
 }
 
 void displayAdjlist(adjlist_p list)
@@ -197,28 +259,42 @@ void displayAdjlist(adjlist_p list)
     list_elem_p elem = list->head;
     list_elem_p next = elem->next;
 
+
     while(elem){
-        printf("%s || ", *(elem->node->name));
+        printf("%s || ", elem->node->name);
         elem = next;
-        next = elem->next;
+        if(elem)
+            next = elem->next;
     }
+    printf("\n");
 }
 
 /* Function to print the adjacency list of graph*/
 void displayGraph(graph_p graph)
 {
     list_elem_p elem = graph->nodes_list->head;
-    list_elem_p next = elem->next;
+    list_elem_p next = NULL;
 
     if(!elem)
     {
         printf("Empty graph.\n");
+        return;
     }
 
+    next = elem->next;
+
+
     while(elem){
-        printf("Node %s:\nParents: ", *(elem->node->name));
-        displayAdjlist(elem->node->parents);
+
+        printf("Node %s:\nParents: ", elem->node->name);
+
+        if(elem->node->parents->num_members > 0)
+            displayAdjlist(elem->node->parents);
+        else
+            printf("None\n");
         elem = next;
-        next = elem->next;
+        if(next)
+            next = elem->next;
     }
+
 }

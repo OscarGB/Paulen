@@ -1,19 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-void print_numbers(int* nump) {
-	int i = 0, jump=0;
+void print_numbers(char* input) {
+	char *str = input;
+	int i;
 
 	for(i=0; i<5; i++){
-		printf("%d, ", *(nump + jump));
-		jump ++ ;
+		printf("%s\n", str);
 	}
 }
 
 int main() {
-	int numbers[5] = {1,2,3,4,5};
+	char str[7] = "String";
 
-	print_numbers(numbers);
+	print_numbers(&str[0]);
 
 	return 0;
 }

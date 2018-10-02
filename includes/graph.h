@@ -9,8 +9,8 @@ typedef struct adjlist adjlist_t, *adjlist_p;
 /* Node*/
 typedef struct node
 {
-    char **name;    /*Name of the node*/
-    char **content; /*Node content*/
+    char name[20];    /*Name of the node*/
+    char content[20]; /*Node content*/
     adjlist_p parents; /*List of parents*/
     adjlist_p children; /*List of children*/
 }node_t, *node_p;
@@ -47,7 +47,7 @@ node_p createNode(int v);
 
 graph_p createGraph();
 
-void addNode(graph_t *graph, node_p* parents, int numparents, char** name, char** content);
+node_p addNode(graph_t *graph, node_p* parents, int numparents, char* name, char* content);
 
 void destroyGraph(graph_p graph);
 
