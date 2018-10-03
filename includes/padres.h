@@ -1,8 +1,10 @@
 #include "graph.h"
 
-#ifndef _GRAPH_H_
-#define _GRAPH_H_
+#ifndef _PADRES_H_
+#define _PADRES_H_
+
+#define MAX_PADRES 100
 
 char** get_padres(graph_p grafo, char** padres, int size);
 
-#endif // _GRAPH_H_
+#endif // _PADRES_H_

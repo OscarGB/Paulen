@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "graph.h"
+#include "padres.h"
 
 /* Function to create a graph with n vertices; Creates both directed and undirected graphs*/
 graph_p createGraph()
@@ -95,6 +96,8 @@ void destroyNode(node_p node)
             destroyRelatives(node->parents);
         if(node->children)
             destroyRelatives(node->children);
+        if(node->padres)
+            free(node->padres);
         free(node);
     }
 
@@ -173,6 +176,12 @@ node_p addNode(graph_t *graph, node_p* node_parents, int numparents, char* name,
     new_node -> parents = parents;
     new_node -> children = children;
     
+    char* nombres_padres[numparents];
+    for(i = 0; i < numparents;i++){
+        nombres_padres[i] = node_parents[i]->name;
+    }
+    new_node-> padres = get_padres(graph, nombres_padres, numparents);
+
     /*Adding the node to the graph*/
     graph_element -> node = new_node;
 
@@ -301,6 +310,18 @@ void displayGraph(graph_p graph)
             displayAdjlist(elem->node->parents);
         else
             printf("None\n");
+
+        int i = 0;
+
+        if(elem->node->padres != NULL){
+            printf("Padres ordenados:");
+            while(elem->node->padres[i] != NULL){
+                printf("%s ", elem->node->padres[i]);
+                i++;
+            }
+            printf("\n");
+        }
+
         elem = next;
         if(next)
             next = elem->next;

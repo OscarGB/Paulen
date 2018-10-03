@@ -1,8 +1,7 @@
-#include "padres.h"
 #include <string.h>
 #include <stdio.h>
+#include "padres.h"
 
-#define MAX_PADRES 100
 
 /* Comprueba que un vector está vacío */
 int vacio(char** list, int size){
@@ -50,7 +49,6 @@ char** get_padres(graph_p grafo, char** padres, int size){
 	for(int i = 0; i < graph_size; i++){
 		if(vacio(padres, size) && vacio2D(padres_de_padres, size)){
 			free(padres_de_padres);
-			free(todos_los_padres);
 			return todos_los_padres;
 		}
 
@@ -63,6 +61,8 @@ char** get_padres(graph_p grafo, char** padres, int size){
 		flag = 0;
 
 		for(int j = 0; j < size; j++){
+			if(padres[j] != NULL){
+			}
 			if(padres[j] != NULL && strcmp(padres[j], elemento->node->name) == 0){
 				padres_de_padres[j] = elemento->node->padres;
 				todos_los_padres[tamano_padres] = elemento->node->name;
@@ -72,10 +72,14 @@ char** get_padres(graph_p grafo, char** padres, int size){
 				break;
 			}
 		}
-
 		
 		for(int j = 0; j < size; j++){
-			if(padres_de_padres[j] == NULL) continue;
+			if(padres_de_padres[j] == NULL){
+				continue;
+			}
+			if(padres_de_padres[j][0] == NULL){
+				continue;
+			}
 			if(strcmp(padres_de_padres[j][0], elemento->node->name) == 0){
 				if(flag == 0){
 					todos_los_padres[tamano_padres] = elemento->node->name;
@@ -90,8 +94,7 @@ char** get_padres(graph_p grafo, char** padres, int size){
 	}
 
 	free(padres_de_padres);
-	free(todos_los_padres);
-	return NULL;
+	return todos_los_padres;
 
 
 }

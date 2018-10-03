@@ -12,6 +12,7 @@ typedef struct node
 {
     char name[20];    /*Name of the node*/
     char content[20]; /*Node content*/
+    char** padres;  /*Name of the parents in order of creation (newest to oldest)*/
     adjlist_p parents; /*List of parents*/
     adjlist_p children; /*List of children*/
 }node_t, *node_p;

@@ -48,8 +48,8 @@ int main(){
       /
 	c
 	*/		
-	list[0] = a;
-	list[1] = b;
+	list[0] = b;
+	list[1] = a;
 	strcpy(str, "d content");
 	strcpy(name, "d");
 	addNode(graph, list, 2, name, str);
