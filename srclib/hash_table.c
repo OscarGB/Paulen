@@ -132,7 +132,7 @@ static void ht_resize_down(ht_hash_table* ht) {
 }
 
 /* Delete a *ht_hash_table* */
-void ht_del_hash_table(ht_hash_table* ht) {
+void ht_del_hash_table(hash_table_p ht) {
 	for (int i = 0; i < ht->size; i++) { // Delete items
 		ht_del_item(ht->items[i]);
 	}
@@ -147,7 +147,7 @@ ht_hash_table* ht_new() {
 }
 
 /* Insert an element to *ht* with *key* and *value* */
-void ht_insert(ht_hash_table* ht, char* key, void* value) {
+void ht_insert(hash_table_p ht, char* key, void* value) {
 
 	
 	ht_item* item = ht_new_item(key,  value);
@@ -177,7 +177,7 @@ void ht_insert(ht_hash_table* ht, char* key, void* value) {
 }
 
 /* Search for a *key* in *ht* and return its *value* */
-void* ht_search(ht_hash_table* ht, char* key) {
+void* ht_search(hash_table_p ht, char* key) {
 	int index = ht_get_hash(key, ht->size, 0);
 	ht_item* item = ht->items[index];
 	int initial_index = index;
@@ -199,7 +199,7 @@ void* ht_search(ht_hash_table* ht, char* key) {
 }
 
 /* Delete a *key* from *ht* */
-void ht_delete(ht_hash_table* ht, char* key) {
+void ht_delete(hash_table_p ht, char* key) {
 	
 	int index = ht_get_hash(key, ht->size, 0);
 	int initial_index = index;
@@ -232,7 +232,7 @@ void ht_delete(ht_hash_table* ht, char* key) {
 }
 
 /* Prints a *ht* */
-void print_table(ht_hash_table* ht){
+void ht_print_table(hash_table_p ht){
 	for(int i = 0; i < ht->size; i++){
 		ht_item*  item = ht->items[i];
 		if(item == &HT_DELETED_ITEM){
