@@ -20,9 +20,9 @@ typedef struct list_elem list_elem_t, *list_elem_p;
 /*Elements of and adjlist*/
 struct list_elem
 {
-	node_p node;
-	list_elem_p next;
-	list_elem_p prev;
+    node_p node;
+    list_elem_p next;
+    list_elem_p prev;
 };
 
 /* Adjacency list: there will be 2 per node, parents and
@@ -32,8 +32,6 @@ struct adjlist
     int num_members;           /*number of members in the list (for future use)*/
     list_elem_p head;      /*head of the adjacency linked list*/
 };
-
-
 
 /* Graph structure. A graph is an array of adjacency lists.
    Size of array will be number of vertices in graph*/
