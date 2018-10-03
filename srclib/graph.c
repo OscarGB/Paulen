@@ -16,7 +16,7 @@ graph_p createGraph()
         exit(1);
     }
 
-    if(!graph->nodes_hash_table = ht_new()){
+    if(!(graph->nodes_hash_table = ht_new(""))){
         free(graph->nodes_list);
         free(graph);
         exit(1);

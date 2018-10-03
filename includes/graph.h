@@ -56,5 +56,7 @@ void destroyNode(node_p node);
 
 void displayGraph(graph_p graph);
 
+node_p searchNode(graph_p graph, char* key);
+
 
 #endif
