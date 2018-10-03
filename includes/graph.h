@@ -41,6 +41,7 @@ typedef struct graph_t
 {
     int num_nodes;         /*Number of vertices*/
     adjlist_t *nodes_list;     /*List with all the nodes*/
+    
 }graph_t, *graph_p;
 
 node_p createNode(int v);

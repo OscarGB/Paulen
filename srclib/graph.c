@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "graph.h"
-#include "string.h"
 
 /* Function to create a graph with n vertices; Creates both directed and undirected graphs*/
 graph_p createGraph()
