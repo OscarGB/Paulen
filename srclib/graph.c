@@ -16,6 +16,13 @@ graph_p createGraph()
         exit(1);
     }
 
+    if(!graph->nodes_hash_table = ht_new()){
+        free(graph->nodes_list);
+        free(graph);
+        exit(1);
+    }
+
+
     graph -> nodes_list -> head = NULL;
     graph -> nodes_list -> num_members = 0;
 
@@ -103,6 +110,7 @@ void destroyGraph(graph_p graph)
         {
             destroyAdjList(graph->nodes_list);
         }
+        ht_del_hash_table(graph->nodes_hash_table);
         /*Free the graph*/
         free(graph);
     }
@@ -245,6 +253,7 @@ node_p addNode(graph_t *graph, node_p* node_parents, int numparents, char* name,
         graph -> nodes_list -> num_members ++;
     }
 
+    ht_insert(graph -> nodes_hash_table, new_node -> name, new_node);
 
     // children_element->node = new_node;
     // children_element->prev = NULL;

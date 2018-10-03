@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "hash_table.h"
 
 #ifndef _GRAPH_H_
 #define _GRAPH_H_
@@ -39,6 +40,7 @@ typedef struct graph_t
 {
     int num_nodes;         /*Number of vertices*/
     adjlist_t *nodes_list;     /*List with all the nodes*/
+    hash_table_p nodes_hash_table;  /*Hash table for node access*/
     
 }graph_t, *graph_p;
 
