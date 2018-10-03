@@ -6,7 +6,7 @@
 	if(ht!=NULL){ ht_del_hash_table(ht); ht=NULL;}
 
 int main() {
-	ht_hash_table* ht = ht_new();
+	ht_hash_table* ht = ht_new("");
 	if(!ht){
 		printf("ERROR al crear la tabla\n");
 		return 1;

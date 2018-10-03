@@ -15,6 +15,7 @@ typedef struct _ht_item {
 
 /* Tabla hash */
 struct  _ht_hash_table {
+	char name[100]; // Nombre
 	int size; // Tamaño
 	int count; // Numero de elementos dentro de la tabla
 	int base_size; // Numero base de elementos
@@ -73,8 +74,9 @@ static int ht_get_hash(char* s, int num_buckets, int attempt) {
 }
 
 /* Creates a *ht* of certain size */
-static ht_hash_table* ht_new_sized(int base_size) {
+static ht_hash_table* ht_new_sized(int base_size, char* name) {
 	ht_hash_table* ht = malloc(sizeof(ht_hash_table));
+	strcpy(ht->name, name);
 	if(!ht) return NULL;
 	ht->base_size = base_size;
 
@@ -91,7 +93,7 @@ static void ht_resize(ht_hash_table* ht, int base_size) {
 	if (base_size < HT_INITIAL_BASE_SIZE) {
 		return;
 	}
-	ht_hash_table* new_ht = ht_new_sized(base_size);
+	ht_hash_table* new_ht = ht_new_sized(base_size, ht->name);
 	if(!new_ht) return;
 	for (int i = 0; i < ht->size; i++) {
 		ht_item* item = ht->items[i];
@@ -142,8 +144,8 @@ void ht_del_hash_table(hash_table_p ht) {
 }
 
 /* Create a *ht_hash_table* */
-ht_hash_table* ht_new() {
-	return ht_new_sized(HT_INITIAL_BASE_SIZE);
+ht_hash_table* ht_new(char* name) {
+	return ht_new_sized(HT_INITIAL_BASE_SIZE, name);
 }
 
 /* Insert an element to *ht* with *key* and *value* */

@@ -8,7 +8,7 @@
 typedef struct _ht_hash_table ht_hash_table, *hash_table_p;
 
 /* Create a *ht_hash_table* */
-hash_table_p ht_new();
+hash_table_p ht_new(char* name);
 
 /* Delete a *ht_hash_table* */
 void ht_del_hash_table(hash_table_p ht);
