@@ -7,6 +7,9 @@ GREEN = '\033[0;32m'
 # Compilador usado
 CC = gcc
 
+# Flex
+CF = flex
+
 # Carpeta donde se encuentran las librerias desarrolladas por nosotros
 SRCLIBDIR = srclib/
 SRCDIR = src/
@@ -14,10 +17,11 @@ LIBDIR = lib/
 INCDIR = includes/
 TESTDIR = test/
 EXECDIR = executables/
+FLEXDIR = flex/
 
 # Flags de compilacion
 CFLAGS_AUX = $(addprefix -I, $(INCDIR) $(TESTDIR))
-CFLAGS = $(CFLAGS_AUX) -lpthread -lm -lrt -g -Wall -pedantic
+CFLAGS = $(CFLAGS_AUX) -lpthread -lm -lrt -g -pedantic
 
 #Modificamos los directorios de búsqueda para nuestro makefile
 vpath %.c $(SRCDIR)
@@ -25,6 +29,7 @@ vpath %.c $(SRCLIBDIR)
 vpath %.c $(TESTDIR)
 vpath %.a $(LIBDIR)
 vpath %.h $(INCDIR)
+vpath %.c $(FLEXDIR)
 
 #Creamos el directorio ejecutables
 $(shell mkdir -p $(EXECDIR))
@@ -44,43 +49,72 @@ TEST = $(TEST_AUX:.c=)
 LIBS_AUX = $(shell find $(SRCLIBDIR) -name '*.c' -printf "%P\n" | xargs)
 LIBS = $(LIBS_AUX:.c=.a)
 
+# Nombre de los ficheros flex
+FLEX_AUX = $(shell find $(FLEXDIR) -name '*.l' -printf "%P\n" | xargs)
+FLEX = $(FLEX_AUX:.l=.yy.c)
+
+# Nombre de los ficheros C de flex
+FLEXC_AUX1 = $(shell find $(FLEXDIR) -name '*.yy.c' -printf "%P\n" | xargs)
+FLEXC_AUX2 = $(FLEXC_AUX1:.yy.c=.yy.a)
+FLEXC = $(addprefix $(LIBDIR), $(FLEXC_AUX2))
+
 # Lista de dependencias a compilar
 CLIBS = $(addprefix $(LIBDIR), $(LIBS))
 
+# Lista de elementos flex a tratar
+CFLEX = $(addprefix $(FLEXDIR), $(FLEX))
+
+
 # Realiza todas las acciones
-all: test exec
+all: flex test exec
 
 # Compila solo los ejecutables principales
 exec: $(EXE)
 
 # Compila las librerias propias
-libs: cleanlibs $(CLIBS)
+libs: cleanlibs $(CLIBS) $(FLEXC)
 
-#Compila los ejecutables de test
+# Compila los ejecutables de test
 test: $(TEST)
 
-#Compilacion de ejecutables
+# Trata los elementos flex
+flex: $(CFLEX)
+	@$(eval FLEXC_AUX1 = $(shell find $(FLEXDIR) -name '*.yy.c' -printf "%P\n" | xargs))
+	@$(eval FLEXC_AUX2 = $(FLEXC_AUX1:.yy.c=.yy.a))
+	@$(eval FLEXC = $(addprefix $(LIBDIR), $(FLEXC_AUX2)))
+
+# Compilacion de ejecutables
 % : %.c $(CLIBS)
 	@echo Creando el ejecutable $@
-	@$(CC) $(CFLAGS) $^ -o $(EXECDIR)$@ $(CFLAGS)
+	@$(CC) $(CFLAGS) $^ $(CFLEX) -o $(EXECDIR)$@ $(CFLAGS)
 	@echo $(GREEN)[OK]$(NC)
 
-#Compilacion de librerias
+# Compilacion de librerias
 $(LIBDIR)%.a: %.c $(INC)
 	@echo Compilando $< a $@
 	@$(CC) -c $< $(CFLAGS) -o $@
 	@echo $(GREEN)[OK]$(NC)
 
-#Limpieza de ejecutables 
+# Limpieza de ejecutables 
 clean: 
 	-rm -f $(EXE) $(TEST)
 
-#Limpieza de librerias
+# Limpieza de librerias
 cleanlibs: 
 	-rm -f $(LIBDIR)*.a 
 
-#Limpieza completa
-cleanall: clean cleanlibs
+cleanflex:
+	-rm -f $(FLEXDIR)*.c
+	-rm -f $(FLEXC)
+
+# Limpieza completa
+cleanall: clean cleanlibs cleanflex
+
+# Trata cada elemento flex
+%.yy.c : %.l
+	@echo Transformando a flex $< a $@
+	@$(CF) -o $@ $<
+	@echo $(GREEN)[OK]$(NC)
 
 #Ayuda del makefile
 help:
