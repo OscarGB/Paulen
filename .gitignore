@@ -56,4 +56,5 @@ dkms.conf
 
 # Executables
 executables/*
+flex/*.c
 !executables/olib.o
