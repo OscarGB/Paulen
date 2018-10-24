@@ -67,13 +67,13 @@ CFLEX = $(addprefix $(FLEXDIR), $(FLEX))
 all: flex libs test exec
 
 # Compila solo los ejecutables principales
-exec: $(EXE)
+exec: flex libs $(EXE)
 
 # Compila las librerias propias
-libs: cleanlibs $(CLIBS) $(FLEXC)
+libs: cleanlibs flex $(CLIBS) $(FLEXC)	
 
 # Compila los ejecutables de test
-test: $(TEST)
+test: flex libs $(TEST)
 
 # Trata los elementos flex
 flex: $(CFLEX)
@@ -81,13 +81,11 @@ flex: $(CFLEX)
 # Compilacion de ejecutables
 % : %.c $(CLIBS)
 	@echo Creando el ejecutable $@
-	@$(CC) $(CFLAGS) $^ -o $(EXECDIR)$@ $(CFLAGS)
-	@echo $(GREEN)[OK]$(NC)
-
-# Compilacion de ejecutables
-omicron : omicron.c $(CLIBS) $(FLEXC)
-	@echo Creando el ejecutable $@
-	@$(CC) $(CFLAGS) $^ -o $(EXECDIR)$@ $(CFLAGS)
+	@ if grep -q -E 'yylex|yyparse' $<; then\
+		$(CC) $(CFLAGS) $^ $(FLEXC) -o $(EXECDIR)$@ $(CFLAGS);\
+      else\
+        $(CC) $(CFLAGS) $^ -o $(EXECDIR)$@ $(CFLAGS);\
+      fi
 	@echo $(GREEN)[OK]$(NC)
 
 # Compilacion de librerias
@@ -113,7 +111,7 @@ cleanall: clean cleanlibs cleanflex
 
 # Trata cada elemento flex
 %.yy.c : %.l
-	@echo Transformando a flex $< a $@
+	@echo Transformando flex $< a $@
 	@$(CF) -o $@ $<
 	@echo $(GREEN)[OK]$(NC)
 
