@@ -53,9 +53,8 @@ LIBS = $(LIBS_AUX:.c=.a)
 FLEX_AUX = $(shell find $(FLEXDIR) -name '*.l' -printf "%P\n" | xargs)
 FLEX = $(FLEX_AUX:.l=.yy.c)
 
-# Nombre de los ficheros C de flex
-FLEXC_AUX1 = $(shell find $(FLEXDIR) -name '*.yy.c' -printf "%P\n" | xargs)
-FLEXC_AUX2 = $(FLEXC_AUX1:.yy.c=.yy.a)
+# Lista de librerias flex
+FLEXC_AUX2 = $(FLEX_AUX:.l=.yy.a)
 FLEXC = $(addprefix $(LIBDIR), $(FLEXC_AUX2))
 
 # Lista de dependencias a compilar
@@ -64,9 +63,8 @@ CLIBS = $(addprefix $(LIBDIR), $(LIBS))
 # Lista de elementos flex a tratar
 CFLEX = $(addprefix $(FLEXDIR), $(FLEX))
 
-
 # Realiza todas las acciones
-all: flex test exec
+all: flex libs test exec
 
 # Compila solo los ejecutables principales
 exec: $(EXE)
@@ -79,14 +77,11 @@ test: $(TEST)
 
 # Trata los elementos flex
 flex: $(CFLEX)
-	@$(eval FLEXC_AUX1 = $(shell find $(FLEXDIR) -name '*.yy.c' -printf "%P\n" | xargs))
-	@$(eval FLEXC_AUX2 = $(FLEXC_AUX1:.yy.c=.yy.a))
-	@$(eval FLEXC = $(addprefix $(LIBDIR), $(FLEXC_AUX2)))
 
 # Compilacion de ejecutables
-% : %.c $(CLIBS)
+% : %.c $(CLIBS) $(FLEXC)
 	@echo Creando el ejecutable $@
-	@$(CC) $(CFLAGS) $^ $(CFLEX) -o $(EXECDIR)$@ $(CFLAGS)
+	@$(CC) $(CFLAGS) $^ -o $(EXECDIR)$@ $(CFLAGS)
 	@echo $(GREEN)[OK]$(NC)
 
 # Compilacion de librerias
