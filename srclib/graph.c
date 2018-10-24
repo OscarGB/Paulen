@@ -92,6 +92,10 @@ void destroyNode(node_p node)
 {
     if(node)
     {
+        if(node->local)
+            ht_del_hash_table(node->local);
+        if(node->principal)
+            ht_del_hash_table(node->principal);
         if(node->parents)
             destroyRelatives(node->parents);
         if(node->children)
@@ -175,6 +179,8 @@ node_p addNode(graph_t *graph, node_p* node_parents, int numparents, char* name,
     strcpy(new_node->content, content);
     new_node -> parents = parents;
     new_node -> children = children;
+    new_node -> principal = ht_new(name);
+    new_node -> local = NULL;
     
     char* nombres_padres[numparents];
     for(i = 0; i < numparents;i++){
@@ -327,4 +333,29 @@ void displayGraph(graph_p graph)
             next = elem->next;
     }
 
+}
+
+node_p searchNode(graph_p graph, char* key){
+    return ht_search(graph->nodes_hash_table, key);
+}
+
+
+hash_table_p getHT(graph_p graph, char* key, int tipo){
+    node_p node = searchNode(graph, key);
+    if(tipo == PRINCIPAL)
+        return node->principal;
+    else{
+        return node->local;
+    }
+}
+
+void createHTLocal(graph_p graph, char* key, char* name){
+    node_p node = searchNode(graph, key);
+    node -> local = ht_new(name);
+}
+
+void deleteHTLocal(graph_p graph, char* key, char* name){
+    node_p node = searchNode(graph, key);
+    ht_del_hash_table(node->local);
+    node -> local = NULL;
 }

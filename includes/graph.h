@@ -5,6 +5,9 @@
 #ifndef _GRAPH_H_
 #define _GRAPH_H_
 
+#define LOCAL 0
+#define PRINCIPAL 1
+
 typedef struct adjlist adjlist_t, *adjlist_p;
 
 /* Node*/
@@ -15,6 +18,8 @@ typedef struct node
     char** padres;  /*Name of the parents in order of creation (newest to oldest)*/
     adjlist_p parents; /*List of parents*/
     adjlist_p children; /*List of children*/
+    hash_table_p local; /*Tabla simbolos local*/
+    hash_table_p principal; /*Tabla simbolos principal*/
 }node_t, *node_p;
 
 typedef struct list_elem list_elem_t, *list_elem_p;
@@ -57,5 +62,10 @@ void displayGraph(graph_p graph);
 
 node_p searchNode(graph_p graph, char* key);
 
+hash_table_p getHT(graph_p graph, char* key, int tipo);
+
+void createHTLocal(graph_p graph, char* key, char* name);
+
+void deleteHTLocal(graph_p graph, char* key, char* name);
 
 #endif
