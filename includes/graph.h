@@ -45,8 +45,6 @@ typedef struct graph_t
     
 }graph_t, *graph_p;
 
-node_p createNode(int v);
-
 graph_p createGraph();
 
 node_p addNode(graph_t *graph, node_p* parents, int numparents, char* name, char* content);

@@ -5,7 +5,6 @@
 FILE * yyout;
 extern FILE* yyin;
 extern int yylex();
-extern int yyparse();
 
 int main(int argc, char const *argv[]) {
 	int ret=1;
