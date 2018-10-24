@@ -79,7 +79,13 @@ test: $(TEST)
 flex: $(CFLEX)
 
 # Compilacion de ejecutables
-% : %.c $(CLIBS) $(FLEXC)
+% : %.c $(CLIBS)
+	@echo Creando el ejecutable $@
+	@$(CC) $(CFLAGS) $^ -o $(EXECDIR)$@ $(CFLAGS)
+	@echo $(GREEN)[OK]$(NC)
+
+# Compilacion de ejecutables
+omicron : omicron.c $(CLIBS) $(FLEXC)
 	@echo Creando el ejecutable $@
 	@$(CC) $(CFLAGS) $^ -o $(EXECDIR)$@ $(CFLAGS)
 	@echo $(GREEN)[OK]$(NC)

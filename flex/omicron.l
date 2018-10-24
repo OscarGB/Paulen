@@ -298,7 +298,7 @@ true {
 {IDENTIFICADOR} {
   if(yyleng > MAX_LONG_ID){
   	columna+=yyleng; 
-  	fprintf(yyout, "TOK_ERROR\t%d %s\n", TOK_ERROR, yytext);
+    fprintf(yyout, "TOK_ERROR\t%d %s\n", TOK_ERROR, yytext);
     return TOK_ERROR;
   }
   columna+=yyleng;
