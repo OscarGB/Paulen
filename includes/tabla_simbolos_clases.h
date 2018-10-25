@@ -9,7 +9,19 @@ typedef struct _simbolos
 
 }simbolos_t, *simbolos_p;
 
+/*Crea la estructura y reserva toda la memoria necesaria*/
 simbolos_p createSimbolos();
 
+/*Elimina la estructura y libera toda la memoria ocupada*/
+void eliminaSimbolos();
+
+/*Inserta una clase en el gafo*/
+void nuevaClase();
+
+/*Inserta un simbolo en una clase concreta*/
+void nuevoSimboloEnClase();
+
+/*Comprueba si un simbolo esta en una clase*/
+void checkSimboloEnClase();
 
 #endif // TABLA_SIMBOLOS_CLASES_H
