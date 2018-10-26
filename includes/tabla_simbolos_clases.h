@@ -1,6 +1,17 @@
 #ifndef TABLA_SIMBOLOS_CLASES_H
 #define TABLA_SIMBOLOS_CLASES_H
 
+#include "graph.h"
+#include "hash_table.h"
+
+/*En graph.h estan definidas las siguientes macros de utilidad:
+
+#define LOCAL 0
+#define PRINCIPAL 1
+
+que refieren al ámbito de la tabla de simbolos
+*/
+
 typedef struct _simbolos
 {
     hash_table_p main_principal;  /*Hash table for main*/
@@ -16,12 +27,12 @@ simbolos_p createSimbolos();
 void eliminaSimbolos();
 
 /*Inserta una clase en el gafo*/
-void nuevaClase();
+void nuevaClase(simbolos_p simbolos, node_p* parents, int numparents, char* name);
 
 /*Inserta un simbolo en una clase concreta*/
-void nuevoSimboloEnClase();
+void nuevoSimboloEnClase(simbolos_p simbolos, char* nombre_clase, char* simbolo_a_insertar, int ambito);
 
 /*Comprueba si un simbolo esta en una clase*/
-void checkSimboloEnClase();
+void checkSimboloEnClase(simbolos_p simbolos, char* nombre_clase, char* simbolo_a_comprobar, int ambito);
 
 #endif // TABLA_SIMBOLOS_CLASES_H
