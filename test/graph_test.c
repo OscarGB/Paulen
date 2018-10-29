@@ -16,17 +16,14 @@ int main(){
 
 	displayGraph(graph);
 	/*Adding some nodes without parents*/
-	strcpy(str, "a content");
 	strcpy(name, "a");
-	a = addNode(graph, NULL, 0, name, str);
-
-	strcpy(str, "b content");
+	a = addNode(graph, NULL, 0, name);
+;
 	strcpy(name, "b");
-	b = addNode(graph, NULL, 0, name, str);
+	b = addNode(graph, NULL, 0, name);
 	
-	strcpy(str, "c content");
 	strcpy(name, "c");
-	c = addNode(graph, NULL, 0, name, str);
+	c = addNode(graph, NULL, 0, name);
 	
 	printf("\n");
 
@@ -50,18 +47,15 @@ int main(){
 	*/		
 	list[0] = b;
 	list[1] = a;
-	strcpy(str, "d content");
 	strcpy(name, "d");
-	addNode(graph, list, 2, name, str);
+	addNode(graph, list, 2, name);
 	list[0] = b;
 	list[1] = c;
-	strcpy(str, "e content");
 	strcpy(name, "e");
-	e = addNode(graph, list, 2, name, str);
+	e = addNode(graph, list, 2, name);
 	list[0] = e;
-	strcpy(str, "f content");
 	strcpy(name, "f");
-	addNode(graph, list, 1, name, str);
+	addNode(graph, list, 1, name);
 
 	printf("Three more nodes added. Displaying...\n\n");
 	displayGraph(graph);

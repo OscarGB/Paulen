@@ -248,3 +248,48 @@ void ht_print_table(hash_table_p ht){
 		}
 	}
 }
+
+/*Checks if a key is present in the hash table*/
+int ht_isin(hash_table_p ht, char* key){
+	int index = ht_get_hash(key, ht->size, 0);
+	ht_item* item = ht->items[index];
+	int initial_index = index;
+	int i = 1;
+	while (item != NULL) {
+		if (item != &HT_DELETED_ITEM) {
+			if (strcmp(item->key, key) == 0) {
+				return 1;
+			}
+		}   
+		index = ht_get_hash(key, ht->size, i);
+		if(initial_index == index){
+			return 0;
+		}
+		item = ht->items[index]; // If an item is NULL stop
+		i++;
+	} 
+	return 0;
+}
+
+
+/*Gets all keys, REMEMBER to free keys but not the items inside
+last pointer is NULL*/
+char** ht_get_keys(hash_table_p ht){
+	char** keys = (char**)malloc(sizeof(char*)*(ht->size+1));
+	int j = 0;
+	for(int i = 0; i < ht->size; i++){
+		ht_item*  item = ht->items[i];
+		if(item == &HT_DELETED_ITEM){
+			continue;
+		}
+		else if (item != NULL){
+			keys[j] = item->key;
+			j++;
+		}
+		else{
+			continue;
+		}
+	}
+	keys[j] = NULL;
+	return keys;
+}

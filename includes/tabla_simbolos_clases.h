@@ -16,7 +16,7 @@ typedef struct _simbolos
 {
     hash_table_p main_principal;  /*Hash table for main*/
     hash_table_p main_local; /*Hash table for methods in main*/
-	graph_p graph;
+	graph_p graph; /*Graph class*/
 
 }simbolos_t, *simbolos_p;
 
@@ -24,15 +24,32 @@ typedef struct _simbolos
 simbolos_p createSimbolos();
 
 /*Elimina la estructura y libera toda la memoria ocupada*/
-void eliminaSimbolos();
+void eliminaSimbolos(simbolos_p simbolos);
 
 /*Inserta una clase en el gafo*/
-void nuevaClase(simbolos_p simbolos, node_p* parents, int numparents, char* name);
+void nuevaClase(simbolos_p simbolos, char** parents, int numparents, char* name);
 
 /*Inserta un simbolo en una clase concreta*/
 void nuevoSimboloEnClase(simbolos_p simbolos, char* nombre_clase, char* simbolo_a_insertar, int ambito);
 
 /*Comprueba si un simbolo esta en una clase*/
-void checkSimboloEnClase(simbolos_p simbolos, char* nombre_clase, char* simbolo_a_comprobar, int ambito);
+int checkSimboloEnClase(simbolos_p simbolos, char* nombre_clase, char* simbolo_a_comprobar, int ambito);
 
+/*Crea la tabla local*/
+void iniciaLocal(simbolos_p simbolos, char* nombre);
+
+/*Elimina la tabla local*/
+void eliminaLocal(simbolos_p simbolos);
+
+/*Crea la tabla local de una clase*/
+void iniciaLocalEnClase(simbolos_p simbolos, char* nombre_clase, char* nombre);
+
+/*Elimina la tabla local de una clase*/
+void eliminaLocalEnClase(simbolos_p simbolos, char* nombre_clase);
+
+/*Devuelve todos los simbolos de main*/
+char** getSimbolos(simbolos_p simbolos, int ambito);
+
+/*Devuelve todos los simbolos en una clase*/
+char** getSimbolosEnClase(simbolos_p simbolos, char* nombre_clase, int ambito);
 #endif // TABLA_SIMBOLOS_CLASES_H

@@ -123,7 +123,7 @@ void destroyGraph(graph_p graph)
     }
 }
 
-node_p addNode(graph_t *graph, node_p* node_parents, int numparents, char* name, char* content)
+node_p addNode(graph_t *graph, node_p* node_parents, int numparents, char* name)
 {
     adjlist_p parents; /*Parents list*/
     adjlist_p children; /*Children list*/
@@ -176,7 +176,6 @@ node_p addNode(graph_t *graph, node_p* node_parents, int numparents, char* name,
 
     /*Filling the new node*/
     strcpy(new_node->name, name);
-    strcpy(new_node->content, content);
     new_node -> parents = parents;
     new_node -> children = children;
     new_node -> principal = ht_new(name);

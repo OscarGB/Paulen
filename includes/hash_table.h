@@ -19,10 +19,17 @@ void ht_insert(hash_table_p ht, char* key, void* value);
 /* Search for a *key* in *ht* and return its *value* */
 void* ht_search(hash_table_p ht, char* key);
 
+/*Checks if a key is present in the hash table*/
+int ht_isin(hash_table_p ht, char* key);
+
 /* Delete a *key* from *ht* */
 void ht_delete(hash_table_p h, char* key);
 
 /* Prints a hash table */
 void ht_print_table(hash_table_p ht);
+
+/*Gets all keys, REMEMBER to free keys but not the items inside
+last pointer is NULL*/
+char** ht_get_keys(hash_table_p ht);
 
 #endif // HASH_H

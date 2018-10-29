@@ -14,7 +14,6 @@ typedef struct adjlist adjlist_t, *adjlist_p;
 typedef struct node
 {
     char name[20];    /*Name of the node*/
-    char content[20]; /*Node content*/
     char** padres;  /*Name of the parents in order of creation (newest to oldest)*/
     adjlist_p parents; /*List of parents*/
     adjlist_p children; /*List of children*/
@@ -52,7 +51,7 @@ typedef struct graph_t
 
 graph_p createGraph();
 
-node_p addNode(graph_t *graph, node_p* parents, int numparents, char* name, char* content);
+node_p addNode(graph_t *graph, node_p* parents, int numparents, char* name);
 
 void destroyGraph(graph_p graph);
 
