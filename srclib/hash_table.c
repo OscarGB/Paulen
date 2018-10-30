@@ -119,7 +119,6 @@ static void ht_resize(ht_hash_table* ht, int base_size) {
 
 /* Resize to double the size of *ht* */
 static void ht_resize_up(ht_hash_table* ht) {
-	
 	int new_size = ht->base_size * 2;
 	ht_resize(ht, new_size);
 	
@@ -169,12 +168,12 @@ void ht_insert(hash_table_p ht, char* key, void* value) {
 		cur_item = ht->items[index];
 		i++;
 	}
+	ht->items[index] = item;
+	ht->count++;
 	int load = ht->count * 100 / ht->size;
 	if (load > 70) {
 		ht_resize_up(ht);
 	}
-	ht->items[index] = item;
-	ht->count++;
 	
 }
 
@@ -235,6 +234,9 @@ void ht_delete(hash_table_p ht, char* key) {
 
 /* Prints a *ht* */
 void ht_print_table(hash_table_p ht){
+	if(!ht){
+		printf("La tabla es NULL\n");
+	}
 	for(int i = 0; i < ht->size; i++){
 		ht_item*  item = ht->items[i];
 		if(item == &HT_DELETED_ITEM){

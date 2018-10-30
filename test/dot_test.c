@@ -10,6 +10,11 @@ int main(){
 	char str[20];
 	char name[5];
 
+	// nuevaClase(simbol, NULL, 0, "a");
+	// nuevaClase(simbol, NULL, 0, "b");
+	// nuevaClase(simbol, NULL, 0, "c");
+
+
 	strcpy(name, "a");
 	a = addNode(simbol->graph, NULL, 0, name);
 
@@ -43,6 +48,8 @@ int main(){
 	list[0] = e;
 	strcpy(name, "f");
 	addNode(simbol->graph, list, 1, name);
+
+	nuevoSimboloEnClase(simbol, "a", "sim1", PRINCIPAL);
 
 	tablaSimbolosClasesToDot(simbol);
 

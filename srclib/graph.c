@@ -188,7 +188,7 @@ node_p addNode(graph_t *graph, node_p* node_parents, int numparents, char* name)
     new_node -> parents = parents;
     new_node -> children = children;
     new_node -> principal = ht_new(name);
-    new_node -> local = NULL;
+    new_node -> local = ht_new("temporal");
     
     char* nombres_padres[numparents];
     for(i = 0; i < numparents;i++){
@@ -351,6 +351,8 @@ node_p searchNode(graph_p graph, char* key){
 
 hash_table_p getHT(graph_p graph, char* key, int tipo){
     node_p node = searchNode(graph, key);
+    printf("%s\n", node->name);
+    // ht_print_table(node->principal);
     if(tipo == PRINCIPAL)
         return node->principal;
     else{

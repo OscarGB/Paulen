@@ -96,7 +96,7 @@ void printLinearGraph(FILE * file, graph_p graph){
 
 		node_name = current->node->name;
 
-		fprintf(file, "\t%s [label=\"%s\"][shape=oval];\n", node_name, node_name);
+		fprintf(file, "\t%sL [label=\"%s\"][shape=oval];\n", node_name, node_name);
 
 		current = next;
 		if(current)
@@ -113,7 +113,7 @@ void printLinearGraph(FILE * file, graph_p graph){
 		node_name = current->node->name;
 		next_name = next->node->name;
 
-		fprintf(file, "\t%s -> %s;\n", node_name, next_name);
+		fprintf(file, "\t%sL -> %sL;\n", node_name, next_name);
 
 		current = next;
 		next = current->next;
@@ -143,6 +143,11 @@ void printDiagram(FILE * file, graph_p graph, simbolos_p tabla_simbolos) {
 
 		printf("Nodo:\n");
 		printf("%s\n", node_name);
+
+		ht_print_table(graph->nodes_hash_table);
+		node_p n = ht_search(graph->nodes_hash_table, "f");
+		printf("%s\n", n->name);
+
 
 		simbolos_clase = getSimbolosEnClase(tabla_simbolos, node_name, PRINCIPAL);
 		i = 0;

@@ -1,2 +1,26 @@
 digraph Test_graph { rankdir=BT; 
 	edge [arrowhead = empty]
+	f [label="{f|f}"][shape=record];
+	e [label="{e|e}"][shape=record];
+	d [label="{d|d}"][shape=record];
+	c [label="{c|c}"][shape=record];
+	b [label="{b|b}"][shape=record];
+	a [label="{a|a\lsim1}"][shape=record];
+	f -> e;
+	e -> c;
+	e -> b;
+	d -> b;
+	d -> a;
+	edge [arrowhead = normal]
+	fL [label="f"][shape=oval];
+	eL [label="e"][shape=oval];
+	dL [label="d"][shape=oval];
+	cL [label="c"][shape=oval];
+	bL [label="b"][shape=oval];
+	aL [label="a"][shape=oval];
+	fL -> eL;
+	eL -> dL;
+	dL -> cL;
+	cL -> bL;
+	bL -> aL;
+}
