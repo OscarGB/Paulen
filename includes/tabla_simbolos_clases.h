@@ -21,7 +21,7 @@ typedef struct _simbolos
 }simbolos_t, *simbolos_p;
 
 /*Crea la estructura y reserva toda la memoria necesaria*/
-simbolos_p createSimbolos();
+simbolos_p createSimbolos(char* graph_name);
 
 /*Elimina la estructura y libera toda la memoria ocupada*/
 void eliminaSimbolos(simbolos_p simbolos);
@@ -52,4 +52,8 @@ char** getSimbolos(simbolos_p simbolos, int ambito);
 
 /*Devuelve todos los simbolos en una clase*/
 char** getSimbolosEnClase(simbolos_p simbolos, char* nombre_clase, int ambito);
+
+/*Crea un fichero .dot con el nombre del grafo*/
+simbolos_p tablaSimbolosClasesToDot(simbolos_p tabla_simbolos);
+
 #endif // TABLA_SIMBOLOS_CLASES_H

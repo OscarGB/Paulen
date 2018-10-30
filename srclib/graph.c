@@ -5,11 +5,14 @@
 #include "padres.h"
 
 /* Function to create a graph with n vertices; Creates both directed and undirected graphs*/
-graph_p createGraph()
+graph_p createGraph(char* input)
 {
+
+
     graph_p graph = (graph_p)malloc(sizeof(graph_t));
-    if(!graph)
+    if(!graph) {
         exit(1);
+    }
     graph->num_nodes = 0;
     graph->nodes_list = (adjlist_p)malloc(sizeof(adjlist_t));
     if(!graph->nodes_list){
@@ -17,7 +20,12 @@ graph_p createGraph()
         exit(1);
     }
 
+    graph->name = (char*)malloc(strlen(input)*sizeof(char)+1);
+
+    strcpy(graph->name, input);
+
     if(!(graph->nodes_hash_table = ht_new(""))){
+        free(graph->name);
         free(graph->nodes_list);
         free(graph);
         exit(1);
@@ -59,8 +67,8 @@ void destroyAdjList(adjlist_p list)
             destroyNode(elem->node);
         }
         free(elem);
-        free(list);
     }
+    free(list);
 }
 
 void destroyRelatives(adjlist_p list){
@@ -119,6 +127,7 @@ void destroyGraph(graph_p graph)
         }
         ht_del_hash_table(graph->nodes_hash_table);
         /*Free the graph*/
+        free(graph->name);
         free(graph);
     }
 }
@@ -186,6 +195,7 @@ node_p addNode(graph_t *graph, node_p* node_parents, int numparents, char* name)
         nombres_padres[i] = node_parents[i]->name;
     }
     new_node-> padres = get_padres(graph, nombres_padres, numparents);
+    new_node->numparents = numparents;
 
     /*Adding the node to the graph*/
     graph_element -> node = new_node;
@@ -262,7 +272,7 @@ node_p addNode(graph_t *graph, node_p* node_parents, int numparents, char* name)
     else {
         aux = graph->nodes_list->head;
         graph->nodes_list->head = graph_element;
-        graph_element -> next = aux;
+        graph->nodes_list->head->next = aux;
         aux -> prev = graph_element;
         graph -> nodes_list -> num_members ++;
     }
@@ -358,3 +368,4 @@ void deleteHTLocal(graph_p graph, char* key, char* name){
     ht_del_hash_table(node->local);
     node -> local = NULL;
 }
+

@@ -1,0 +1,2 @@
+digraph Test_graph { rankdir=BT; 
+	edge [arrowhead = empty]

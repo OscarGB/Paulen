@@ -19,6 +19,7 @@ typedef struct node
     adjlist_p children; /*List of children*/
     hash_table_p local; /*Tabla simbolos local*/
     hash_table_p principal; /*Tabla simbolos principal*/
+    int numparents;
 }node_t, *node_p;
 
 typedef struct list_elem list_elem_t, *list_elem_p;
@@ -46,10 +47,11 @@ typedef struct graph_t
     int num_nodes;         /*Number of vertices*/
     adjlist_t *nodes_list;     /*List with all the nodes*/
     hash_table_p nodes_hash_table;  /*Hash table for node access*/
+    char* name;
     
 }graph_t, *graph_p;
 
-graph_p createGraph();
+graph_p createGraph(char* name);
 
 node_p addNode(graph_t *graph, node_p* parents, int numparents, char* name);
 

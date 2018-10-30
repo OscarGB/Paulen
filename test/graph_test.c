@@ -10,15 +10,15 @@ int main(){
 	char str[20];
 	char name[5];
 
-	graph = createGraph();
+	graph = createGraph("grafo 1");
 
-	printf("Graph created. Displaying...\n");
+	printf("Graph %s created. Displaying...\n", graph->name);
 
 	displayGraph(graph);
 	/*Adding some nodes without parents*/
 	strcpy(name, "a");
 	a = addNode(graph, NULL, 0, name);
-;
+
 	strcpy(name, "b");
 	b = addNode(graph, NULL, 0, name);
 	
