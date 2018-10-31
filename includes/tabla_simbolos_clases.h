@@ -42,7 +42,14 @@ void iniciaLocal(simbolos_p simbolos, char* nombre);
 void eliminaLocal(simbolos_p simbolos);
 
 /*Crea la tabla local de una clase*/
-void iniciaLocalEnClase(simbolos_p simbolos, char* nombre_clase, char* nombre);
+void iniciaLocalEnClase(simbolos_p simbolos,
+						char* nombre_clase, 
+						char* nombre_ambito,
+						int categoria_ambito,
+						int acceso_metodo,
+						int tipo_metodo,
+						int posicion_metodo_sobre,
+						int tamanio);
 
 /*Elimina la tabla local de una clase*/
 void eliminaLocalEnClase(simbolos_p simbolos, char* nombre_clase);
@@ -55,5 +62,20 @@ char** getSimbolosEnClase(simbolos_p simbolos, char* nombre_clase, int ambito);
 
 /*Crea un fichero .dot con el nombre del grafo*/
 simbolos_p tablaSimbolosClasesToDot(simbolos_p tabla_simbolos);
+
+/*Cierra una clase*/
+void cerrarClase(simbolos_p simbolos,
+				char* name, 
+				int n_atributos_clase, 
+				int n_atributos_instancia,
+				int num_metodos_sobreescribibles,
+				int num_metodos_no_sobreescribibles);
+
+/*Cierra el ambito local de una clase
+tablaSimbolosClasesCerrarAmbitoEnClase()*/
+void cerrarLocalEnClase(simbolos_p simbolos, char* nombre_clase);
+
+/*Cierra la tabla*/
+void cerrarTablaSimbolosClases(simbolos_p simbolos);
 
 #endif // TABLA_SIMBOLOS_CLASES_H

@@ -1,7 +1,9 @@
 #include "tabla_simbolos_clases.h"
+#include "simbolo.h"
 #include <string.h>
 
-/*Crea la estructura y reserva toda la memoria necesaria*/
+/*Crea la estructura y reserva toda la memoria necesaria
+iniciarTablasSimbolosClases()*/
 simbolos_p createSimbolos(char* name){
 	simbolos_p sim = (simbolos_p)malloc(sizeof(simbolos_t));
 	sim->graph = createGraph(name);
@@ -19,7 +21,8 @@ void eliminaSimbolos(simbolos_p simbolos){
 	free(simbolos);
 }
 
-/*Inserta una clase en el gafo*/
+/*Inserta una clase en el gafo
+abrirClase() y abrirClaseHeredaN(), para una clase que no hereda, poner numparents a 0 y parents a NULL*/
 void nuevaClase(simbolos_p simbolos, char** parents, int numparents, char* name){
 	node_p padres[numparents];
 	for(int i = 0; i<numparents;i++){
@@ -28,10 +31,81 @@ void nuevaClase(simbolos_p simbolos, char** parents, int numparents, char* name)
 	addNode(simbolos->graph, padres, numparents, name);
 }
 
+/*Cierra una clase*/
+void cerrarClase(simbolos_p simbolos,
+				char* name, 
+				int n_atributos_clase, 
+				int n_atributos_instancia,
+				int num_metodos_sobreescribibles,
+				int num_metodos_no_sobreescribibles){
+	/*-------------------------------------------------------------------------------------------------------TODO*/
+	return;
+}
+
+/*Cierra el ambito local de una clase
+tablaSimbolosClasesCerrarAmbitoEnClase()*/
+void cerrarLocalEnClase(simbolos_p simbolos, char* nombre_clase){
+	eliminaLocalEnClase(simbolos, nombre_clase);
+}
+
 /*Inserta un simbolo en una clase concreta*/
 void nuevoSimboloEnClase(simbolos_p simbolos, char* nombre_clase, char* simbolo_a_insertar, int ambito){
 	hash_table_p h = getHT(simbolos->graph, nombre_clase, ambito);
 	ht_insert(h, simbolo_a_insertar, NULL);
+}
+
+/*Inserta un simbolo en el main
+insertarTablaSimbolosAmbitos()*/
+void nuevoSimboloEnMain(simbolos_p simbolos, char* simbolo_a_insertar,  
+	int clase,
+	int tipo,                        int estructura,
+	int direcciones,                    int numero_parametros,
+	int numero_variables_locales,        int posicion_variable_local,
+	int posicion_parametro,            int dimension,
+	int tamanio,                    int filas,
+	int columnas,                    int capacidad,
+	int numero_atributos_clase,            int numero_atributos_instancia,
+	int numero_metodos_sobreescribibles,    int numero_metodos_no_sobreescribibles,
+	int tipo_acceso,                  int tipo_miembro, 
+	int posicion_atributo_instancia,        int posicion_metodo_sobreescribible,
+	int num_acumulado_atributos_instancia,    int num_acumulado_metodos_sobreescritura,
+	int posicion_acumulada_atributos_instancia,
+	int posicion_acumulada_metodos_sobreescritura,
+	int * tipo_args
+){
+	simbolo_p s = createSimbolo(simbolo_a_insertar,
+								clase,
+								tipo,
+								estructura,
+								direcciones,
+								numero_parametros,
+								numero_variables_locales,
+								posicion_variable_local,
+								posicion_parametro,
+								dimension,
+								tamanio,
+								filas,
+								columnas,
+								capacidad,
+								numero_atributos_clase,
+								numero_atributos_instancia,
+								numero_metodos_sobreescribibles,
+								numero_metodos_no_sobreescribibles,
+								tipo_acceso,
+								tipo_miembro, 
+								posicion_atributo_instancia,
+								posicion_metodo_sobreescribible,
+								num_acumulado_atributos_instancia,
+								num_acumulado_metodos_sobreescritura,
+								posicion_acumulada_atributos_instancia,
+								posicion_acumulada_metodos_sobreescritura,
+								tipo_args);
+	if(simbolos->main_local != NULL){
+		ht_insert(simbolos->main_local, simbolo_a_insertar, s);
+	}
+	else{
+		ht_insert(simbolos->main_principal, simbolo_a_insertar, s);
+	}
 }
 
 /*Comprueba si un simbolo esta en una clase*/
@@ -40,7 +114,8 @@ int checkSimboloEnClase(simbolos_p simbolos, char* nombre_clase, char* simbolo_a
 	return ht_isin(h, simbolo_a_comprobar);
 }
 
-/*Crea la tabla local*/
+/*Crea la tabla local
+abrirAmbitoClase()*/
 void iniciaLocal(simbolos_p simbolos, char* nombre){
 	if(simbolos->main_local) ht_del_hash_table(simbolos->main_local);
 	simbolos->main_local = ht_new(nombre);
@@ -52,18 +127,22 @@ void eliminaLocal(simbolos_p simbolos){
 	simbolos->main_local = NULL;
 }
 
-/*Crea la tabla local de una clase*/
-void iniciaLocalEnClase(simbolos_p simbolos, char* nombre_clase, char* nombre){
-	hash_table_p h = getHT(simbolos->graph, nombre_clase, LOCAL);
-	if(h) ht_del_hash_table(h);
-	h = ht_new(nombre);
+/*Crea la tabla local de una clase
+tablaSimbolosClasesAbrirAmbitoEnClase()*/
+void iniciaLocalEnClase(simbolos_p simbolos,
+						char* nombre_clase, 
+						char* nombre_ambito,
+						int categoria_ambito,
+						int acceso_metodo,
+						int tipo_metodo,
+						int posicion_metodo_sobre,
+						int tamanio){
+	createHTLocal(simbolos->graph, nombre_clase, nombre_ambito);
 }
 
 /*Elimina la tabla local de una clase*/
 void eliminaLocalEnClase(simbolos_p simbolos, char* nombre_clase){
-	hash_table_p h = getHT(simbolos->graph, nombre_clase, LOCAL);
-	if(h) ht_del_hash_table(h);
-	h = NULL;
+	deleteHTLocal(simbolos->graph, nombre_clase);
 }
 
 /*Devuelve todos los simbolos de main*/
@@ -219,4 +298,8 @@ simbolos_p tablaSimbolosClasesToDot(simbolos_p tabla_simbolos){
 	free(file);
 
 	return NULL;
+}
+
+void cerrarTablaSimbolosClases(simbolos_p simbolos){
+	return;
 }

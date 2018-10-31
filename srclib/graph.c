@@ -360,10 +360,11 @@ hash_table_p getHT(graph_p graph, char* key, int tipo){
 
 void createHTLocal(graph_p graph, char* key, char* name){
     node_p node = searchNode(graph, key);
+    if(node->local) ht_del_hash_table(node->local); //En principio no seria necesario
     node -> local = ht_new(name);
 }
 
-void deleteHTLocal(graph_p graph, char* key, char* name){
+void deleteHTLocal(graph_p graph, char* key){
     node_p node = searchNode(graph, key);
     ht_del_hash_table(node->local);
     node -> local = NULL;

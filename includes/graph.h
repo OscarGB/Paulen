@@ -67,6 +67,6 @@ hash_table_p getHT(graph_p graph, char* key, int tipo);
 
 void createHTLocal(graph_p graph, char* key, char* name);
 
-void deleteHTLocal(graph_p graph, char* key, char* name);
+void deleteHTLocal(graph_p graph, char* key);
 
 #endif
