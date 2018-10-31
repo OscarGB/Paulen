@@ -39,11 +39,13 @@ INC = $(shell find $(INCDIR) -name '*.h' -printf "%P\n" | xargs)
 
 # Lista de ejecutables a compilar
 EXE_AUX = $(shell find $(SRCDIR) -name '*.c' -printf "%P\n" | xargs)
-EXE = $(EXE_AUX:.c=) 
+EXE_AUX2 = $(EXE_AUX:.c=) 
+EXE = $(addprefix $(EXECDIR), $(EXE_AUX2))
 
 # Lista de ejecutables de pruebas
 TEST_AUX = $(shell find $(TESTDIR) -name '*.c' -printf "%P\n" | xargs)
-TEST = $(TEST_AUX:.c=)
+TEST_AUX2 = $(TEST_AUX:.c=)
+TEST = $(addprefix $(EXECDIR), $(TEST_AUX2))
 
 # Nombres de las dependencias
 LIBS_AUX = $(shell find $(SRCLIBDIR) -name '*.c' -printf "%P\n" | xargs)
@@ -64,27 +66,27 @@ CLIBS = $(addprefix $(LIBDIR), $(LIBS))
 CFLEX = $(addprefix $(FLEXDIR), $(FLEX))
 
 # Realiza todas las acciones
-all: flex libs test exec
+all: flex test exec
 
 # Compila solo los ejecutables principales
-exec: flex libs $(EXE)
+exec: flex $(EXE)
 
 # Compila las librerias propias
 libs: cleanlibs flex $(CLIBS) $(FLEXC)	
 
 # Compila los ejecutables de test
-test: flex libs $(TEST)
+test: flex $(TEST)
 
 # Trata los elementos flex
-flex: $(CFLEX)
+flex: $(CFLEX) $(FLEXC)
 
 # Compilacion de ejecutables
-% : %.c $(CLIBS)
+$(EXECDIR)% : %.c $(CLIBS)
 	@echo Creando el ejecutable $@
 	@ if grep -q -E 'yylex|yyparse' $<; then\
-		$(CC) $(CFLAGS) $^ $(FLEXC) -o $(EXECDIR)$@ $(CFLAGS);\
+		$(CC) $(CFLAGS) $^ $(FLEXC) -o $@ $(CFLAGS);\
       else\
-        $(CC) $(CFLAGS) $^ -o $(EXECDIR)$@ $(CFLAGS);\
+        $(CC) $(CFLAGS) $^ -o $@ $(CFLAGS);\
       fi
 	@echo $(GREEN)[OK]$(NC)
 

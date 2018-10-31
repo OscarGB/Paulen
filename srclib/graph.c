@@ -351,8 +351,6 @@ node_p searchNode(graph_p graph, char* key){
 
 hash_table_p getHT(graph_p graph, char* key, int tipo){
     node_p node = searchNode(graph, key);
-    printf("%s\n", node->name);
-    // ht_print_table(node->principal);
     if(tipo == PRINCIPAL)
         return node->principal;
     else{

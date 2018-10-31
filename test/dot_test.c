@@ -4,25 +4,16 @@
 #include <string.h>
 
 int main(){
+	int i;
 	simbolos_p simbol = createSimbolos("Test_graph");
-	node_p a, b, c, e;
-	node_p list[5];
-	char str[20];
-	char name[5];
+	char **padres = (char**)malloc(sizeof(char*)*5);
+	for (i = 0; i < 5; i++){
+		padres[i] = (char*) malloc(sizeof(char)*10);
+	}
 
-	// nuevaClase(simbol, NULL, 0, "a");
-	// nuevaClase(simbol, NULL, 0, "b");
-	// nuevaClase(simbol, NULL, 0, "c");
-
-
-	strcpy(name, "a");
-	a = addNode(simbol->graph, NULL, 0, name);
-
-	strcpy(name, "b");
-	b = addNode(simbol->graph, NULL, 0, name);
-	
-	strcpy(name, "c");
-	c = addNode(simbol->graph, NULL, 0, name);
+	nuevaClase(simbol, NULL, 0, "a");
+	nuevaClase(simbol, NULL, 0, "b");
+	nuevaClase(simbol, NULL, 0, "c");
 
 	/*Adding children*/
 	/*
@@ -37,23 +28,31 @@ int main(){
 	c
 	*/
 
-	list[0] = b;
-	list[1] = a;
-	strcpy(name, "d");
-	addNode(simbol->graph, list, 2, name);
-	list[0] = b;
-	list[1] = c;
-	strcpy(name, "e");
-	e = addNode(simbol->graph, list, 2, name);
-	list[0] = e;
-	strcpy(name, "f");
-	addNode(simbol->graph, list, 1, name);
+	strcpy(padres[0],"b");
+	strcpy(padres[1],"a");
+	nuevaClase(simbol, padres, 2, "d");
 
-	nuevoSimboloEnClase(simbol, "a", "sim1", PRINCIPAL);
+	strcpy(padres[0],"b");
+	strcpy(padres[1],"c");
+	nuevaClase(simbol, padres, 2, "e");
+
+	strcpy(padres[0],"e");
+	nuevaClase(simbol, padres, 1, "f");
+
+	nuevoSimboloEnClase(simbol, "a", "sim a1", PRINCIPAL);
+	nuevoSimboloEnClase(simbol, "b", "sim b1", PRINCIPAL);
+	nuevoSimboloEnClase(simbol, "c", "sim c1", PRINCIPAL);
+	nuevoSimboloEnClase(simbol, "d", "sim d1", PRINCIPAL);
+	nuevoSimboloEnClase(simbol, "e", "sim e1", PRINCIPAL);
+	nuevoSimboloEnClase(simbol, "f", "sim f1", PRINCIPAL);
 
 	tablaSimbolosClasesToDot(simbol);
 
 	eliminaSimbolos(simbol);
+
+	for (i = 0; i < 5; i++){
+		free(padres[i]);
+	}
 
 	return 0;
 }

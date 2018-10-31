@@ -22,7 +22,7 @@ void eliminaSimbolos(simbolos_p simbolos){
 /*Inserta una clase en el gafo*/
 void nuevaClase(simbolos_p simbolos, char** parents, int numparents, char* name){
 	node_p padres[numparents];
-	for(int i; i<numparents;i++){
+	for(int i = 0; i<numparents;i++){
 		padres[i] = searchNode(simbolos->graph, parents[i]);
 	}
 	addNode(simbolos->graph, padres, numparents, name);
@@ -140,14 +140,6 @@ void printDiagram(FILE * file, graph_p graph, simbolos_p tabla_simbolos) {
 	while(current) {
 
 		node_name = current->node->name;
-
-		printf("Nodo:\n");
-		printf("%s\n", node_name);
-
-		ht_print_table(graph->nodes_hash_table);
-		node_p n = ht_search(graph->nodes_hash_table, "f");
-		printf("%s\n", n->name);
-
 
 		simbolos_clase = getSimbolosEnClase(tabla_simbolos, node_name, PRINCIPAL);
 		i = 0;
