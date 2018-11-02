@@ -295,3 +295,8 @@ char** ht_get_keys(hash_table_p ht){
 	keys[j] = NULL;
 	return keys;
 }
+
+/*Gets the nae of the hash_table*/
+char* ht_get_name(hash_table_p ht){
+	return ht->name;
+}

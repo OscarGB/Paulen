@@ -1,5 +1,6 @@
 #include "tabla_simbolos_clases.h"
 #include "simbolo.h"
+#include "hash_table.h"
 #include <string.h>
 
 /*Crea la estructura y reserva toda la memoria necesaria
@@ -16,6 +17,45 @@ simbolos_p createSimbolos(char* name){
 /*Elimina la estructura y libera toda la memoria ocupada*/
 void eliminaSimbolos(simbolos_p simbolos){
 	if(simbolos->main_local) ht_del_hash_table(simbolos->main_local);
+	char** keys;
+	int i;
+	list_elem_p lelem = simbolos->graph->nodes_list->head;
+	while(lelem != NULL){
+		if(lelem->node->local != NULL){
+			keys =  ht_get_keys(lelem->node->local);
+			i = 0;
+			while(keys[i] != NULL){
+				eliminaSimbolo(ht_search(lelem->node->local, keys[i]));
+				i++;
+			}
+			free(keys);
+		}
+		keys =  ht_get_keys(lelem->node->principal);
+		i = 0;
+		while(keys[i] != NULL){
+			eliminaSimbolo(ht_search(lelem->node->principal, keys[i]));
+			i++;
+		}
+		free(keys);
+		lelem=lelem->next;
+	}
+	if(simbolos->main_local != NULL){
+		keys =  ht_get_keys(simbolos->main_local);
+		i = 0;
+		while(keys[i] != NULL){
+			eliminaSimbolo(ht_search(simbolos->main_local, keys[i]));
+			i++;
+		}
+		free(keys);
+	}
+	keys =  ht_get_keys(simbolos->main_principal);
+	i = 0;
+	while(keys[i] != NULL){
+		eliminaSimbolo(ht_search(simbolos->main_principal, keys[i]));
+		i++;
+	}
+	free(keys);
+
 	ht_del_hash_table(simbolos->main_principal);
 	destroyGraph(simbolos->graph);
 	free(simbolos);
@@ -49,13 +89,63 @@ void cerrarLocalEnClase(simbolos_p simbolos, char* nombre_clase){
 }
 
 /*Inserta un simbolo en una clase concreta*/
-void nuevoSimboloEnClase(simbolos_p simbolos, char* nombre_clase, char* simbolo_a_insertar, int ambito){
-	hash_table_p h = getHT(simbolos->graph, nombre_clase, ambito);
-	ht_insert(h, simbolo_a_insertar, NULL);
+/*TODO falta el prefijo de clase*/
+void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,  
+	char* nombre_clase, 			int clase,
+	int tipo,                        int estructura,
+	int direcciones,                    int numero_parametros,
+	int numero_variables_locales,        int posicion_variable_local,
+	int posicion_parametro,            int dimension,
+	int tamanio,                    int filas,
+	int columnas,                    int capacidad,
+	int numero_atributos_clase,            int numero_atributos_instancia,
+	int numero_metodos_sobreescribibles,    int numero_metodos_no_sobreescribibles,
+	int tipo_acceso,                  int tipo_miembro, 
+	int posicion_atributo_instancia,        int posicion_metodo_sobreescribible,
+	int num_acumulado_atributos_instancia,    int num_acumulado_metodos_sobreescritura,
+	int posicion_acumulada_atributos_instancia,
+	int posicion_acumulada_metodos_sobreescritura,
+	int * tipo_args
+){
+	simbolo_p s = createSimbolo(simbolo_a_insertar,
+								clase,
+								tipo,
+								estructura,
+								direcciones,
+								numero_parametros,
+								numero_variables_locales,
+								posicion_variable_local,
+								posicion_parametro,
+								dimension,
+								tamanio,
+								filas,
+								columnas,
+								capacidad,
+								numero_atributos_clase,
+								numero_atributos_instancia,
+								numero_metodos_sobreescribibles,
+								numero_metodos_no_sobreescribibles,
+								tipo_acceso,
+								tipo_miembro, 
+								posicion_atributo_instancia,
+								posicion_metodo_sobreescribible,
+								num_acumulado_atributos_instancia,
+								num_acumulado_metodos_sobreescritura,
+								posicion_acumulada_atributos_instancia,
+								posicion_acumulada_metodos_sobreescritura,
+								tipo_args);
+	node_p node = searchNode(simbolos->graph, nombre_clase);
+	if(node->local != NULL){
+		ht_insert(node->local, simbolo_a_insertar, s);
+	}
+	else{
+		ht_insert(node->principal, simbolo_a_insertar, s);
+	}
 }
 
 /*Inserta un simbolo en el main
 insertarTablaSimbolosAmbitos()*/
+/*TODO falta el prefijo de clase*/
 void nuevoSimboloEnMain(simbolos_p simbolos, char* simbolo_a_insertar,  
 	int clase,
 	int tipo,                        int estructura,
@@ -109,6 +199,7 @@ void nuevoSimboloEnMain(simbolos_p simbolos, char* simbolo_a_insertar,
 }
 
 /*Comprueba si un simbolo esta en una clase*/
+/*TODO falta el prefijo de clase*/
 int checkSimboloEnClase(simbolos_p simbolos, char* nombre_clase, char* simbolo_a_comprobar, int ambito){
 	hash_table_p h = getHT(simbolos->graph, nombre_clase, ambito);
 	return ht_isin(h, simbolo_a_comprobar);
@@ -123,8 +214,20 @@ void iniciaLocal(simbolos_p simbolos, char* nombre){
 
 /*Elimina la tabla local*/
 void eliminaLocal(simbolos_p simbolos){
+	char **keys =  ht_get_keys(simbolos->main_local);
+	int i = 0;
+	while(keys[i] != NULL){
+		eliminaSimbolo(ht_search(simbolos->main_local, keys[i]));
+		i++;
+	}
+	free(keys);
 	if(simbolos->main_local) ht_del_hash_table(simbolos->main_local);
 	simbolos->main_local = NULL;
+}
+
+/*Cierra local del main*/
+void cerrarLocal(simbolos_p simbolos){
+	eliminaLocal(simbolos);
 }
 
 /*Crea la tabla local de una clase
@@ -135,13 +238,20 @@ void iniciaLocalEnClase(simbolos_p simbolos,
 						int categoria_ambito,
 						int acceso_metodo,
 						int tipo_metodo,
-						int posicion_metodo_sobre,
-						int tamanio){
+						int posicion_metodo_sobre){
 	createHTLocal(simbolos->graph, nombre_clase, nombre_ambito);
 }
 
 /*Elimina la tabla local de una clase*/
 void eliminaLocalEnClase(simbolos_p simbolos, char* nombre_clase){
+	node_p node = searchNode(simbolos->graph, nombre_clase);
+	char **keys =  ht_get_keys(node->local);
+	int i = 0;
+	while(keys[i] != NULL){
+		eliminaSimbolo(ht_search(node->local, keys[i]));
+		i++;
+	}
+	free(keys);
 	deleteHTLocal(simbolos->graph, nombre_clase);
 }
 
@@ -300,6 +410,130 @@ simbolos_p tablaSimbolosClasesToDot(simbolos_p tabla_simbolos){
 	return NULL;
 }
 
+/*Cierra la tabla de simbolos de clases*/
 void cerrarTablaSimbolosClases(simbolos_p simbolos){
 	return;
 }
+
+/*Comprueba los accesos de un simbolo concreto*/
+int aplicarAccesos(simbolos_p simbolos, char * clase_actual, 
+					char * clase_variable_encontrada, simbolo_p s){
+	// Caso MAIN
+	if(strcmp(clase_actual, "main") == 0){
+		if (s->tipo_acceso == HIDDEN) return ERROR;
+		else{
+			return OK;
+		}
+	}
+	else{ // Caso en una clase no main
+		if(s->tipo_acceso == HIDDEN){
+			if(strcmp(clase_actual, clase_variable_encontrada) == 0){
+				return OK; // En la propia clase
+			}
+			else{
+				return ERROR;
+			}
+		}
+		else if(s->tipo_acceso == EXPOSED){
+			return OK; // Si expuesto siempre OK
+		}
+		else if(s->tipo_acceso == SECRET){
+			node_p node = searchNode(simbolos->graph, clase_actual);
+			int i = 0;
+			while(node->padres[i] != NULL){
+                if(strcmp(clase_actual, node->padres[i]) == 0){
+                	return OK;
+                }
+                i++;
+            }
+            return ERROR;
+		}
+	}
+}
+
+/*Busca un simbolo en la jerarquia de clases*/
+/*TODO falta todo lo de los prefijos, esto es el esqueleto*/
+int buscarIdEnJerarquiaDesdeClase( simbolos_p simbolos, 
+									char * simbolo_a_buscar,
+                          			char * nombre_clase, 
+  									simbolo_p *s,
+  									char * nombre_ambito_encontrado){
+	node_p node = searchNode(simbolos->graph, nombre_clase);
+	if(node->local != NULL){
+		if(ht_isin(node->local, simbolo_a_buscar)){
+			*s = ht_search(node->local, simbolo_a_buscar);
+			strcpy(nombre_ambito_encontrado, ht_get_name(node->local));
+			return aplicarAccesos(simbolos, nombre_clase, nombre_ambito_encontrado, *s);
+		}
+	}
+	if(ht_isin(node->principal, simbolo_a_buscar)){
+		*s = ht_search(node->principal, simbolo_a_buscar);
+		strcpy(nombre_ambito_encontrado, nombre_clase);
+		return aplicarAccesos(simbolos, nombre_clase, nombre_clase, *s);
+	}
+	else{
+		int i = 0;
+		while(node->padres[i] != NULL){
+			node = searchNode(simbolos->graph, node->padres[i]);
+            if(ht_isin(node->principal, simbolo_a_buscar)){
+				*s = ht_search(node->principal, simbolo_a_buscar);
+				strcpy(nombre_ambito_encontrado, node->padres[i]);
+				return aplicarAccesos(simbolos, nombre_clase, node->padres[i], *s);
+			}
+			i++;
+        }
+        if(ht_isin(node->principal, simbolo_a_buscar)){
+			*s = ht_search(simbolos->main_principal, simbolo_a_buscar);
+			strcpy(nombre_ambito_encontrado, "main");
+			return aplicarAccesos(simbolos, nombre_clase, "main", *s);
+		}
+	}
+	return ERROR;
+}
+
+/*Busca un id no cualificado*/
+/*TODO falta todo lo de los prefijos, esto es el esqueleto*/
+int buscarIdNoCualificado(  simbolos_p simbolos,
+                     		char * nombre_simbolo, char * clase_actual,
+                    		simbolo_p * s, 
+							char * nombre_ambito_encontrado){
+	if(strcmp(clase_actual, "main") == 0){
+		if(simbolos->main_local != NULL){
+			if(ht_isin(simbolos->main_local, nombre_simbolo)){
+				*s = ht_search(simbolos->main_local, nombre_simbolo);
+				strcpy(nombre_ambito_encontrado, ht_get_name(simbolos->main_local));
+				return aplicarAccesos(simbolos, clase_actual, nombre_ambito_encontrado, *s);
+			}
+		}
+		if(ht_isin(simbolos->main_principal, nombre_simbolo)){
+			*s = ht_search(simbolos->main_principal, nombre_simbolo);
+			strcpy(nombre_ambito_encontrado, "main");
+			return aplicarAccesos(simbolos, clase_actual, "main", *s);
+		}
+		else{
+			list_elem_p lelem = simbolos->graph->nodes_list->head;
+			while(lelem != NULL){
+				if(ht_isin(lelem->node->principal, nombre_simbolo)){
+					*s = ht_search(lelem->node->principal, nombre_simbolo);
+					strcpy(nombre_ambito_encontrado, lelem->node->name);
+					return aplicarAccesos(simbolos, clase_actual, lelem->node->name, *s);
+				}
+				lelem=lelem->next;
+			}
+		}
+		return ERROR;
+	}
+	else{
+		if(OK == buscarIdEnJerarquiaDesdeClase(simbolos, nombre_simbolo, clase_actual, s, nombre_ambito_encontrado))
+			return OK;
+		else{
+			if(ht_isin(simbolos->main_principal, nombre_simbolo)){
+				*s = ht_search(simbolos->main_principal, nombre_simbolo);
+				strcpy(nombre_ambito_encontrado, "main");
+				return aplicarAccesos(simbolos, clase_actual, "main", *s);
+			}
+		}
+	}
+}
+
+

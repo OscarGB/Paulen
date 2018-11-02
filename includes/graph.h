@@ -1,19 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "hash_table.h"
+#include "macros.h"
 
 #ifndef _GRAPH_H_
 #define _GRAPH_H_
 
-#define LOCAL 0
-#define PRINCIPAL 1
+
 
 typedef struct adjlist adjlist_t, *adjlist_p;
 
 /* Node*/
 typedef struct node
 {
-    char name[20];    /*Name of the node*/
+    char name[100];    /*Name of the node*/
     char** padres;  /*Name of the parents in order of creation (newest to oldest)*/
     adjlist_p parents; /*List of parents*/
     adjlist_p children; /*List of children*/

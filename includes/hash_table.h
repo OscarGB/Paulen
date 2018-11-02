@@ -32,4 +32,7 @@ void ht_print_table(hash_table_p ht);
 last pointer is NULL*/
 char** ht_get_keys(hash_table_p ht);
 
+/*Gets the nae of the hash_table*/
+char* ht_get_name(hash_table_p ht);
+
 #endif // HASH_H

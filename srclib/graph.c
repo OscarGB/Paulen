@@ -44,29 +44,12 @@ void destroyAdjList(adjlist_p list)
 {
     list_elem_p elem = list->head;
     list_elem_p next = NULL;
-    int num = list->num_members;
 
-    if(elem)
-        next = elem -> next;
-
-    if(list -> num_members > 0){
-        while(next){
-            elem = next;
-            next = elem->next;
-        }
-
-        while(num > 0){
-            next = elem;
-            elem = next->prev;
-            if(next->node)
-                destroyNode(next->node);
-            free(next);
-            num--;
-        }
-        if(elem->node){
-            destroyNode(elem->node);
-        }
+    while(elem!=NULL){
+        next = elem->next;
+        destroyNode(elem->node);
         free(elem);
+        elem=next;
     }
     free(list);
 }
@@ -188,7 +171,7 @@ node_p addNode(graph_t *graph, node_p* node_parents, int numparents, char* name)
     new_node -> parents = parents;
     new_node -> children = children;
     new_node -> principal = ht_new(name);
-    new_node -> local = ht_new("temporal");
+    new_node -> local = NULL;
     
     char* nombres_padres[numparents];
     for(i = 0; i < numparents;i++){
