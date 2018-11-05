@@ -88,6 +88,37 @@ void cerrarLocalEnClase(simbolos_p simbolos, char* nombre_clase){
 	eliminaLocalEnClase(simbolos, nombre_clase);
 }
 
+
+/*Concatena el simbolo al nombre del ambito, con una _ en medio*/
+char * addPrefijo(char * nombre_ambito, char * simbolo) {
+	char* nombre_prefijo = NULL;
+	char * underscore = "_";
+
+	/*Reservamos memoria para el nombre del simbolo: clase_nombreSimbolo*/
+	nombre_prefijo = (char *)malloc(sizeof(char) * (strlen(nombre_ambito) + 1 + strlen(simbolo) + 1)); 
+	strcpy(nombre_prefijo, nombre_ambito);
+	strcat(nombre_prefijo, "_");
+	strcat(nombre_prefijo, simbolo);
+
+	return nombre_prefijo;
+}
+
+/*Crea el nombre de una funcion intercalando los parametros con @.
+El resultado debe concatenarse al resto del nombre (ambito + simbolo)
+Se reserva memoria*/
+char * crearNombreFuncion(char* simbolo_a_insertar, int num_parametros, int * tipo_args){
+	int i;
+	char buffer[2];
+	char * resultado = (char *)malloc(sizeof(char) * (strlen(simbolo_a_insertar) + num_parametros * 2 + 1));
+	strcpy(resultado, simbolo_a_insertar);
+	for(i = 0; i < num_parametros; i++){
+		strcat(resultado, "@");
+		sprintf(buffer, "%d", tipo_args[i]);
+		strcat(resultado, buffer);
+	}
+	return resultado;
+}
+
 /*Inserta un simbolo en una clase concreta*/
 /*TODO falta el prefijo de clase*/
 void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,  
@@ -107,7 +138,20 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 	int posicion_acumulada_metodos_sobreescritura,
 	int * tipo_args
 ){
-	simbolo_p s = createSimbolo(simbolo_a_insertar,
+	char * nombre_prefijo = NULL;
+	char * nombre_ambito = NULL;
+	node_p node = searchNode(simbolos->graph, nombre_clase);
+
+	/*Metemos los parametros de la funcion en el nombre del simbolo
+	ATENCION: sobreescribimos simbolo_a_insertar*/
+	if(tipo == FUNCION) {
+		simbolo_a_insertar = crearNombreFuncion(simbolo_a_insertar, numero_parametros, tipo_args);
+	}
+
+	nombre_ambito = getAmbito(node);
+
+	nombre_prefijo = addPrefijo(nombre_ambito, simbolo_a_insertar);
+	simbolo_p s = createSimbolo(nombre_prefijo,
 								clase,
 								tipo,
 								estructura,
@@ -134,13 +178,20 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 								posicion_acumulada_atributos_instancia,
 								posicion_acumulada_metodos_sobreescritura,
 								tipo_args);
-	node_p node = searchNode(simbolos->graph, nombre_clase);
+	/*Nuestro simbolo guarda una copia del nombre_prefijo con reserva*/
+
+
+
+
 	if(node->local != NULL){
-		ht_insert(node->local, simbolo_a_insertar, s);
+		ht_insert(node->local, nombre_prefijo, s);
 	}
 	else{
-		ht_insert(node->principal, simbolo_a_insertar, s);
+		ht_insert(node->principal, nombre_prefijo, s);
 	}
+	free(nombre_prefijo);
+	if(tipo == FUNCION)
+		free(simbolo_a_insertar);
 }
 
 /*Inserta un simbolo en el main
@@ -163,7 +214,26 @@ void nuevoSimboloEnMain(simbolos_p simbolos, char* simbolo_a_insertar,
 	int posicion_acumulada_metodos_sobreescritura,
 	int * tipo_args
 ){
-	simbolo_p s = createSimbolo(simbolo_a_insertar,
+	char * main_name = "main";
+	char * nombre_prefijo = NULL;
+	char * nombre_ambito = NULL;
+
+	/*Metemos los parametros de la funcion en el nombre del simbolo
+	ATENCION: sobreescribimos simbolo_a_insertar*/
+	if(tipo == FUNCION) {
+		simbolo_a_insertar = crearNombreFuncion(simbolo_a_insertar, numero_parametros, tipo_args);
+	}
+
+	if(simbolos->main_local) {
+		nombre_ambito = ht_get_name(simbolos->main_local);
+	}
+	else {
+		nombre_ambito = main_name;
+	}
+
+	nombre_prefijo = addPrefijo(nombre_ambito, simbolo_a_insertar);
+
+	simbolo_p s = createSimbolo(nombre_prefijo,
 								clase,
 								tipo,
 								estructura,
@@ -190,12 +260,18 @@ void nuevoSimboloEnMain(simbolos_p simbolos, char* simbolo_a_insertar,
 								posicion_acumulada_atributos_instancia,
 								posicion_acumulada_metodos_sobreescritura,
 								tipo_args);
+
+
+
 	if(simbolos->main_local != NULL){
-		ht_insert(simbolos->main_local, simbolo_a_insertar, s);
+		ht_insert(simbolos->main_local, nombre_prefijo, s);
 	}
 	else{
-		ht_insert(simbolos->main_principal, simbolo_a_insertar, s);
+		ht_insert(simbolos->main_principal, nombre_prefijo, s);
 	}
+	free(nombre_prefijo);
+	if(tipo == FUNCION)
+		free(simbolo_a_insertar);
 }
 
 /*Comprueba si un simbolo esta en una clase*/
@@ -458,35 +534,57 @@ int buscarIdEnJerarquiaDesdeClase( simbolos_p simbolos,
                           			char * nombre_clase, 
   									simbolo_p *s,
   									char * nombre_ambito_encontrado){
+	char * nombre_prefijo = NULL;
+	char * nombre_ambito = NULL;
+	char * main_name = "main";
 	node_p node = searchNode(simbolos->graph, nombre_clase);
 	if(node->local != NULL){
-		if(ht_isin(node->local, simbolo_a_buscar)){
-			*s = ht_search(node->local, simbolo_a_buscar);
-			strcpy(nombre_ambito_encontrado, ht_get_name(node->local));
+		nombre_ambito = getAmbito(node);
+		nombre_prefijo = addPrefijo(nombre_ambito, simbolo_a_buscar);
+		if(ht_isin(node->local, nombre_prefijo)){
+			*s = ht_search(node->local, nombre_prefijo);
+			strcpy(nombre_ambito_encontrado, nombre_ambito);
+			free(nombre_prefijo);
 			return aplicarAccesos(simbolos, nombre_clase, nombre_ambito_encontrado, *s);
 		}
+		free(nombre_prefijo);
 	}
-	if(ht_isin(node->principal, simbolo_a_buscar)){
-		*s = ht_search(node->principal, simbolo_a_buscar);
-		strcpy(nombre_ambito_encontrado, nombre_clase);
+
+
+	nombre_ambito = ht_get_name(node->principal);
+	nombre_prefijo = addPrefijo(nombre_ambito, simbolo_a_buscar);
+	if(ht_isin(node->principal, nombre_prefijo)){
+		*s = ht_search(node->principal, nombre_prefijo);
+		strcpy(nombre_ambito_encontrado, nombre_ambito);
+		free(nombre_prefijo);
 		return aplicarAccesos(simbolos, nombre_clase, nombre_clase, *s);
 	}
 	else{
+		free(nombre_prefijo);
 		int i = 0;
 		while(node->padres[i] != NULL){
 			node = searchNode(simbolos->graph, node->padres[i]);
-            if(ht_isin(node->principal, simbolo_a_buscar)){
-				*s = ht_search(node->principal, simbolo_a_buscar);
+			nombre_ambito = getAmbito(node);
+			nombre_prefijo = addPrefijo(nombre_ambito, simbolo_a_buscar);
+            if(ht_isin(node->principal, nombre_prefijo)){
+				*s = ht_search(node->principal,nombre_prefijo);
 				strcpy(nombre_ambito_encontrado, node->padres[i]);
+				free(nombre_prefijo);
 				return aplicarAccesos(simbolos, nombre_clase, node->padres[i], *s);
 			}
+			free(nombre_prefijo);
 			i++;
         }
-        if(ht_isin(node->principal, simbolo_a_buscar)){
-			*s = ht_search(simbolos->main_principal, simbolo_a_buscar);
-			strcpy(nombre_ambito_encontrado, "main");
-			return aplicarAccesos(simbolos, nombre_clase, "main", *s);
+
+        nombre_prefijo = addPrefijo(main_name, simbolo_a_buscar);
+
+        if(ht_isin(simbolos->main_principal, nombre_prefijo)){
+			*s = ht_search(simbolos->main_principal, nombre_prefijo);
+			strcpy(nombre_ambito_encontrado, main_name);
+			free(nombre_prefijo);
+			return aplicarAccesos(simbolos, nombre_clase, main_name, *s);
 		}
+		free(nombre_prefijo);
 	}
 	return ERROR;
 }
@@ -497,33 +595,36 @@ int buscarIdNoCualificado(  simbolos_p simbolos,
                      		char * nombre_simbolo, char * clase_actual,
                     		simbolo_p * s, 
 							char * nombre_ambito_encontrado){
-	if(strcmp(clase_actual, "main") == 0){
+	char * nombre_ambito = NULL;
+	char * main_name = "main";
+	char * nombre_prefijo = NULL;
+
+	if(strcmp(clase_actual, main_name) == 0){
 		if(simbolos->main_local != NULL){
-			if(ht_isin(simbolos->main_local, nombre_simbolo)){
-				*s = ht_search(simbolos->main_local, nombre_simbolo);
-				strcpy(nombre_ambito_encontrado, ht_get_name(simbolos->main_local));
+			nombre_ambito = ht_get_name(simbolos->main_local);
+			nombre_prefijo = addPrefijo(nombre_ambito, nombre_simbolo);
+			if(ht_isin(simbolos->main_local, nombre_prefijo)){
+				*s = ht_search(simbolos->main_local, nombre_prefijo);
+				strcpy(nombre_ambito_encontrado, nombre_ambito);
+				free(nombre_prefijo);
 				return aplicarAccesos(simbolos, clase_actual, nombre_ambito_encontrado, *s);
 			}
+			free(nombre_prefijo);
 		}
-		if(ht_isin(simbolos->main_principal, nombre_simbolo)){
-			*s = ht_search(simbolos->main_principal, nombre_simbolo);
+		nombre_prefijo = addPrefijo(main_name, nombre_simbolo);
+		if(ht_isin(simbolos->main_principal, nombre_prefijo)){
+			*s = ht_search(simbolos->main_principal, nombre_prefijo);
 			strcpy(nombre_ambito_encontrado, "main");
+			free(nombre_prefijo);
 			return aplicarAccesos(simbolos, clase_actual, "main", *s);
 		}
 		else{
+			free(nombre_prefijo);
 			return ERROR;
 		}
 	}
 	else{
-		if(OK == buscarIdEnJerarquiaDesdeClase(simbolos, nombre_simbolo, clase_actual, s, nombre_ambito_encontrado))
-			return OK;
-		else{
-			if(ht_isin(simbolos->main_principal, nombre_simbolo)){
-				*s = ht_search(simbolos->main_principal, nombre_simbolo);
-				strcpy(nombre_ambito_encontrado, "main");
-				return aplicarAccesos(simbolos, clase_actual, "main", *s);
-			}
-		}
+		return buscarIdEnJerarquiaDesdeClase(simbolos, nombre_simbolo, clase_actual, s, nombre_ambito_encontrado);
 	}
 }
 

@@ -32,6 +32,7 @@ int main(){
 	int i;
 	simbolos_p simbol = createSimbolos("Test_graph");
 	char **padres = (char**)malloc(sizeof(char*)*5);
+	int args[2] = {1,3};
 	for (i = 0; i < 5; i++){
 		padres[i] = (char*) malloc(sizeof(char)*10);
 	}
@@ -42,9 +43,9 @@ int main(){
 	nuevoSimboloEnClase(simbol, "a1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 	nuevoSimboloEnClase(simbol, "sa1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,HIDDEN,0,0,0,0,0,0,0,NULL);
 
-	nuevoSimboloEnClase(simbol, "ma1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
+	nuevoSimboloEnClase(simbol, "ma1", "AA", 0,FUNCION,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,args);
 	iniciaLocalEnClase(simbol, "AA", "ma1", 0,0,0,0);
-	nuevoSimboloEnClase(simbol, "ma1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
+	nuevoSimboloEnClase(simbol, "ma1", "AA", 0,FUNCION,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,args);
 	nuevoSimboloEnClase(simbol, "pmA1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 	nuevoSimboloEnClase(simbol, "v1mA1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 
@@ -55,6 +56,7 @@ int main(){
 
 	cerrarLocalEnClase(simbol, "AA");
 
+	check_simbol(simbol, "ma1@1@3", "AA", 1);
 	check_simbol(simbol, "v1mA1", "AA", 0);
 
 	cerrarClase(simbol, "AA", 0,0,0,0);
@@ -76,7 +78,7 @@ int main(){
 	check_simbol(simbol, "v1", "main", 1);
 	check_simbol(simbol, "x", "main", 0);
 
-
+	tablaSimbolosClasesToDot(simbol);
 
 	eliminaSimbolos(simbol);
 

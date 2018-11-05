@@ -69,4 +69,7 @@ void createHTLocal(graph_p graph, char* key, char* name);
 
 void deleteHTLocal(graph_p graph, char* key);
 
+/*Devuelve el nombre del ambito principal, a no ser que exista el ambito local*/
+char * getAmbito(node_p node);
+
 #endif

@@ -353,3 +353,12 @@ void deleteHTLocal(graph_p graph, char* key){
     node -> local = NULL;
 }
 
+/*Devuelve el nombre del ambito principal, a no ser que exista el ambito local*/
+char * getAmbito(node_p node){
+    if(node->local) {
+        return ht_get_name(node->local);
+    }
+    else
+        return ht_get_name(node->principal);
+}
+

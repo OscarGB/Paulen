@@ -14,8 +14,11 @@
 #define EXPOSED 1
 #define SECRET 2
 
-
-
+// Tipo de parametro de funcion
+#define ENTERO 1
+#define BOOLEANO 3
+#define OBJETO 4
+#define FUNCION 5
 
 
 #endif //MACROS_H
