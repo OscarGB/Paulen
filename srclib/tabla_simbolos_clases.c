@@ -511,17 +511,8 @@ int buscarIdNoCualificado(  simbolos_p simbolos,
 			return aplicarAccesos(simbolos, clase_actual, "main", *s);
 		}
 		else{
-			list_elem_p lelem = simbolos->graph->nodes_list->head;
-			while(lelem != NULL){
-				if(ht_isin(lelem->node->principal, nombre_simbolo)){
-					*s = ht_search(lelem->node->principal, nombre_simbolo);
-					strcpy(nombre_ambito_encontrado, lelem->node->name);
-					return aplicarAccesos(simbolos, clase_actual, lelem->node->name, *s);
-				}
-				lelem=lelem->next;
-			}
+			return ERROR;
 		}
-		return ERROR;
 	}
 	else{
 		if(OK == buscarIdEnJerarquiaDesdeClase(simbolos, nombre_simbolo, clase_actual, s, nombre_ambito_encontrado))
