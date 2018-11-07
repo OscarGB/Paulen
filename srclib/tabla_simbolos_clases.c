@@ -534,6 +534,8 @@ int buscarIdEnJerarquiaDesdeClase( simbolos_p simbolos,
 	char * nombre_ambito = NULL;
 	char * main_name = "main";
 	node_p node = searchNode(simbolos->graph, nombre_clase);
+
+	/*Busca en al ambito actual, tabla local*/
 	if(node->local != NULL){
 		nombre_ambito = getAmbito(node);
 		nombre_prefijo = addPrefijo(nombre_ambito, simbolo_a_buscar);
@@ -549,6 +551,7 @@ int buscarIdEnJerarquiaDesdeClase( simbolos_p simbolos,
 
 	nombre_ambito = ht_get_name(node->principal);
 	nombre_prefijo = addPrefijo(nombre_ambito, simbolo_a_buscar);
+	/*Buscar en el ambito actual, tabla principal*/
 	if(ht_isin(node->principal, nombre_prefijo)){
 		*s = ht_search(node->principal, nombre_prefijo);
 		strcpy(nombre_ambito_encontrado, nombre_ambito);
@@ -558,6 +561,7 @@ int buscarIdEnJerarquiaDesdeClase( simbolos_p simbolos,
 	else{
 		free(nombre_prefijo);
 		int i = 0;
+		/*Busca el simbolo en la jerarquia linealizada de padres*/
 		while(node->padres[i] != NULL){
 			node = searchNode(simbolos->graph, node->padres[i]);
 			nombre_ambito = getAmbito(node);
@@ -573,7 +577,7 @@ int buscarIdEnJerarquiaDesdeClase( simbolos_p simbolos,
         }
 
         nombre_prefijo = addPrefijo(main_name, simbolo_a_buscar);
-
+        /*Finalmente lo busca en main*/
         if(ht_isin(simbolos->main_principal, nombre_prefijo)){
 			*s = ht_search(simbolos->main_principal, nombre_prefijo);
 			strcpy(nombre_ambito_encontrado, main_name);
@@ -594,7 +598,9 @@ int buscarIdNoCualificado(  simbolos_p simbolos,
 	char * main_name = "main";
 	char * nombre_prefijo = NULL;
 
+	/*Busca el simbolo en main (si estamos en main)*/
 	if(strcmp(clase_actual, main_name) == 0){
+		/*Tabla local de main*/
 		if(simbolos->main_local != NULL){
 			nombre_ambito = ht_get_name(simbolos->main_local);
 			nombre_prefijo = addPrefijo(nombre_ambito, nombre_simbolo);
@@ -607,17 +613,20 @@ int buscarIdNoCualificado(  simbolos_p simbolos,
 			free(nombre_prefijo);
 		}
 		nombre_prefijo = addPrefijo(main_name, nombre_simbolo);
+		/*Tabla principal de main*/
 		if(ht_isin(simbolos->main_principal, nombre_prefijo)){
 			*s = ht_search(simbolos->main_principal, nombre_prefijo);
 			strcpy(nombre_ambito_encontrado, "main");
 			free(nombre_prefijo);
 			return aplicarAccesos(simbolos, clase_actual, "main", *s);
 		}
+		/*Si no esta en main, da error*/
 		else{
 			free(nombre_prefijo);
 			return ERROR;
 		}
 	}
+	/*Si no estamos en main, busca en la jerarquia empezando por el ambito actual*/
 	else{
 		return buscarIdEnJerarquiaDesdeClase(simbolos, nombre_simbolo, clase_actual, s, nombre_ambito_encontrado);
 	}
