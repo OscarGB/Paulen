@@ -46,7 +46,6 @@ tablaSimbolosClasesCerrarAmbitoEnClase()*/
 void cerrarLocalEnClase(simbolos_p simbolos, char* nombre_clase);
 
 /*Inserta un simbolo en una clase concreta*/
-/*TODO falta el prefijo de clase*/
 void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,  
 	char* nombre_clase, 			int clase,
 	int tipo,                        int estructura,
@@ -67,7 +66,6 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 
 /*Inserta un simbolo en el main
 insertarTablaSimbolosAmbitos()*/
-/*TODO falta el prefijo de clase*/
 void nuevoSimboloEnMain(simbolos_p simbolos, char* simbolo_a_insertar,  
 	int clase,
 	int tipo,                        int estructura,
@@ -87,7 +85,6 @@ void nuevoSimboloEnMain(simbolos_p simbolos, char* simbolo_a_insertar,
 );
 
 /*Comprueba si un simbolo esta en una clase*/
-/*TODO falta el prefijo de clase*/
 int checkSimboloEnClase(simbolos_p simbolos, char* nombre_clase, char* simbolo_a_comprobar, int ambito);
 
 /*Crea la tabla local
@@ -136,7 +133,6 @@ int aplicarAccesos(simbolos_p simbolos, char * clase_actual,
 					char * clase_variable_encontrada, simbolo_p s);
 
 /*Busca un simbolo en la jerarquia de clases*/
-/*TODO falta todo lo de los prefijos, esto es el esqueleto*/
 int buscarIdEnJerarquiaDesdeClase( simbolos_p simbolos, 
 									char * simbolo_a_buscar,
                           			char * nombre_clase, 
@@ -144,7 +140,6 @@ int buscarIdEnJerarquiaDesdeClase( simbolos_p simbolos,
   									char * nombre_ambito_encontrado);
 
 /*Busca un id no cualificado*/
-/*TODO falta todo lo de los prefijos, esto es el esqueleto*/
 int buscarIdNoCualificado(  simbolos_p simbolos,
                      		char * nombre_simbolo, char * clase_actual,
                     		simbolo_p * s, 
