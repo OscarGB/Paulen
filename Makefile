@@ -10,6 +10,10 @@ CC = gcc
 # Flex
 CF = flex
 
+# Bison
+CB = bison 
+BISONFLAGS = -dyv
+
 # Carpeta donde se encuentran las librerias desarrolladas por nosotros
 SRCLIBDIR = srclib/
 SRCDIR = src/
@@ -18,9 +22,10 @@ INCDIR = includes/
 TESTDIR = test/
 EXECDIR = executables/
 FLEXDIR = flex/
+BISONDIR = bison/
 
 # Flags de compilacion
-CFLAGS_AUX = $(addprefix -I, $(INCDIR) $(TESTDIR))
+CFLAGS_AUX = $(addprefix -I, $(INCDIR) $(TESTDIR) $(BISONDIR))
 CFLAGS = $(CFLAGS_AUX) -lpthread -lm -lrt -g -pedantic
 
 #Modificamos los directorios de búsqueda para nuestro makefile
@@ -30,12 +35,11 @@ vpath %.c $(TESTDIR)
 vpath %.a $(LIBDIR)
 vpath %.h $(INCDIR)
 vpath %.c $(FLEXDIR)
+vpath %.c $(BISONDIR)
+vpath %.h $(BISONDIR)
 
 #Creamos el directorio ejecutables
 $(shell mkdir -p $(EXECDIR))
-
-# Nombre de todos los ficheros de cabecera
-INC = $(shell find $(INCDIR) -name '*.h' -printf "%P\n" | xargs)
 
 # Lista de ejecutables a compilar
 EXE_AUX = $(shell find $(SRCDIR) -name '*.c' -printf "%P\n" | xargs)
@@ -59,39 +63,56 @@ FLEX = $(FLEX_AUX:.l=.yy.c)
 FLEXC_AUX2 = $(FLEX_AUX:.l=.yy.a)
 FLEXC = $(addprefix $(LIBDIR), $(FLEXC_AUX2))
 
+# Nombre de los ficheros bison
+BISON_AUX = $(shell find $(BISONDIR) -name '*.y' -printf "%P\n" | xargs)
+BISON = $(BISON_AUX:.y=.tab.c)
+BISONHEADERS_AUX = $(BISON_AUX:.y=.tab.h)
+BISONHEADERS = $(addprefix $(BISONDIR), $(BISONHEADERS_AUX))
+INC += $(BISONHEADERS)
+
+# Lista de librerias flex
+BISON_AUX2 = $(BISON_AUX:.y=.tab.a)
+BISONC = $(addprefix $(LIBDIR), $(BISON_AUX2))
+
 # Lista de dependencias a compilar
 CLIBS = $(addprefix $(LIBDIR), $(LIBS))
 
 # Lista de elementos flex a tratar
 CFLEX = $(addprefix $(FLEXDIR), $(FLEX))
 
+# Lista de elementos bison a tratar
+CBISON = $(addprefix $(BISONDIR), $(BISON))
+
 # Realiza todas las acciones
-all: flex test exec
+all: flex bison test exec
 
 # Compila solo los ejecutables principales
-exec: flex $(EXE)
+exec: flex bison $(EXE)
 
 # Compila las librerias propias
-libs: cleanlibs flex $(CLIBS) $(FLEXC)	
+libs: cleanlibs flex bison $(CLIBS) $(FLEXC)	
 
 # Compila los ejecutables de test
-test: flex $(TEST)
+test: flex bison $(TEST)
 
 # Trata los elementos flex
 flex: $(CFLEX) $(FLEXC)
+
+# Trara los elementos bison
+bison:  $(BISONHEADERS) $(CBISON)  $(BISONC)
 
 # Compilacion de ejecutables
 $(EXECDIR)% : %.c $(CLIBS)
 	@echo Creando el ejecutable $@
 	@ if grep -q -E 'yylex|yyparse' $<; then\
-		$(CC) $(CFLAGS) $^ $(FLEXC) -o $@ $(CFLAGS);\
+		$(CC) $(CFLAGS) $^ $(FLEXC) $(BISONC) -o $@ $(CFLAGS);\
       else\
         $(CC) $(CFLAGS) $^ -o $@ $(CFLAGS);\
-      fi
+fi
 	@echo $(GREEN)[OK]$(NC)
 
 # Compilacion de librerias
-$(LIBDIR)%.a: %.c $(INC)
+$(LIBDIR)%.a: %.c
 	@echo Compilando $< a $@
 	@$(CC) -c $< $(CFLAGS) -o $@
 	@echo $(GREEN)[OK]$(NC)
@@ -108,13 +129,27 @@ cleanflex:
 	-rm -f $(FLEXDIR)*.c
 	-rm -f $(FLEXC)
 
+cleanbison:
+	-rm -f $(BISONDIR)*.c
+	-rm -f $(BISONC) $(BISONHEADERS)
+
 # Limpieza completa
-cleanall: clean cleanlibs cleanflex
+cleanall: clean cleanlibs cleanflex cleanbison
 
 # Trata cada elemento flex
 %.yy.c : %.l
 	@echo Transformando flex $< a $@
 	@$(CF) -o $@ $<
+	@echo $(GREEN)[OK]$(NC)
+
+%.tab.c: %.y
+	@echo Transformando bison $< a $@
+	@$(CB) $(BISONFLAGS) -o $@ $<
+	@echo $(GREEN)[OK]$(NC)
+
+%.tab.h: %.y
+	@echo Transformando bison $< a $@
+	@$(CB) $(BISONFLAGS) -o $@ $<
 	@echo $(GREEN)[OK]$(NC)
 
 #Ayuda del makefile
@@ -126,5 +161,7 @@ help:
 	@echo "libs: Compila las librerias"
 	@echo "clean: Borra los ejecutables (pero no las librerias)"
 	@echo "cleanlibs: Borra las librerias"
-	@echo "cleanall: Borra todo, ejecutables y librerias."
-	@echo "help: Muestra la ayuda"
+	@echo "cleanflex: Borra todo lo generado por flex"
+	@echo "cleanbison: Borra todo lo generado por bison"
+	@echo "cleanall: Borra todo, ejecutables, librerias, bison y flex."
+	@echo "help: Muestra esta ayuda"

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 void yyerror();
+extern int yylex();
 extern int linea;
 extern int columna;
 extern FILE * fout;
