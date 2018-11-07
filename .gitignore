@@ -57,5 +57,8 @@ dkms.conf
 # Executables
 executables/*
 flex/*.c
+bison/*.h
+bison/*.c
+bison/*.output
 !executables/olib.o
 *.dot
