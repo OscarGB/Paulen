@@ -266,11 +266,6 @@ parametros_funcion: parametro_funcion resto_parametros_funcion
 			fprintf(fout, ";R:\tparametros_funcion: parametro_funcion resto_parametros_funcion\n");
 		}
 		|
-		clase_objeto TOK_IDENTIFICADOR
-		{
-			fprintf(fout, ";R:\tparametros_funcion: clase_objeto TOK_IDENTIFICADOR\n");
-		}
-		|
 		/*vacio*/
 		{
 			fprintf(fout, ";R:\tparametros_funcion:\n");
