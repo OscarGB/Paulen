@@ -362,3 +362,12 @@ char * getAmbito(node_p node){
         return ht_get_name(node->principal);
 }
 
+
+node_p getINode(graph_p graph, int indice){
+    list_elem_p elem = graph->nodes_list->head;
+    for(int i = 0; i < indice; i++){
+        elem = elem->next;
+    }
+    return elem->node;
+}
+
