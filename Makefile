@@ -84,16 +84,16 @@ CFLEX = $(addprefix $(FLEXDIR), $(FLEX))
 CBISON = $(addprefix $(BISONDIR), $(BISON))
 
 # Realiza todas las acciones
-all: flex bison test exec
+all: bison flex test exec
 
 # Compila solo los ejecutables principales
-exec: flex bison $(EXE)
+exec: bison flex $(EXE)
 
 # Compila las librerias propias
-libs: cleanlibs flex bison $(CLIBS) $(FLEXC)	
+libs: cleanlibs bison flex $(CLIBS) $(FLEXC)	
 
 # Compila los ejecutables de test
-test: flex bison $(TEST)
+test: bison flex $(TEST)
 
 # Trata los elementos flex
 flex: $(CFLEX) $(FLEXC)
