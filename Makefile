@@ -112,7 +112,7 @@ fi
 	@echo $(GREEN)[OK]$(NC)
 
 # Compilacion de librerias
-$(LIBDIR)%.a: %.c
+$(LIBDIR)%.a: %.c $(INC)
 	@echo Compilando $< a $@
 	@$(CC) -c $< $(CFLAGS) -o $@
 	@echo $(GREEN)[OK]$(NC)
