@@ -365,9 +365,23 @@ char * getAmbito(node_p node){
 
 node_p getINode(graph_p graph, int indice){
     list_elem_p elem = graph->nodes_list->head;
-    for(int i = 0; i < indice; i++){
+    for(int i = 1; i < indice; i++){
         elem = elem->next;
     }
     return elem->node;
+}
+
+
+int getIndex(graph_p graph, char* key){
+    list_elem_p elem = graph->nodes_list->head;
+    int i = 0;
+    while(elem != NULL){
+        i++;
+        if(!strcmp(key, elem->node->name)){
+            return i;
+        }
+        elem = elem->next;
+    }
+    return ERROR;
 }
 

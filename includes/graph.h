@@ -65,6 +65,8 @@ node_p searchNode(graph_p graph, char* key);
 
 node_p getINode(graph_p graph, int indice);
 
+int getIndex(graph_p graph, char* key);
+
 hash_table_p getHT(graph_p graph, char* key, int tipo);
 
 void createHTLocal(graph_p graph, char* key, char* name);

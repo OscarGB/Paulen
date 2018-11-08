@@ -146,7 +146,7 @@ int buscarIdNoCualificado(  simbolos_p simbolos,
 							char * nombre_ambito_encontrado);
 
 /*Buscar un id cualificado de una clase (no de una instancia)*/
-int buscarIdIDCualificadoClase(    simbolos_p simbolos, char * nombre_clase_cualifica,
+int buscarIdCualificadoClase(    simbolos_p simbolos, char * nombre_clase_cualifica,
 	                        char * nombre_id,char * nombre_clase_desde,
 	                        simbolo_p *s,
 	                        char * nombre_ambito_encontrado);
