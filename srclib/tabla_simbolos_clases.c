@@ -591,15 +591,54 @@ int buscarIdEnJerarquiaDesdeClase( simbolos_p simbolos,
 
 /*Para declarar elementos UNIQUE
 Hay que estar en la clase en la que quieres declarar
-1. Miramos en el ambito actual. Si existe, OK (no se inserta)
+Miramos unicamente en el ambito actual. Si existe y es accesible, OK (no se inserta)
+
+nombre_clase es el de la clase desde la que se busca
+nombre_simbolo incluye el prefijo
+nombre_ambito_encontrado
 */
-int buscarParaDeclararMiembroClase(){
+int buscarParaDeclararMiembroClase(	simbolos_p simbolos,
+									char * nombre_clase,
+									char * nombre_simbolo,
+									simbolo_p * s,
+									char * nombre_ambito_encontrado){
+	char * nombre_ambito = NULL;
+	node_p node = searchNode(simbolos->graph, nombre_clase);
+
+	/*Busca en al ambito actual, tabla local*/
+	if(node->local != NULL){
+		nombre_ambito = getAmbito(node);
+		if(ht_isin(node->local, nombre_prefijo)){
+			*s = ht_search(node->local, nombre_simbolo);
+			strcpy(nombre_ambito_encontrado, nombre_ambito);
+			return aplicarAccesos(simbolos, nombre_clase, nombre_ambito_encontrado, *s);
+		}
+
+		s = NULL;
+		nombre_ambito_encontrado = NULL;
+
+		return ERROR;
+	}
+
+
+	nombre_ambito = ht_get_name(node->principal);
+	/*Buscar en el ambito actual, tabla principal*/
+	if(ht_isin(node->principal, nombre_simbolo)){
+		*s = ht_search(node->principal, nombre_simbolo);
+		strcpy(nombre_ambito_encontrado, nombre_ambito);
+		return aplicarAccesos(simbolos, nombre_clase, nombre_clase, *s);
+	}
+
+	s = NULL;
+	nombre_ambito_encontrado = NULL;
+
+	return ERROR;
 
 }
 
 /* Para declarar miembro de una instancia.
 Es necesario comprobar la jerarquia de padres
-1. Se comrperueba el ambito actual. Si existe, OK (no se inserta)
+1. Se comprueba el ambito actual. Si existe, OK (no se inserta)
 2. Se busca en la jerarquia usando buscarIdJerarquiaDesdeClase():
 	a) ERROR -> Se podra declarar
 	b) OK -> :
@@ -607,8 +646,12 @@ Es necesario comprobar la jerarquia de padres
 		2.2/ Si es atributo de instancia, no se puede declarar
 		2.3/ Si es UNIQUE, no podra declararse
 */
-int buscarParaDeclararMiembroInstancia(){
-
+int buscarParaDeclararMiembroInstancia(	simbolos_p simbolos,
+									char * nombre_clase,
+									char * nombre_simbolo,
+									simbolo_p * s,
+									char * nombre_ambito_encontrado){
+	return buscarIdJerarquiaDesdeClase(simbolos, nombre_simbolo, nombre_clase, s, nombre_ambito_encontrado);
 }
 
 /*Busca un id no cualificado*/
