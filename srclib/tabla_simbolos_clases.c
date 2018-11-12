@@ -589,6 +589,28 @@ int buscarIdEnJerarquiaDesdeClase( simbolos_p simbolos,
 	return ERROR;
 }
 
+/*Para declarar elementos UNIQUE
+Hay que estar en la clase en la que quieres declarar
+1. Miramos en el ambito actual. Si existe, OK (no se inserta)
+*/
+int buscarParaDeclararMiembroClase(){
+
+}
+
+/* Para declarar miembro de una instancia.
+Es necesario comprobar la jerarquia de padres
+1. Se comrperueba el ambito actual. Si existe, OK (no se inserta)
+2. Se busca en la jerarquia usando buscarIdJerarquiaDesdeClase():
+	a) ERROR -> Se podra declarar
+	b) OK -> :
+		2.1/ Si es metodo sobreescribible, hay que avisarlo para usar el mismo offset
+		2.2/ Si es atributo de instancia, no se puede declarar
+		2.3/ Si es UNIQUE, no podra declararse
+*/
+int buscarParaDeclararMiembroInstancia(){
+
+}
+
 /*Busca un id no cualificado*/
 int buscarIdNoCualificado(  simbolos_p simbolos,
                      		char * nombre_simbolo, char * clase_actual,
