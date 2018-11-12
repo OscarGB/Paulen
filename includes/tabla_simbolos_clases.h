@@ -145,4 +145,18 @@ int buscarIdNoCualificado(  simbolos_p simbolos,
                     		simbolo_p * s, 
 							char * nombre_ambito_encontrado);
 
+/*Buscar un id cualificado de una clase (no de una instancia)*/
+int buscarIdCualificadoClase(    simbolos_p simbolos, char * nombre_clase_cualifica,
+	                        char * nombre_id,char * nombre_clase_desde,
+	                        simbolo_p *s,
+	                        char * nombre_ambito_encontrado);
+
+/*Buscar un id cualificado por una instancia (no de clase)*/
+int buscarIdCualificadoInstancia(simbolos_p simbolos,
+							char * nombre_instancia_cualifica,
+							char * nombre_id, char * nombre_clase_desde,
+							simbolo_p * s,
+							char * nombre_ambito_encontrado);
+
+
 #endif //TABLA_SIMBOLOS_CLASES_H

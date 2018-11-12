@@ -2,28 +2,68 @@
 #include "macros.h"
 #include "hash_table.h"
 #include "simbolo.h"
+#include "graph.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-void check_simbol(simbolos_p simbol, char* simbolo, char* clase, int deberia_estar){
+#define NOCUALIFICADO 1
+#define INSTANCIA 2
+#define CLASE 3
+
+void check_simbol(simbolos_p simbol, char* simbolo, char* clase_desde, char* nombre_cualifica, int deberia_estar, int prueba){
 	
 	simbolo_p s = NULL;
 	char nombre_ambito_encontrado[100];
-
-	if(deberia_estar){
-		if(buscarIdNoCualificado(simbol, simbolo, clase, &s, nombre_ambito_encontrado)){
-			printf("OK: %s encontrado en %s\n", simbolo, nombre_ambito_encontrado);
+	if(prueba == NOCUALIFICADO){
+		if(deberia_estar){
+			if(buscarIdNoCualificado(simbol, simbolo, clase_desde, &s, nombre_ambito_encontrado)){
+				printf("NC OK: %s encontrado en %s\n", simbolo, nombre_ambito_encontrado);
+			}
+			else{
+				printf("NC ERROR: %s debería encontrarse\n", simbolo);
+			}
+		}else{
+			if(!buscarIdNoCualificado(simbol, simbolo, clase_desde, &s, nombre_ambito_encontrado)){
+				printf("NC OK: %s no encontrado\n", simbolo);
+			}
+			else{
+				printf("NC ERROR %s no debería encontrarse\n", simbolo);
+			}
 		}
-		else{
-			printf("ERROR: %s debería encontrarse\n", simbolo);
+	}
+	if(prueba == INSTANCIA){
+		if(deberia_estar){
+			if(buscarIdCualificadoInstancia(simbol, nombre_cualifica, simbolo, clase_desde, &s, nombre_ambito_encontrado)){
+				printf("CI OK: %s encontrado en %s\n", simbolo, nombre_ambito_encontrado);
+			}
+			else{
+				printf("CI ERROR: %s debería encontrarse\n", simbolo);
+			}
+		}else{
+			if(!buscarIdCualificadoInstancia(simbol, nombre_cualifica, simbolo, clase_desde, &s, nombre_ambito_encontrado)){
+				printf("CI OK: %s no encontrado\n", simbolo);
+			}
+			else{
+				printf("CI ERROR %s no debería encontrarse\n", simbolo);
+			}
 		}
-	}else{
-		if(!buscarIdNoCualificado(simbol, simbolo, clase, &s, nombre_ambito_encontrado)){
-			printf("OK: %s no encontrado\n", simbolo);
-		}
-		else{
-			printf("ERROR %s no debería encontrarse\n", simbolo);
+	}
+	if(prueba == CLASE){
+		if(deberia_estar){
+			if(buscarIdCualificadoClase(simbol, nombre_cualifica, simbolo, clase_desde, &s, nombre_ambito_encontrado)){
+				printf("CC OK: %s encontrado en %s\n", simbolo, nombre_ambito_encontrado);
+			}
+			else{
+				printf("CC ERROR: %s debería encontrarse\n", simbolo);
+			}
+		}else{
+			if(!buscarIdCualificadoClase(simbol, nombre_cualifica, simbolo, clase_desde, &s, nombre_ambito_encontrado)){
+				printf("CC OK: %s no encontrado\n", simbolo);
+			}
+			else{
+				printf("CC ERROR %s no debería encontrarse\n", simbolo);
+			}
 		}
 	}
 }
@@ -49,34 +89,47 @@ int main(){
 	nuevoSimboloEnClase(simbol, "pmA1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 	nuevoSimboloEnClase(simbol, "v1mA1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 
-	check_simbol(simbol, "v1", "AA", 1);
-	check_simbol(simbol, "x", "AA", 0);
-	check_simbol(simbol, "v1mA1", "AA", 1);
-	check_simbol(simbol, "a1", "AA", 1);
+	check_simbol(simbol, "v1", "AA", NULL, 1, NOCUALIFICADO);
+	check_simbol(simbol, "x", "AA",NULL, 0, NOCUALIFICADO);
+	check_simbol(simbol, "v1mA1", "AA",NULL, 1, NOCUALIFICADO);
+	check_simbol(simbol, "a1", "AA",NULL, 1, NOCUALIFICADO);
 
 	cerrarLocalEnClase(simbol, "AA");
 
-	check_simbol(simbol, "ma1@1@3", "AA", 1);
-	check_simbol(simbol, "v1mA1", "AA", 0);
+	check_simbol(simbol, "ma1@1@3", "AA",NULL, 1, NOCUALIFICADO);
+	check_simbol(simbol, "v1mA1", "AA",NULL, 0, NOCUALIFICADO);
 
 	cerrarClase(simbol, "AA", 0,0,0,0);
+	nuevaClase(simbol, NULL, 0, "BB");
 
 	nuevoSimboloEnMain(simbol, "f1", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 	iniciaLocal(simbol, "f1");
 	nuevoSimboloEnMain(simbol, "f1", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 	nuevoSimboloEnMain(simbol, "pf1", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
-	
-	check_simbol(simbol, "pf1", "main", 1);
-	check_simbol(simbol, "v1", "main", 1);
-	check_simbol(simbol, "a1", "main", 0);
 
+	check_simbol(simbol, "pf1", "main",NULL, 1, NOCUALIFICADO);
+	check_simbol(simbol, "v1", "main",NULL, 1, NOCUALIFICADO);
+	check_simbol(simbol, "a1", "main",NULL, 0, NOCUALIFICADO);
 
 	nuevoSimboloEnMain(simbol, "v1f11", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 	
 	cerrarLocal(simbol);
 
-	check_simbol(simbol, "v1", "main", 1);
-	check_simbol(simbol, "x", "main", 0);
+	check_simbol(simbol, "v1", "main",NULL, 1, NOCUALIFICADO);
+	check_simbol(simbol, "x", "main",NULL, 0, NOCUALIFICADO);
+
+	nuevoSimboloEnMain(simbol, "claseAA", 0,-getIndex(simbol->graph, "AA"),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
+	nuevoSimboloEnMain(simbol, "claseBB", 0,-getIndex(simbol->graph, "BB"),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
+
+	check_simbol(simbol, "a1", "main", "claseAA", 1, INSTANCIA);
+	check_simbol(simbol, "sa1", "main", "claseAA", 0, INSTANCIA);
+	check_simbol(simbol, "a1", "main", "claseCC", 0, INSTANCIA);
+	check_simbol(simbol, "a1", "main", "claseBB", 0, INSTANCIA);
+
+	check_simbol(simbol, "a1", "main", "BB", 0, CLASE);
+	check_simbol(simbol, "a1", "main", "AA", 1, CLASE);
+	check_simbol(simbol, "sa1", "main", "AA", 0, CLASE);
+	check_simbol(simbol, "sa1", "main", "CC", 0, CLASE);
 
 	tablaSimbolosClasesToDot(simbol);
 

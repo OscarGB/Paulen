@@ -19,6 +19,7 @@
 #define BOOLEANO 3
 #define OBJETO 4
 #define FUNCION 5
+// Recuerdo que las clases tienen tipo como el - indice que tienen en el grafo
 
 
 #endif //MACROS_H

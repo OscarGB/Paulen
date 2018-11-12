@@ -654,4 +654,49 @@ int buscarIdNoCualificado(  simbolos_p simbolos,
 	}
 }
 
+/*Buscar un id cualificado de una clase (no de una instancia)*/
+int buscarIdCualificadoClase(    simbolos_p simbolos, char * nombre_clase_cualifica,
+                        char * nombre_id,char * nombre_clase_desde,
+                        simbolo_p *s,
+                        char * nombre_ambito_encontrado){
+
+	node_p node = searchNode(simbolos->graph, nombre_clase_cualifica);
+	if(!node){
+		return ERROR;
+	}
+	else{
+		if(!buscarIdEnJerarquiaDesdeClase(simbolos, nombre_id, nombre_clase_cualifica, s, nombre_ambito_encontrado)){
+			return ERROR;
+		}
+		return aplicarAccesos(simbolos, nombre_clase_desde, nombre_ambito_encontrado, *s);
+	}
+}
+
+/*Buscar un id cualificado por una instancia (no de clase)*/
+int buscarIdCualificadoInstancia(simbolos_p simbolos,
+							char * nombre_instancia_cualifica,
+							char * nombre_id, char * nombre_clase_desde,
+							simbolo_p * s,
+							char * nombre_ambito_encontrado){
+	char nombre_clase_cualifica[100];
+	if(buscarIdNoCualificado(simbolos, nombre_instancia_cualifica, nombre_clase_desde, s, nombre_ambito_encontrado)){
+		strcpy(nombre_clase_cualifica, nombre_ambito_encontrado);
+		if((*s)->tipo>=0){
+			return ERROR;
+		}
+		node_p node = getINode(simbolos->graph, -(*s)->tipo);
+		strcpy(nombre_clase_cualifica, node->name);
+		if(!aplicarAccesos(simbolos, nombre_clase_desde, nombre_ambito_encontrado, *s)){
+			return ERROR;
+		}
+		if(buscarIdEnJerarquiaDesdeClase(simbolos, nombre_id, nombre_clase_cualifica, s, nombre_ambito_encontrado)){
+			return aplicarAccesos(simbolos, nombre_clase_desde, nombre_ambito_encontrado, *s);
+		}else{
+			
+		}
+	}
+	return ERROR;
+}
+
+
 

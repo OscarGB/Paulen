@@ -265,11 +265,12 @@ int ht_isin(hash_table_p ht, char* key){
 		}   
 		index = ht_get_hash(key, ht->size, i);
 		if(initial_index == index){
+			// printf("what");
 			return 0;
 		}
 		item = ht->items[index]; // If an item is NULL stop
 		i++;
-	} 
+	}
 	return 0;
 }
 
