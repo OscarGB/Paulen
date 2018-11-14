@@ -10,6 +10,8 @@
 #define NOCUALIFICADO 1
 #define INSTANCIA 2
 #define CLASE 3
+#define BUSCAR_PARA_CLASE 4
+#define BUSCAR_PARA_INSTANCIA 5
 
 void check_simbol(simbolos_p simbol, char* simbolo, char* clase_desde, char* nombre_cualifica, int deberia_estar, int prueba){
 	
@@ -59,6 +61,42 @@ void check_simbol(simbolos_p simbol, char* simbolo, char* clase_desde, char* nom
 			}
 		}else{
 			if(!buscarIdCualificadoClase(simbol, nombre_cualifica, simbolo, clase_desde, &s, nombre_ambito_encontrado)){
+				printf("CC OK: %s no encontrado\n", simbolo);
+			}
+			else{
+				printf("CC ERROR %s no debería encontrarse\n", simbolo);
+			}
+		}
+	}
+
+	if(prueba == BUSCAR_PARA_CLASE){
+		if(deberia_estar){
+			if(buscarParaDeclararMiembroClase(simbol, clase_desde, simbolo, &s, nombre_ambito_encontrado)){
+				printf("CC OK: %s encontrado en %s\n", simbolo, nombre_ambito_encontrado);
+			}
+			else{
+				printf("CC ERROR: %s debería encontrarse\n", simbolo);
+			}
+		}else{
+			if(!buscarParaDeclararMiembroClase(simbol, clase_desde, simbolo, &s, nombre_ambito_encontrado)){
+				printf("CC OK: %s no encontrado\n", simbolo);
+			}
+			else{
+				printf("CC ERROR %s no debería encontrarse\n", simbolo);
+			}
+		}
+	}
+
+	if(prueba == BUSCAR_PARA_INSTANCIA){
+		if(deberia_estar){
+			if(buscarParaDeclararMiembroInstancia(simbol, clase_desde, simbolo, &s, nombre_ambito_encontrado)){
+				printf("CC OK: %s encontrado en %s\n", simbolo, nombre_ambito_encontrado);
+			}
+			else{
+				printf("CC ERROR: %s debería encontrarse\n", simbolo);
+			}
+		}else{
+			if(!buscarParaDeclararMiembroInstancia(simbol, clase_desde, simbolo, &s, nombre_ambito_encontrado)){
 				printf("CC OK: %s no encontrado\n", simbolo);
 			}
 			else{
@@ -131,6 +169,23 @@ int main(){
 	check_simbol(simbol, "sa1", "main", "AA", 0, CLASE);
 	check_simbol(simbol, "sa1", "main", "CC", 0, CLASE);
 
+
+
+	check_simbol(simbol, "AA_a1", "AA", "", 1, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "a1", "AA", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "ba1", "AA", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "AA_ma1@1@3", "AA", "", 1, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "AA_ma1@1@3@1", "AA", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "AA_a1", "BB", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "f1", "AA", "", 0, BUSCAR_PARA_CLASE);
+
+	check_simbol(simbol, "AA_a1", "AA", "", 0, BUSCAR_PARA_INSTANCIA);
+	check_simbol(simbol, "a1", "AA", "", 1, BUSCAR_PARA_INSTANCIA);
+	check_simbol(simbol, "f1", "AA", "", 1, BUSCAR_PARA_INSTANCIA);
+
+
+	
+	cerrarClase(simbol, "BB", 0,0,0,0);
 	tablaSimbolosClasesToDot(simbol);
 
 	eliminaSimbolos(simbol);

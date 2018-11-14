@@ -158,5 +158,35 @@ int buscarIdCualificadoInstancia(simbolos_p simbolos,
 							simbolo_p * s,
 							char * nombre_ambito_encontrado);
 
+/* Para declarar miembro de una instancia.
+Es necesario comprobar la jerarquia de padres
+1. Se comprueba el ambito actual. Si existe, OK (no se inserta)
+2. Se busca en la jerarquia usando buscarIdJerarquiaDesdeClase():
+	a) ERROR -> Se podra declarar
+	b) OK -> :
+		2.1/ Si es metodo sobreescribible, hay que avisarlo para usar el mismo offset
+		2.2/ Si es atributo de instancia, no se puede declarar
+		2.3/ Si es UNIQUE, no podra declararse
+*/
+int buscarParaDeclararMiembroInstancia(	simbolos_p simbolos,
+									char * nombre_clase,
+									char * nombre_simbolo,
+									simbolo_p * s,
+									char * nombre_ambito_encontrado);
+
+/*Para declarar elementos UNIQUE
+Hay que estar en la clase en la que quieres declarar
+Miramos unicamente en el ambito actual. Si existe y es accesible, OK (no se inserta)
+
+nombre_clase es el de la clase desde la que se busca
+nombre_simbolo incluye el prefijo
+nombre_ambito_encontrado
+*/
+int buscarParaDeclararMiembroClase(	simbolos_p simbolos,
+									char * nombre_clase,
+									char * nombre_simbolo,
+									simbolo_p * s,
+									char * nombre_ambito_encontrado);
+
 
 #endif //TABLA_SIMBOLOS_CLASES_H

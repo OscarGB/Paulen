@@ -605,10 +605,14 @@ int buscarParaDeclararMiembroClase(	simbolos_p simbolos,
 	char * nombre_ambito = NULL;
 	node_p node = searchNode(simbolos->graph, nombre_clase);
 
+	if(!node){
+		printf("ERRROOOOOR %s\n", nombre_clase);
+	}
+
 	/*Busca en al ambito actual, tabla local*/
 	if(node->local != NULL){
 		nombre_ambito = getAmbito(node);
-		if(ht_isin(node->local, nombre_prefijo)){
+		if(ht_isin(node->local, nombre_simbolo)){
 			*s = ht_search(node->local, nombre_simbolo);
 			strcpy(nombre_ambito_encontrado, nombre_ambito);
 			return aplicarAccesos(simbolos, nombre_clase, nombre_ambito_encontrado, *s);
@@ -645,13 +649,15 @@ Es necesario comprobar la jerarquia de padres
 		2.1/ Si es metodo sobreescribible, hay que avisarlo para usar el mismo offset
 		2.2/ Si es atributo de instancia, no se puede declarar
 		2.3/ Si es UNIQUE, no podra declararse
+
+3. En este caso, el simbolo se mete sin prefijo
 */
 int buscarParaDeclararMiembroInstancia(	simbolos_p simbolos,
 									char * nombre_clase,
 									char * nombre_simbolo,
 									simbolo_p * s,
 									char * nombre_ambito_encontrado){
-	return buscarIdJerarquiaDesdeClase(simbolos, nombre_simbolo, nombre_clase, s, nombre_ambito_encontrado);
+	return buscarIdEnJerarquiaDesdeClase(simbolos, nombre_simbolo, nombre_clase, s, nombre_ambito_encontrado);
 }
 
 /*Busca un id no cualificado*/
