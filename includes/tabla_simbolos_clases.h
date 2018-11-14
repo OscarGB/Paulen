@@ -189,4 +189,16 @@ int buscarParaDeclararMiembroClase(	simbolos_p simbolos,
 									char * nombre_ambito_encontrado);
 
 
+int buscarParaDeclararIdTablaSimbolosAmbitos(simbolos_p simbolos, 
+                                    char* id, 
+                                    simbolo_p * s,  
+                                    char* id_ambito);
+
+int buscarParaDeclararIdLocalEnMetodo(simbolos_p simbolos, 
+                            char * nombre_clase,
+                            char * nombre_id,
+                            simbolo_p * s, 
+                            char * nombre_ambito_encontrado);
+
+
 #endif //TABLA_SIMBOLOS_CLASES_H

@@ -139,6 +139,7 @@ int main(){
 
 	cerrarClase(simbol, "AA", 0,0,0,0);
 	nuevaClase(simbol, NULL, 0, "BB");
+	cerrarClase(simbol, "BB", 0,0,0,0);
 
 	nuevoSimboloEnMain(simbol, "f1", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 	iniciaLocal(simbol, "f1");
@@ -169,8 +170,6 @@ int main(){
 	check_simbol(simbol, "sa1", "main", "AA", 0, CLASE);
 	check_simbol(simbol, "sa1", "main", "CC", 0, CLASE);
 
-
-
 	check_simbol(simbol, "AA_a1", "AA", "", 1, BUSCAR_PARA_CLASE);
 	check_simbol(simbol, "a1", "AA", "", 0, BUSCAR_PARA_CLASE);
 	check_simbol(simbol, "ba1", "AA", "", 0, BUSCAR_PARA_CLASE);
@@ -183,9 +182,6 @@ int main(){
 	check_simbol(simbol, "a1", "AA", "", 1, BUSCAR_PARA_INSTANCIA);
 	check_simbol(simbol, "f1", "AA", "", 1, BUSCAR_PARA_INSTANCIA);
 
-
-	
-	cerrarClase(simbol, "BB", 0,0,0,0);
 	tablaSimbolosClasesToDot(simbol);
 
 	eliminaSimbolos(simbol);

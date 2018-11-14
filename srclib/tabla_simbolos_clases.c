@@ -606,7 +606,7 @@ int buscarParaDeclararMiembroClase(	simbolos_p simbolos,
 	node_p node = searchNode(simbolos->graph, nombre_clase);
 
 	if(!node){
-		printf("ERRROOOOOR %s\n", nombre_clase);
+		return ERROR;
 	}
 
 	/*Busca en al ambito actual, tabla local*/
@@ -747,5 +747,58 @@ int buscarIdCualificadoInstancia(simbolos_p simbolos,
 	return ERROR;
 }
 
+int buscarParaDeclararIdTablaSimbolosAmbitos(simbolos_p simbolos, 
+                                    char* id, 
+                                    simbolo_p * s,  
+                                    char* id_ambito){
+
+	char * nombre_prefijo = NULL;
+	nombre_prefijo = addPrefijo(id_ambito, id);
+
+	if(simbolos->main_local){
+		*s = NULL;
+		*s = ht_search(simbolos->main_local, nombre_prefijo);
+		free(nombre_prefijo);
+		if(*s == NULL){
+			return ERROR;
+		}
+		strcpy(id_ambito, ht_get_name(simbolos->main_local));
+		return OK;
+	}
+	else{
+		*s = NULL;
+		*s = ht_search(simbolos->main_principal, nombre_prefijo);
+		free(nombre_prefijo);
+		if(*s == NULL){
+			return ERROR;
+		}
+		strcpy(id_ambito, "main");
+		return OK;
+	}
+}
 
 
+int buscarParaDeclararIdLocalEnMetodo(simbolos_p simbolos, 
+                            char * nombre_clase,
+                            char * nombre_id,
+                            simbolo_p * s, 
+                            char * nombre_ambito_encontrado){
+
+	char * nombre_prefijo = NULL;
+
+	node_p node = searchNode(simbolos->graph, nombre_clase);
+	if(!node || !node->local){
+		return ERROR;
+	}
+
+	nombre_prefijo = addPrefijo(ht_get_name(node->local), nombre_id);
+
+	*s = ht_search(node->local, nombre_prefijo);
+	free(nombre_prefijo);
+	if(*s == NULL){
+		return ERROR;
+	}
+	strcpy(nombre_ambito_encontrado, ht_get_name(node->local));
+	return OK;
+
+}
