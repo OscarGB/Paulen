@@ -753,10 +753,10 @@ int buscarParaDeclararIdTablaSimbolosAmbitos(simbolos_p simbolos,
                                     char* id_ambito){
 
 	char * nombre_prefijo = NULL;
-	nombre_prefijo = addPrefijo(id_ambito, id);
 
 	if(simbolos->main_local){
 		*s = NULL;
+		nombre_prefijo = addPrefijo(ht_get_name(simbolos->main_local), id);
 		*s = ht_search(simbolos->main_local, nombre_prefijo);
 		free(nombre_prefijo);
 		if(*s == NULL){
@@ -767,6 +767,7 @@ int buscarParaDeclararIdTablaSimbolosAmbitos(simbolos_p simbolos,
 	}
 	else{
 		*s = NULL;
+		nombre_prefijo = addPrefijo("main", id);
 		*s = ht_search(simbolos->main_principal, nombre_prefijo);
 		free(nombre_prefijo);
 		if(*s == NULL){
