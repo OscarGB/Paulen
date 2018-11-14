@@ -122,7 +122,7 @@ int main(){
 	nuevoSimboloEnClase(simbol, "sA1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,SECRET,0,0,0,0,0,0,0,NULL);
 	
 	check_simbol(simbol, "AA_sA1", "AA", "", 1, BUSCAR_PARA_CLASE);
-	nuevoSimboloEnClase(simbol, "sA1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,SECRET,0,0,0,0,0,0,0,NULL);
+	// nuevoSimboloEnClase(simbol, "sA1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,SECRET,0,0,0,0,0,0,0,NULL);
 
 	check_simbol(simbol, "AA_hA1", "AA", "", 0, BUSCAR_PARA_CLASE);
 	nuevoSimboloEnClase(simbol, "hA1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,HIDDEN,0,0,0,0,0,0,0,NULL);
@@ -134,7 +134,7 @@ int main(){
 	nuevoSimboloEnClase(simbol, "MA1", "AA", 0,FUNCION,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,HIDDEN,0,0,0,0,0,0,0,args1);
 
 	check_simbol(simbol, "AA_MA1@1", "AA", "", 1, BUSCAR_PARA_CLASE);
-	nuevoSimboloEnClase(simbol, "MA1", "AA", 0,FUNCION,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,SECRET,0,0,0,0,0,0,0,args1);
+	// nuevoSimboloEnClase(simbol, "MA1", "AA", 0,FUNCION,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,SECRET,0,0,0,0,0,0,0,args1);
 
 	check_simbol(simbol, "AA_MA1@1@1", "AA", "", 0, BUSCAR_PARA_CLASE);
 	nuevoSimboloEnClase(simbol, "MA1", "AA", 0,FUNCION,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,HIDDEN,0,0,0,0,0,0,0,args2);
@@ -157,9 +157,7 @@ int main(){
 
 
 	check_simbol(simbol, "BB_MB1@1", "BB", "", 0, BUSCAR_PARA_CLASE);
-	printf("Hoola\n");
 	nuevoSimboloEnClase(simbol, "MB1", "BB", 0,FUNCION,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,SECRET,0,0,0,0,0,0,0,args1);
-	printf("Hoola\n");
 
 	check_simbol(simbol, "BB_MA1@1", "BB", "", 0, BUSCAR_PARA_CLASE);
 	nuevoSimboloEnClase(simbol, "MA1", "BB", 0,FUNCION,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,HIDDEN,0,0,0,0,0,0,0,args1);

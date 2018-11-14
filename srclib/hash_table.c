@@ -70,6 +70,9 @@ static int ht_hash(char* s, int a, int m) {
 static int ht_get_hash(char* s, int num_buckets, int attempt) {
 	int hash_a = ht_hash(s, HT_PRIME_1, num_buckets);
 	int hash_b = ht_hash(s, HT_PRIME_2, num_buckets);
+	if(hash_b == num_buckets-1){
+		hash_b --;
+	}
 	return (hash_a + (attempt * (hash_b + 1))) % num_buckets;
 }
 
