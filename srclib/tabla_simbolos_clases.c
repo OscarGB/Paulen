@@ -615,7 +615,8 @@ int buscarParaDeclararMiembroClase(	simbolos_p simbolos,
 		if(ht_isin(node->local, nombre_simbolo)){
 			*s = ht_search(node->local, nombre_simbolo);
 			strcpy(nombre_ambito_encontrado, nombre_ambito);
-			return aplicarAccesos(simbolos, nombre_clase, nombre_ambito_encontrado, *s);
+			// return aplicarAccesos(simbolos, nombre_clase, nombre_ambito_encontrado, *s);
+			return OK;
 		}
 
 		s = NULL;
@@ -630,7 +631,8 @@ int buscarParaDeclararMiembroClase(	simbolos_p simbolos,
 	if(ht_isin(node->principal, nombre_simbolo)){
 		*s = ht_search(node->principal, nombre_simbolo);
 		strcpy(nombre_ambito_encontrado, nombre_ambito);
-		return aplicarAccesos(simbolos, nombre_clase, nombre_clase, *s);
+		// return aplicarAccesos(simbolos, nombre_clase, nombre_clase, *s);
+		return OK;
 	}
 
 	s = NULL;
