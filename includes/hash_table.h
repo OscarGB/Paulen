@@ -32,6 +32,10 @@ void ht_print_table(hash_table_p ht);
 last pointer is NULL*/
 char** ht_get_keys(hash_table_p ht);
 
+/*Gets all values, REMEMBER to free values but not the items inside
+last pointer is NULL*/
+void** ht_get_values(hash_table_p ht);
+
 /*Gets the nae of the hash_table*/
 char* ht_get_name(hash_table_p ht);
 

@@ -300,6 +300,28 @@ char** ht_get_keys(hash_table_p ht){
 	return keys;
 }
 
+/*Gets all values, REMEMBER to free values but not the items inside
+last pointer is NULL*/
+void** ht_get_values(hash_table_p ht){
+	void** values = (void**)malloc(sizeof(void*)*(ht->size+1));
+	int j = 0;
+	for(int i = 0; i < ht->size; i++){
+		ht_item*  item = ht->items[i];
+		if(item == &HT_DELETED_ITEM){
+			continue;
+		}
+		else if (item != NULL){
+			values[j] = item->value;
+			j++;
+		}
+		else{
+			continue;
+		}
+	}
+	values[j] = NULL;
+	return values;
+}
+
 /*Gets the nae of the hash_table*/
 char* ht_get_name(hash_table_p ht){
 	return ht->name;
