@@ -1,15 +1,55 @@
 %{
-
+#include "generacion.h"
+#include "omicron.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-void yyerror();
-extern int yylex();
+
+
 extern int linea;
 extern int columna;
-extern FILE * fout;
+extern FILE * salida;
+
+
+
+int etiqueta = 0;
+int tipo_actual = 0;
+int clase_actual = 0;
+int valor_actual = 0;
+int num_parametros_actual=0;
+int num_variables_locales_actual=0;
+int pos_parametro_actual = 0;
+char* nombre_actual_simbolo=NULL;
+
+void escribe_cabecera (FILE * salida);
+void escribe_variables (FILE * salida, char* nombre, int tamanio);
+void gc_suma_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2);
+void gc_resta_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2);
+void gc_division_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2);
+void gc_producto_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2);
+void gc_negacion_entero(FILE *salida, int es_direccion_op1);
+void gc_and_logico(FILE *salida, int es_direccion_op1, int es_direccion_op2);
+void gc_or_logico(FILE *salida, int es_direccion_op1, int es_direccion_op2);
+void gc_not_logico(FILE *salida, int es_direccion_op1, int etiqueta);
+void gc_igual(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta);
+void gc_distinto(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta);
+void gc_menorigual(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta);
+void gc_mayorigual(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta);
+void gc_menor(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta);
+void gc_mayor(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta);
+void gc_vectores_indice(FILE *salida, int es_direccion_op1, char *lexema, int tam_vector);
+void gc_printf_vectores(FILE *salida, int etiqueta, int tamanio, int tipo);
+void gc_printf(FILE *salida, int es_direccion_op1, int tipo);
+void gc_ident_asiglocal(FILE *salida, int es_direccion, int categoria, int nPar, int pos);
+void gc_asigexp_ident(FILE *salida, int es_direccion_op1, char *lexema);
+void imprimir_error(FILE * salida);
+void yyerror();
 
 %}
+
+%union{
+	tipo_atributos atributos;
+}
 
 %token TOK_NONE
 %token TOK_CLASS
@@ -23,7 +63,8 @@ extern FILE * fout;
 %token TOK_EXPOSED
 %token TOK_UNIQUE
 %token TOK_FUNCTION
-%token TOK_RETURN
+
+
 %token TOK_MAIN
 %token TOK_INT
 %token TOK_BOOLEAN
@@ -33,8 +74,7 @@ extern FILE * fout;
 %token TOK_WHILE
 %token TOK_SCANF
 %token TOK_PRINTF
-
-%token TOK_IDENTIFICADOR
+%token TOK_RETURN
 
 %token TOK_IGUAL
 %token TOK_DISTINTO
@@ -43,11 +83,6 @@ extern FILE * fout;
 %token TOK_OR
 %token TOK_AND
 
-%token TOK_CONSTANTE_ENTERA
-%token TOK_FALSE
-%token TOK_TRUE
-
-%token TOK_ERROR
 
 %token TOK_FOR
 %token TOK_SWITCH
@@ -66,6 +101,48 @@ extern FILE * fout;
 %token TOK_SIZE
 %token TOK_CONTAINS
 %token TOK_CONSTANTE_REAL
+%token TOK_TRUE
+%token TOK_FALSE
+
+/*Identificadores*/
+%token <atributos> TOK_IDENTIFICADOR
+
+/*Constantes*/
+%token <atributos> TOK_CONSTANTE_ENTERA
+
+
+
+%type <atributos> programa
+%type <atributos> escritura_main
+/*%type <atributos> inicioTabla*/
+%type <atributos> declaraciones
+%type <atributos> declaracion
+%type <atributos> clase
+%type <atributos> clase_escalar
+%type <atributos> tipo
+%type <atributos> clase_vector
+%type <atributos> identificadores
+%type <atributos> funciones
+%type <atributos> funcion
+%type <atributos> parametros_funcion
+%type <atributos> resto_parametros_funcion
+%type <atributos> parametro_funcion
+%type <atributos> declaraciones_funcion
+%type <atributos> sentencias
+%type <atributos> sentencia_simple
+%type <atributos> bloque
+%type <atributos> asignacion
+%type <atributos> elemento_vector
+%type <atributos> bucle
+%type <atributos> lectura
+%type <atributos> escritura
+%type <atributos> retorno_funcion
+%type <atributos> exp
+%type <atributos> comparacion
+%type <atributos> constante
+%type <atributos> constante_logica
+%type <atributos> constante_entera
+%type <atributos> identificador
 
 %left '+' '-' TOK_OR
 %left '*' '/' TOK_AND
@@ -73,565 +150,828 @@ extern FILE * fout;
 
 %start programa
 
+
+
 %%
 
-programa: TOK_MAIN '{' declaraciones funciones sentencias '}'
+programa: inicioTabla TOK_MAIN '{' declaraciones escritura_TS funciones escritura_main sentencias final_programa'}'
 		{
-			fprintf(fout, ";R:\tprograma: TOK_MAIN '{' declaraciones funciones sentencias '}'\n");
 		}
 		|
 		TOK_MAIN '{' funciones sentencias '}'
 		{
-			fprintf(fout, ";R:\tprograma: TOK_MAIN '{' funciones sentencias '}'\n");
 		}
 		;
 
+escritura_TS : {
+			escribir_subseccion_data(salida);
+			escribir_cabecera_bss(salida);
+			escribe_variables(salida, nombre_actual_simbolo, 1);
+			escribe_cabecera(salida);
+		}
+		;
+
+escritura_main : {
+			escribir_inicio_main(salida);
+		}
+		;
+
+final_programa : {
+			imprimir_error(salida);
+		}
+		;
+
+inicioTabla : {
+		simbolos_p simbol = createSimbolos("Programa");
+			if (simbol->main_principal == NULL){
+				fprintf(salida, "Error al inicializar la tabla\n");
+				return -1;
+			}
+		}
+		;
+
+
 declaraciones: declaracion
 		{
-			fprintf(fout, ";R:\tdeclaraciones: declaracion\n");
 		}
 		|
 		declaracion declaraciones
 		{
-			fprintf(fout, ";R:\tdeclaraciones: declaracion declaraciones\n");
 		}
 		;
 
-declaracion: modificadores_acceso clase identificadores ';'
+declaracion: modificador_acceso clase identificadores ';'
 		{
-			fprintf(fout, ";R:\tdeclaracion: modificadores_acceso clase identificadores ';'\n");
+			nombre_actual_simbolo = $3.lexema;
+			/*if(buscarIdNoCualificado(simbol, $3.lexema, "main", NULL)){
+				fprintf(salida, "Error al declarar el el elemento, ya esta declarado\n");
+			}
+			else{
+				nuevoSimboloEnMain(simbol, $3.lexema, "main",clase_actual,tipo_actual,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
+			}*/
 		}
 		|
-		modificadores_acceso declaracion_clase ';'
+		modificador_acceso declaracion_clase ';'
 		{
-			fprintf(fout, ";R:\tdeclaracion: modificadores_acceso declaracion_clase ';'\n");
+			/*nuevaClase(simbol, NULL, 0, $2.lexema);*/
+			/*No sé si deberiamos de comprobar que la calse que estamos creada haya sido ya creada*/
 		}
 		;
 
-modificadores_acceso: TOK_HIDDEN TOK_UNIQUE
+modificador_acceso: /*vacio*/
 		{
-			fprintf(fout, ";R:\tmodificadores_acceso:\tTOK_HIDDEN TOK_UNIQUE\n");
+		}
+		|
+		TOK_HIDDEN TOK_UNIQUE
+		{
 		}
 		|
 		TOK_SECRET TOK_UNIQUE
 		{
-			fprintf(fout, ";R:\tmodificadores_acceso:\tTOK_SECRET TOK_UNIQUE\n");
 		}
 		|
 		TOK_EXPOSED TOK_UNIQUE
 		{
-			fprintf(fout, ";R:\tmodificadores_acceso:\tTOK_EXPOSED TOK_UNIQUE\n");
 		}
 		|
 		TOK_HIDDEN
 		{
-			fprintf(fout, ";R:\tmodificadores_acceso:\tTOK_HIDDEN\n");
 		}
 		|
 		TOK_SECRET
 		{
-			fprintf(fout, ";R:\tmodificadores_acceso:\tTOK_SECRET\n");
 		}
 		|
 		TOK_EXPOSED
 		{
-			fprintf(fout, ";R\tmodificadores_acceso:\tTOK_EXPOSED\n");
 		}
 		|
 		TOK_UNIQUE
 		{
-			fprintf(fout, ";R:\tmodificadores_acceso:\tTOK_UNIQUE\n");
-		}
-		|
-		/*vacio*/
-		{
-			fprintf(fout, ";R:\tmodificadores_acceso: \n");
 		}
 		;
 
 clase: clase_escalar
 		{
-			fprintf(fout, ";R:\tclase: clase_escalar\n");
+			clase_actual=1;
 		}
 		|
 		clase_vector
 		{
-			fprintf(fout, ";R:\tclase: clase_vector\n");
+			clase_actual=3;
 		}
 		|
 		clase_objeto
 		{
-			fprintf(fout, ";R:\tclase: clase_objeto\n");
+			clase_actual=5;
 		}
 		;
 
 
 declaracion_clase: modificadores_clase TOK_CLASS TOK_IDENTIFICADOR TOK_INHERITS identificadores '{' declaraciones funciones '}'
 		{
-			fprintf(fout, ";R:\tdeclaracion_clase: modificadores_clase TOK_CLASS TOK_IDENTIFICADOR TOK_INHERITS identificadores '{' declaraciones funciones '}' \n");
-		}
-		|
-		modificadores_clase TOK_CLASS TOK_IDENTIFICADOR TOK_INHERITS identificadores '{' funciones '}'
-		{
-			fprintf(fout, ";R:\tdeclaracion_clase: modificadores_clase TOK_CLASS TOK_IDENTIFICADOR TOK_INHERITS identificadores '{' declaraciones funciones '}' \n");
 		}
 		|
 		modificadores_clase TOK_CLASS TOK_IDENTIFICADOR '{' declaraciones funciones '}'
 		{
-			fprintf(fout, ";R:\tdeclaracion_clase: modificadores_clase TOK_CLASS TOK_IDENTIFICADOR '{' declaraciones funciones '}'\n");
 		}
 		;
 
 modificadores_clase: /*vacio*/
 		{
-			fprintf(fout, ";R:\tmodificadores_clase: \n");
 		}
 		;
 
 clase_escalar: tipo
 		{
-			fprintf(fout, ";R:\tclase_escalar: tipo\n");
 		}
 		;
 
 tipo: TOK_INT
 		{
-			fprintf(fout, ";R:\ttipo:\tTOK_INT\n");
+			tipo_actual = INT;
 		}
 		|
 		TOK_BOOLEAN
 		{
-			fprintf(fout, ";R\ttipo:\tTOK_BOOLEAN\n");
+			tipo_actual = BOOLEAN;
 		}
 		;
 
 clase_objeto: '{' TOK_IDENTIFICADOR '}'
 		{
-			fprintf(fout, ";R:\tclase_objeto: '{' TOK_IDENTIFICADOR '}'\n");
 		}
 		;
 
 clase_vector: TOK_ARRAY tipo '[' TOK_CONSTANTE_ENTERA ']'
 		{
-			fprintf(fout, ";R:\tclase_vector: TOK_ARRAY tipo '[' TOK_CONSTANTE_ENTERA ']'\n");
 		}
 		;
 
-identificadores: TOK_IDENTIFICADOR
+identificadores: identificador
 		{
-			fprintf(fout, ";R:\tidentificadores:\tTOK_IDENTIFICADOR\n");
 		}
 		|
-		TOK_IDENTIFICADOR ',' identificadores
+		identificador ',' identificadores
 		{
-			fprintf(fout, ";R:\tidentificadores:\tTOK_IDENTIFICADOR ',' identificadores\n");
 		}
 		;
 
 funciones: funcion funciones
 		{
-			fprintf(fout, ";R:\tfunciones: funcion funciones\n");
 		}
 		|
 		/*vacio*/
 		{
-			fprintf(fout, ";R:\tfunciones:\n");
 		}
 		;
 
-funcion: TOK_FUNCTION modificadores_acceso tipo_retorno TOK_IDENTIFICADOR '(' parametros_funcion ')' '{' declaraciones_funcion sentencias '}'
+funcion: TOK_FUNCTION modificador_acceso tipo_retorno TOK_IDENTIFICADOR '(' parametros_funcion ')' '{' declaraciones_funcion sentencias '}'
 		{
-			fprintf(fout, ";R:\tfuncion:\tTOK_FUNCTION modificadores_acceso tipo_retorno TOK_IDENTIFICADOR '(' parametros_funcion ')' '{' declaraciones_funcion sentencias '}'\n");
 		}
 		;
 
 tipo_retorno: TOK_NONE
 		{
-			fprintf(fout, ";R:\ttipo_retorno:\tTOK_NONE\n");
 		}
 		|
 		tipo
 		{
-			fprintf(fout, ";R\ttipo_retorno:\ttipo\n");
-		}
-		|
-		clase_objeto
-		{
-			fprintf(fout, ";R\ttipo_retorno:\tclase_objeto\n");
 		}
 		;
 
 parametros_funcion: parametro_funcion resto_parametros_funcion
 		{
-			fprintf(fout, ";R:\tparametros_funcion: parametro_funcion resto_parametros_funcion\n");
 		}
 		|
 		/*vacio*/
 		{
-			fprintf(fout, ";R:\tparametros_funcion:\n");
 		}
 		;
 
 resto_parametros_funcion: ';' parametro_funcion resto_parametros_funcion
 		{
-			fprintf(fout, ";R:\tresto_parametros_funcion: ';' parametro_funcion resto_parametros_funcion\n");
 		}
 		|
 		/*vacio*/
 		{
-			fprintf(fout, ";R:\tresto_parametros_funcion:\n");
 		}
 		;
 
 parametro_funcion: tipo TOK_IDENTIFICADOR
 		{
-			fprintf(fout, ";R:\tparametro_funcion: tipo TOK_IDENTIFICADOR\n");
-		}
-		|
-		clase_objeto TOK_IDENTIFICADOR
-		{
-			fprintf(fout, ";R:\tparametro_funcion: clase_objeto TOK_IDENTIFICADOR\n");
 		}
 		;
 
-declaraciones_funcion: /*vacio*/
+declaraciones_funcion: declaraciones
 		{
-			fprintf(fout, ";R:\tdeclaraciones_funcion: \n");
 		}
 		|
-		declaraciones
+		/*vacio*/
 		{
-			fprintf(fout, ";R:\tdeclaraciones_funcion: declaraciones\n");
 		}
 		;
 
 sentencias: sentencia
 		{
-			fprintf(fout, ";R:\tsentencias: sentencia\n");
 		}
 		|
 		sentencia sentencias
 		{
-			fprintf(fout, ";R:\tsentencias: sentencia sentencias\n");
 		}
 		;
 
 sentencia: sentencia_simple ';'
 		{
-			fprintf(fout, ";R:\tsentencia:\tsentencia_simple ';'\n");
 		}
 		|
 		bloque
 		{
-			fprintf(fout, ";R:\tsentencia: bloque\n");
 		}
 		;
 
 sentencia_simple: asignacion
 		{
-			fprintf(fout, ";R:\tsentencia_simple:\tasignacion\n");
 		}
 		|
 		lectura
 		{
-			fprintf(fout, ";R:\tsentencia_simple:\tlectura\n");
 		}
 		|
 		escritura
 		{
-			fprintf(fout, ";R:\tsentencia_simple:\tescritura\n");
 		}
 		|
 		retorno_funcion
 		{
-			fprintf(fout, ";R\tsentencia_simple:\tretorno_funcion\n");
 		}
 		|
 		identificador_clase '.' TOK_IDENTIFICADOR '(' lista_expresiones ')'
 		{
-			fprintf(fout, ";R:\tsentencia_simple:\tidentificador_clase '.' TOK_IDENTIFICADOR '(' lista_expresiones ')'\n");
 		}
 		|
 		TOK_IDENTIFICADOR '(' lista_expresiones ')'
 		{
-			fprintf(fout, ";R:\tsentencia_simple:\tTOK_IDENTIFICADOR '(' lista_expresiones ')'\n");
 		}
 		|
 		destruir_objeto
 		{
-			fprintf(fout, ";R:\tsentencia_simple:\tdestruir_objeto\n");
 		}
 		;
 
 destruir_objeto: TOK_DISCARD TOK_IDENTIFICADOR
 		{
-			fprintf(fout, ";R:\tdestruir_objeto:\tTOK_DISCARD TOK_IDENTIFICADOR\n");
 		}
 		;
 
 bloque: condicional
 		{
-			fprintf(fout, ";R:\tbloque:\tcondicional\n");
 		}
 		|
 		bucle
 		{
-			fprintf(fout, ";R:\tbloque:\tbucle\n");
 		}
 		;
 
 asignacion: TOK_IDENTIFICADOR '=' exp
 		{
-			fprintf(fout, ";R:\tasignacion:\tTOK_IDENTIFICADOR '=' exp\n");
+			gc_asigexp_ident(salida, $3.direcciones, $1.lexema);
 		}
 		|
 		elemento_vector '=' exp
 		{
-			fprintf(fout, ";R:\tasignacion:\telemento_vector '=' exp\n");
+			/*simbolo_p sim=NULL;
+			if(simbol-> main_local != NULL){
+				buscarIdCualificadoInstancia(simbol, $1.lexema, nombre_funcion_actual, "main", &sim, INSTANCIA);
+				if(sim == NULL){
+					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s)\n", linea, $1.lexema);
+					return -1;
+				}
+			}else{
+				buscarIdNoCualificado(simbol, $1.lexema, "main", &sim, NULL);
+				if(sim == NULL){
+					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $1.lexema);
+					return -1;
+				}
+			}
+
+			if($3.tipo != INT){
+				printf("****Error semántico en lin %d: El indice en una operacion de indexacion tiene que ser de tipo entero.\n", linea);
+				return -1;
+			}
+			if ($3.clase != VECTOR){
+				printf("****Error semántico en lin %d: Intento de indexacion de una variable que no es de tipo vector.\n", linea);
+				return -1;
+			}
+			$$.direcciones = 1;
+			$$.tipo = sim->tipo;
+			gc_vectores_indice(salida, $3.direcciones, $1.lexema, node->tamanio); */
 		}
 		|
 		elemento_vector '=' TOK_INSTANCE_OF TOK_IDENTIFICADOR '(' lista_expresiones ')'
 		{
-			fprintf(fout, ";R:\tasignacion:\telemento_vector '=' TOK_INSTANCE_OF TOK_IDENTIFICADOR '(' lista_expresiones ')'\n");
 		}
 		|
 		TOK_IDENTIFICADOR '=' TOK_INSTANCE_OF TOK_IDENTIFICADOR '(' lista_expresiones ')'
 		{
-			fprintf(fout, ";R:\tasignacion:\tTOK_IDENTIFICADOR '=' TOK_INSTANCE_OF TOK_IDENTIFICADOR '(' lista_expresiones ')'\n");
 		}
 		|
 		identificador_clase '.' TOK_IDENTIFICADOR '=' exp
 		{
-			fprintf(fout, ";R:\tasignacion:\tidentificador_clase '.' TOK_IDENTIFICADOR '=' exp\n");
 		}
 		;
 
 elemento_vector: TOK_IDENTIFICADOR '[' exp ']'
 		{
-			fprintf(fout, ";R:\telemento_vector:\tTOK_IDENTIFICADOR '[' exp ']'\n");
 		}
 		;
 
 condicional: TOK_IF '(' exp ')' '{' sentencias '}'
 		{
-			fprintf(fout, ";R:\tcondicional:\tTOK_IF '(' exp ')' '{' sentencias '}'\n");
 		}
 		|
 		TOK_IF '(' exp ')' '{' sentencias '}' TOK_ELSE '{' sentencias '}'
 		{
-			fprintf(fout, ";R:\tcondicional:\tTOK_IF '(' exp ')' '{' sentencias '}' TOK_ELSE '{' sentencias '}'\n");
 		}
 		;
 
 bucle: TOK_WHILE '(' exp ')' '{' sentencias '}'
 		{
-			fprintf(fout, ";R:\tbucle:\tTOK_WHILE '(' exp ')' '{' sentencias '}'\n");
 		}
 		;
 
 lectura: TOK_SCANF TOK_IDENTIFICADOR
 		{
-			fprintf(fout, ";R:\tlectura:\tTOK_SCANF TOK_IDENTIFICADOR\n");
 		}
 		|
 		TOK_SCANF elemento_vector
 		{
-			fprintf(fout, ";R:\tlectura:\tTOK_SCANF elemento_vector\n");
 		}
 		;
 
 escritura: TOK_PRINTF exp
 		{
-			fprintf(fout, ";R:\tescritura:\tTOK_PRINTF exp\n");
+			gc_printf(salida, $2.direcciones, $2.tipo);
 		}
 		;
 
 retorno_funcion: TOK_RETURN exp
 		{
-			fprintf(fout, ";R:\tretorno_funcion:\tTOK_RETURN exp\n");
 		}
 		|
 		TOK_RETURN TOK_NONE
 		{
-			fprintf(fout, ";R:\tretorno_funcion:\tTOK_RETURN TOK_NONE\n");
 		}
 		;
 
 exp: exp '+' exp
 		{
-			fprintf(fout, ";R:\texp: exp '+' exp\n");
+			if ($1.tipo != INT || $3.tipo != INT){
+				printf("****Error semántico en lin %d: Operacion aritmetica con operandos boolean.\n", linea);
+				return -1;
+			}
+			gc_suma_enteros(salida, $1.direcciones, $3.direcciones);
+			$$.direcciones = 0;
+			$$.tipo = INT;
 		}
 		|
 		exp '-' exp
 		{
-			fprintf(fout, ";R:\texp: exp '-' exp\n");
+			if ($1.tipo != INT || $3.tipo != INT){
+				printf("****Error semántico en lin %d: Operacion aritmetica con operandos boolean.\n", linea);
+				return -1;
+			}
+			gc_resta_enteros(salida, $1.direcciones, $3.direcciones);
+			$$.direcciones = 0;
+			$$.tipo = INT;
 		}
 		|
 		exp '/' exp
 		{
-			fprintf(fout, ";R:\texp: exp '/' exp\n");
+			if ($1.tipo != INT || $3.tipo != INT){
+				printf("****Error semántico en lin %d: Operacion aritmetica con operandos boolean.\n", linea);
+				return -1;
+			}
+			gc_division_enteros(salida, $1.direcciones, $3.direcciones);
+			$$.direcciones = 0;
+			$$.tipo = INT;
 		}
 		|
 		exp '*' exp
 		{
-			fprintf(fout, ";R:\texp: exp '*' exp\n");
+			if ($1.tipo != INT || $3.tipo != INT){
+				printf("****Error semántico en lin %d: Operacion aritmetica con operandos boolean.\n", linea);
+				return -1;
+			}
+			gc_producto_enteros(salida, $1.direcciones, $3.direcciones);
+			$$.direcciones = 0;
+			$$.tipo = INT;
 		}
 		|
 		'-' exp %prec MENOSU
 		{
-			fprintf(fout, ";R:\texp: '-' exp\n");
+			if ($2.tipo!=INT){
+				printf("****Error semántico en lin %d: Operacion aritmetica con operandos boolean.\n", linea);
+				return -1;
+			}
+			gc_negacion_entero(salida, $2.direcciones);
+			$$.direcciones = 0;
+			$$.tipo = INT;
 		}
 		|
 		exp TOK_AND exp
 		{
-			fprintf(fout, ";R:\texp TOK_AND exp\n");
+			if ($1.tipo != BOOLEAN || $3.tipo != BOOLEAN) {
+				printf("****Error semántico en lin %d: Operacion logica con operandos int.\n", linea);
+				return -1;
+			}
+			gc_and_logico(salida, $1.direcciones, $3.direcciones);
+			$$.direcciones = 0;
+			$$.tipo = BOOLEAN;
 		}
 		|
 		exp TOK_OR exp
 		{
-			fprintf(fout, ";R:\texp TOK_OR exp\n");
+			if ($1.tipo!=BOOLEAN || $3.tipo!=BOOLEAN) {
+				printf("****Error semántico en lin %d: Operacion logica con operandos int.\n", linea);
+				return -1;
+			}
+			gc_or_logico(salida, $1.direcciones, $3.direcciones);
+			$$.direcciones = 0;
+			$$.tipo = BOOLEAN;
 		}
 		|
 		'!' exp
 		{
-			fprintf(fout, ";R:\texp: '!' exp\n");
+			if ($2.tipo!=BOOLEAN) {
+				printf("****Error semántico en lin %d: Operacion logica con operandos int.\n", linea);
+				return -1;
+			}
+			gc_not_logico(salida, $2.direcciones, etiqueta);
+			$$.direcciones = 0;
+			$$.tipo = BOOLEAN;
+			etiqueta++;
 		}
 		|
 		TOK_IDENTIFICADOR
 		{
-			fprintf(fout, ";R:\texp: TOK_IDENTIFICADOR\n");
+			if($1.direcciones == 0){
+				fprintf(salida,"push dword [_%s]\n", $1.lexema);
+			}
+			else{
+				fprintf(salida,"push dword _%s\n", $1.lexema);
+			}
 		}
 		|
 		constante
 		{
-			fprintf(fout, ";R:\texp: constante\n");
+			$$.tipo = $1.tipo;
+			$$.direcciones = $1.direcciones;
 		}
 		|
 		'(' exp ')'
 		{
-			fprintf(fout, ";R:\texp: '(' exp ')'\n");
+			$$.tipo = $2.tipo;
+			$$.direcciones = $2.direcciones;
 		}
 		|
 		'(' comparacion ')'
 		{
-			fprintf(fout, ";R:\texp: '(' comparacion ')'\n");
+			$$.tipo = $2.tipo;
+			$$.direcciones = $2.direcciones;
 		}
 		|
 		elemento_vector
 		{
-			fprintf(fout, ";R:\texp: elemento_vector\n");
+			$$.tipo = $1.tipo;
+			$$.direcciones = $1.direcciones;
 		}
 		|
 		TOK_IDENTIFICADOR '(' lista_expresiones ')'
 		{
-			fprintf(fout, ";R:\texp: TOK_IDENTIFICADOR '(' lista_expresiones ')'\n");
 		}
 		|
 		identificador_clase '.' TOK_IDENTIFICADOR '(' lista_expresiones ')'
 		{
-			fprintf(fout, ";R:\texp: identificador_clase '.' TOK_IDENTIFICADOR '(' lista_expresiones ')'\n");
 		}
 		|
 		identificador_clase '.' TOK_IDENTIFICADOR
 		{
-			fprintf(fout, ";R:\texp: identificador_clase '.' TOK_IDENTIFICADOR\n");
 		}
 		;
 
 
 identificador_clase: TOK_IDENTIFICADOR
 		{
-			fprintf(fout, ";R:\tidentificador_clase:\tTOK_IDENTIFICADOR\n");
 		}
 		|
 		TOK_ITSELF
 		{
-			fprintf(fout, ";R:\tidentificador_clase:\tTOK_ITSELF\n");
 		}
 		;
 
 lista_expresiones: exp resto_lista_expresiones
 		{
-			fprintf(fout, ";R:\tlista_expresiones: exp resto_lista_expresiones\n");
 		}
 		|
 		/*vacio*/
 		{
-			fprintf(fout, ";R:\tlista_expresiones: \n");
 		}
 		;
 
 resto_lista_expresiones: ',' exp resto_lista_expresiones
 		{
-			fprintf(fout, ";R:\tresto_lista_expresiones: ',' exp resto_lista_expresiones\n");
 		}
 		|
 		/*vacio*/
 		{
-			fprintf(fout, ";R:\tresto_lista_expresiones:\n");
 		}
 		;
 
 comparacion: exp TOK_IGUAL exp
 		{
-			fprintf(fout, ";R:\tcomparacion: exp TOK_IGUAL exp\n");
+			if ($1.tipo!=INT || $3.tipo!=INT){
+				printf("****Error semántico en lin %d: Comparacion con operandos boolean.\n", linea);
+				return -1;
+			}
+			gc_igual(salida, $1.direcciones, $3.direcciones, etiqueta);
+			$$.etiqueta = etiqueta++;
+			$$.direcciones = 0;
+			$$.tipo = BOOLEAN;
 		}
 		|
 		exp TOK_DISTINTO exp
 		{
-			fprintf(fout, ";R:\tcomparacion: exp TOK_DISTINTO exp\n");
+			if ($1.tipo!=INT || $3.tipo!=INT){
+				printf("****Error semántico en lin %d: Comparacion con operandos boolean.\n", linea);
+				return -1;
+			}
+			gc_distinto(salida, $1.direcciones, $3.direcciones, etiqueta);
+			$$.etiqueta = etiqueta++;
+			$$.direcciones = 0;
+			$$.tipo = BOOLEAN;
 		}
 		|
 		exp TOK_MAYORIGUAL exp
 		{
-			fprintf(fout, ";R:\tcomparacion: exp TOK_MAYORIGUAL exp\n");
+			if ($1.tipo!=INT || $3.tipo!=INT){
+				printf("****Error semántico en lin %d: Comparacion con operandos boolean.\n", linea);
+				return -1;
+			}
+			gc_mayorigual(salida, $1.direcciones, $3.direcciones, etiqueta);
+			$$.etiqueta = etiqueta++;
+			$$.direcciones = 0;
+			$$.tipo = BOOLEAN;
 		}
 		|
 		exp TOK_MENORIGUAL exp
 		{
-			fprintf(fout, ";R:\tcomparacion: exp TOK_MENORIGUAL exp\n");
+			if ($1.tipo!=INT || $3.tipo!=INT){
+				printf("****Error semántico en lin %d: Comparacion con operandos boolean.\n", linea);
+				return -1;
+			}
+			gc_menorigual(salida, $1.direcciones, $3.direcciones, etiqueta);
+			$$.etiqueta = etiqueta++;
+			$$.direcciones = 0;
+			$$.tipo = BOOLEAN;
 		}
 		|
 		exp '>' exp
 		{
-			fprintf(fout, ";R:\tcomparacion: exp '>' exp\n");
+			if ($1.tipo!=INT || $3.tipo!=INT){
+				printf("****Error semántico en lin %d: Comparacion con operandos boolean.\n", linea);
+				return -1;
+			}
+			gc_mayor(salida, $1.direcciones, $3.direcciones, etiqueta);
+			$$.etiqueta = etiqueta++;
+			$$.direcciones = 0;
+			$$.tipo = BOOLEAN;
 		}
 		|
 		exp '<' exp
 		{
-			fprintf(fout, ";R:\tcomparacion: exp '<' exp\n");
+			if ($1.tipo!=INT || $3.tipo!=INT){
+				printf("****Error semántico en lin %d: Comparacion con operandos boolean.\n", linea);
+				return -1;
+			}
+			gc_menor(salida, $1.direcciones, $3.direcciones, etiqueta);
+			$$.etiqueta = etiqueta++;
+			$$.direcciones = 0;
+			$$.tipo = BOOLEAN;
 		}
 		;
 
 constante: constante_logica
 		{
-			fprintf(fout, ";R:\tconstante: constante_logica\n");
+			$$.tipo = $1.tipo;
+			$$.direcciones = $1.direcciones;
 		}
 		|
 		constante_entera
 		{
-			fprintf(fout, ";R:\tconstante:\tconstante_entera\n");
+			$$.tipo = $1.tipo;
+			$$.direcciones = $1.direcciones;
 		}
 		;
 
 constante_logica: TOK_TRUE
 		{
-			fprintf(fout, ";R:\tconstante_logica:\tTOK_TRUE\n");
+			/* análisis semántico */
+			$$.tipo = BOOLEAN;
+			$$.direcciones = 0;
+			/* generación de código */
+			/*fprintf(salida, "; numero_linea %d\n", numero_linea);*/
+			fprintf(salida, "\tpush dword 1\n");
 		}
 		|
 		TOK_FALSE
 		{
-			fprintf(fout, ";R:\tconstante_logica:\tTOK_FALSE\n");
+			/* análisis semántico */
+			$$.tipo = BOOLEAN;
+			$$.direcciones = 0;
+			/* generación de código */
+			/*fprintf(salida, "; numero_linea %d\n", numero_linea);*/
+			fprintf(salida, "\tpush dword 0\n");
 		}
 		;
 
 constante_entera: TOK_CONSTANTE_ENTERA
 		{
-			fprintf(fout, ";R:\tconstante_entera:\tTOK_CONSTANTE_ENTERA\n");
+			/* análisis semántico */
+			$$.tipo = INT;
+			$$.direcciones = 0;
+			/* generación de código */
+			/*fprintf(salida, "; numero_linea %d\n", numero_linea);*/
+			fprintf(salida, "\tpush dword %d\n", $1.valor_entero);
+		}
+		;
+
+/*idpf : TOK_IDENTIFICADOR{
+	simbol sim=NULL;
+	if(simbol->main_local == NULL){
+		printf("****Error semántico en lin %d: El ambito local no esta abierto.\n", linea);
+		return -1;
+	}*/
+	/*Comprobamos que el identificador existe en el ambito actual*/
+	/*if(!buscarIdCualificadoInstancia(simbol, $1.lexema, nombre_funcion_actual, "main", &sim, CLASE)){
+		printf("****Error semántico en lin %d:  Acceso a variable no declarada (%s).\n", linea, $1.lexema);
+		return -1;
+	}else{
+	    clase_actual = ESCALAR;*/
+	    /*Realizamos la insercion*/
+	    /*nuevoSimboloEnClase(simbol, $1.lexema, "main", clase_actual, tipo_actual,0,0,0,0,0,pos_parametro_actual,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NULL)
+	    pos_parametro_actual++;
+	    num_parametros_actual++;
+	}
+};*/
+
+identificador: TOK_IDENTIFICADOR
+		{
 		}
 		;
 %%
 
+void escribe_cabecera (FILE * salida){
+	escribir_segmento_codigo(salida);
+	return ;
+}
+
+void escribe_variables (FILE * salida, char* nombre, int tamanio){
+	declarar_variable(salida, nombre, tamanio);
+}
+
+void imprimir_error(FILE * salida){
+	fprintf(salida, "jmp near fin\n\n");
+	fprintf(salida, "error_1: push dword mensaje_1\n");
+	fprintf(salida, "	  call print_string\n");
+	fprintf(salida, "	  add esp, 4\n");
+	fprintf(salida, "	  jmp near fin\n\n");
+	fprintf(salida, "error_2: push dword mensaje_2\n");
+	fprintf(salida, "         call print_string\n");
+	fprintf(salida, "         add esp, 4\n");
+	fprintf(salida, "         jmp near fin\n\n");
+	fprintf(salida, "fin:\n");
+	fprintf(salida, "mov dword esp, [__esp]\n");
+	fprintf(salida, "ret\n");
+	return;
+}
+
+void gc_suma_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2) {
+	sumar(salida, es_direccion_op1, es_direccion_op2);
+	return;
+}
+
+void gc_resta_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2) {
+	restar(salida, es_direccion_op1, es_direccion_op2);
+	return;
+}
+
+void gc_division_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2) {
+	dividir(salida, es_direccion_op1, es_direccion_op2);
+	return;
+}
+
+void gc_producto_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2) {
+	multiplicar(salida, es_direccion_op1, es_direccion_op2);
+	return;
+}
+
+void gc_negacion_entero(FILE *salida, int es_direccion_op1){
+	cambiar_signo(salida, es_direccion_op1);
+	return;
+}
+
+void gc_and_logico(FILE *salida, int es_direccion_op1, int es_direccion_op2){
+	y(salida, es_direccion_op1, es_direccion_op2);
+	return;
+}
+
+void gc_or_logico(FILE *salida, int es_direccion_op1, int es_direccion_op2){
+	o(salida, es_direccion_op1, es_direccion_op2);
+	return;
+}
+
+void gc_not_logico(FILE *salida, int es_direccion_op1, int etiqueta){
+	no(salida, es_direccion_op1, etiqueta);
+	return;
+}
+
+void gc_igual(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta){
+	igual(salida, es_direccion_op1, es_direccion_op2, etiqueta);
+	return;
+}
+
+void gc_distinto(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta){
+	distinto(salida, es_direccion_op1, es_direccion_op2, etiqueta);
+	return;
+}
+
+void gc_menorigual(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta){
+	menor_igual(salida, es_direccion_op1, es_direccion_op2, etiqueta);
+	return;
+}
+
+void gc_mayorigual(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta){
+	mayor_igual(salida, es_direccion_op1, es_direccion_op2, etiqueta);
+	return;
+}
+
+void gc_menor(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta){
+	menor(salida, es_direccion_op1, es_direccion_op2, etiqueta);
+	return;
+}
+
+void gc_mayor(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta){
+	mayor(salida, es_direccion_op1, es_direccion_op2, etiqueta);
+	return;
+}
+
+void gc_vectores_indice(FILE *salida, int es_direccion_op1, char *lexema, int tam_vector){
+	fprintf(salida, "; Cargamos en el registro eax el valor del indice\n");
+	fprintf(salida, "pop dword eax \n");
+	if (es_direccion_op1 == 1){
+		fprintf(salida, "mov dword eax , [eax]\n");
+	}
+	fprintf(salida, "; Si el indice es menor que 0 se produce un error\n");
+	fprintf(salida, "cmp eax,0\n");
+	fprintf(salida, "jl near error_1\n");
+	fprintf(salida, "; Si el indice es mayor de lo estipulado se comete un error\n");
+	fprintf(salida, "cmp eax, %d\n", tam_vector-1);
+	fprintf(salida, "jg near error_1\n");
+	fprintf(salida, "mov dword edx, _%s\n", lexema);
+	fprintf(salida, "lea eax, [edx + eax * 4]\n");
+	fprintf(salida, "push dword eax\n");
+	return;
+}
+
+void gc_ident_asiglocal(FILE *salida, int es_direccion, int categoria, int nPar, int pos){
+	fprintf(salida,"pop dword eax\n");
+	if (es_direccion == 1)
+		fprintf(salida,"mov dword eax, [eax]\n");
+	if (categoria == PARAMETRO){
+		fprintf(salida,"mov dword [ebp+4+4*%d], eax\n", nPar-pos);
+	}else{
+		fprintf(salida,"mov dword [ebp-4*%d], eax\n", pos);
+	}
+	return;
+}
+
+void gc_asigexp_ident(FILE *salida, int es_direccion_op1, char *lexema){
+	fprintf(salida, "; Cargamos en el registro eax la parte derecha de la asignacion\n");
+	fprintf(salida, "pop dword eax\n");
+	if (es_direccion_op1==1){
+		fprintf(salida,"mov dword eax, [eax]\n");
+	}
+	fprintf(salida, "; Efectuamos la asignacion\n");
+	fprintf(salida,"mov dword [_%s], eax\n", lexema);
+	return;
+}
+
+
+void gc_printf(FILE *salida, int es_direccion_op1, int tipo){
+	escribir(salida, es_direccion_op1, tipo);
+	return;
+}
 
 void yyerror(const char * s) {
 	printf("****Error sintactico en [lin %d, col %d]\n", linea, columna);
