@@ -118,25 +118,25 @@ int main(){
 
 	nuevaClase(simbol, NULL, 0, "AA");
 	
-	check_simbol(simbol, "AA_sA1", "AA", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "sA1", "AA", "", 0, BUSCAR_PARA_CLASE);
 	nuevoSimboloEnClase(simbol, "sA1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,SECRET,0,0,0,0,0,0,0,NULL);
 	
-	check_simbol(simbol, "AA_sA1", "AA", "", 1, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "sA1", "AA", "", 1, BUSCAR_PARA_CLASE);
 	// nuevoSimboloEnClase(simbol, "sA1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,SECRET,0,0,0,0,0,0,0,NULL);
 
-	check_simbol(simbol, "AA_hA1", "AA", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "hA1", "AA", "", 0, BUSCAR_PARA_CLASE);
 	nuevoSimboloEnClase(simbol, "hA1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,HIDDEN,0,0,0,0,0,0,0,NULL);
 
-	check_simbol(simbol, "AA_xA1", "AA", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "xA1", "AA", "", 0, BUSCAR_PARA_CLASE);
 	nuevoSimboloEnClase(simbol, "xA1", "AA", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 
-	check_simbol(simbol, "AA_MA1@1", "AA", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "MA1@1", "AA", "", 0, BUSCAR_PARA_CLASE);
 	nuevoSimboloEnClase(simbol, "MA1", "AA", 0,FUNCION,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,HIDDEN,0,0,0,0,0,0,0,args1);
 
-	check_simbol(simbol, "AA_MA1@1", "AA", "", 1, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "MA1@1", "AA", "", 1, BUSCAR_PARA_CLASE);
 	// nuevoSimboloEnClase(simbol, "MA1", "AA", 0,FUNCION,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,SECRET,0,0,0,0,0,0,0,args1);
 
-	check_simbol(simbol, "AA_MA1@1@1", "AA", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "MA1@1@1", "AA", "", 0, BUSCAR_PARA_CLASE);
 	nuevoSimboloEnClase(simbol, "MA1", "AA", 0,FUNCION,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,HIDDEN,0,0,0,0,0,0,0,args2);
 
 	cerrarClase(simbol, "AA", 0,0,0,0);
@@ -146,23 +146,23 @@ int main(){
 
 	nuevaClase(simbol, NULL, 0, "BB");
 
-	check_simbol(simbol, "BB_sA1", "BB", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "sA1", "BB", "", 0, BUSCAR_PARA_CLASE);
 	nuevoSimboloEnClase(simbol, "sA1", "BB", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,SECRET,0,0,0,0,0,0,0,NULL);
 
-	check_simbol(simbol, "BB_hA1", "BB", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "hA1", "BB", "", 0, BUSCAR_PARA_CLASE);
 	nuevoSimboloEnClase(simbol, "hA1", "BB", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,HIDDEN,0,0,0,0,0,0,0,NULL);
 
-	check_simbol(simbol, "BB_xA1", "BB", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "xA1", "BB", "", 0, BUSCAR_PARA_CLASE);
 	nuevoSimboloEnClase(simbol, "xA1", "BB", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 
 
-	check_simbol(simbol, "BB_MB1@1", "BB", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "MB1@1", "BB", "", 0, BUSCAR_PARA_CLASE);
 	nuevoSimboloEnClase(simbol, "MB1", "BB", 0,FUNCION,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,SECRET,0,0,0,0,0,0,0,args1);
 
-	check_simbol(simbol, "BB_MA1@1", "BB", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "MA1@1", "BB", "", 0, BUSCAR_PARA_CLASE);
 	nuevoSimboloEnClase(simbol, "MA1", "BB", 0,FUNCION,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,HIDDEN,0,0,0,0,0,0,0,args1);
 
-	check_simbol(simbol, "BB_MA2@1@1", "BB", "", 0, BUSCAR_PARA_CLASE);
+	check_simbol(simbol, "MA2@1@1", "BB", "", 0, BUSCAR_PARA_CLASE);
 	nuevoSimboloEnClase(simbol, "MA2", "BB", 0,FUNCION,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,args2);
 
 	cerrarClase(simbol, "BB", 0,0,0,0);

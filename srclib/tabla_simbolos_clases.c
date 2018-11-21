@@ -594,7 +594,7 @@ Hay que estar en la clase en la que quieres declarar
 Miramos unicamente en el ambito actual. Si existe y es accesible, OK (no se inserta)
 
 nombre_clase es el de la clase desde la que se busca
-nombre_simbolo incluye el prefijo
+nombre_simbolo no incluye el prefijo
 nombre_ambito_encontrado
 */
 int buscarParaDeclararMiembroClase(	simbolos_p simbolos,
@@ -603,40 +603,46 @@ int buscarParaDeclararMiembroClase(	simbolos_p simbolos,
 									simbolo_p * s,
 									char * nombre_ambito_encontrado){
 	char * nombre_ambito = NULL;
+	char * nombre_prefijo = NULL;
 	node_p node = searchNode(simbolos->graph, nombre_clase);
 
 	if(!node){
 		return ERROR;
 	}
-
 	/*Busca en al ambito actual, tabla local*/
 	if(node->local != NULL){
 		nombre_ambito = getAmbito(node);
-		if(ht_isin(node->local, nombre_simbolo)){
-			*s = ht_search(node->local, nombre_simbolo);
+        nombre_prefijo = addPrefijo(nombre_ambito, nombre_simbolo);
+		if(ht_isin(node->local, nombre_prefijo)){
+			*s = ht_search(node->local, nombre_prefijo);
 			strcpy(nombre_ambito_encontrado, nombre_ambito);
 			// return aplicarAccesos(simbolos, nombre_clase, nombre_ambito_encontrado, *s);
+			free(nombre_prefijo);
 			return OK;
 		}
 
 		s = NULL;
 		nombre_ambito_encontrado = NULL;
+		free(nombre_prefijo);
 
 		return ERROR;
 	}
 
 
 	nombre_ambito = ht_get_name(node->principal);
+    nombre_prefijo = addPrefijo(nombre_ambito, nombre_simbolo);
 	/*Buscar en el ambito actual, tabla principal*/
-	if(ht_isin(node->principal, nombre_simbolo)){
-		*s = ht_search(node->principal, nombre_simbolo);
+	if(ht_isin(node->principal, nombre_prefijo)){
+		*s = ht_search(node->principal, nombre_prefijo);
 		strcpy(nombre_ambito_encontrado, nombre_ambito);
+		free(nombre_prefijo);
 		// return aplicarAccesos(simbolos, nombre_clase, nombre_clase, *s);
 		return OK;
 	}
 
 	s = NULL;
 	nombre_ambito_encontrado = NULL;
+	free(nombre_prefijo);
 
 	return ERROR;
 
