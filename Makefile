@@ -1,4 +1,4 @@
-# Óscar Gómez Borzdynski 
+# Óscar Gómez Borzdynski
 
 # Interfaz
 NC = '\033[0m'
@@ -11,7 +11,7 @@ CC = gcc
 CF = flex
 
 # Bison
-CB = bison 
+CB = bison
 BISONFLAGS = -dyv
 
 # Carpeta donde se encuentran las librerias desarrolladas por nosotros
@@ -43,7 +43,7 @@ $(shell mkdir -p $(EXECDIR))
 
 # Lista de ejecutables a compilar
 EXE_AUX = $(shell find $(SRCDIR) -name '*.c' -printf "%P\n" | xargs)
-EXE_AUX2 = $(EXE_AUX:.c=) 
+EXE_AUX2 = $(EXE_AUX:.c=)
 EXE = $(addprefix $(EXECDIR), $(EXE_AUX2))
 
 # Lista de ejecutables de pruebas
@@ -90,7 +90,7 @@ all: bison flex test exec
 exec: bison flex $(EXE)
 
 # Compila las librerias propias
-libs: cleanlibs bison flex $(CLIBS) $(FLEXC)	
+libs: cleanlibs bison flex $(CLIBS) $(FLEXC)
 
 # Compila los ejecutables de test
 test: bison flex $(TEST)
@@ -117,13 +117,13 @@ $(LIBDIR)%.a: %.c $(INC)
 	@$(CC) -c $< $(CFLAGS) -o $@
 	@echo $(GREEN)[OK]$(NC)
 
-# Limpieza de ejecutables 
-clean: 
+# Limpieza de ejecutables
+clean:
 	-rm -f $(EXE) $(TEST)
 
 # Limpieza de librerias
-cleanlibs: 
-	-rm -f $(LIBDIR)*.a 
+cleanlibs:
+	-rm -f $(LIBDIR)*.a
 
 cleanflex:
 	-rm -f $(FLEXDIR)*.c

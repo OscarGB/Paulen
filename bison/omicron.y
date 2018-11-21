@@ -1,6 +1,7 @@
 %{
 #include "generacion.h"
 #include "omicron.h"
+#include "tabla_simbolos_clases.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +12,9 @@ extern int columna;
 extern FILE * salida;
 
 
-
+simbolos_p simbol = NULL;
+simbolo_p s =NULL;
+char * id_ambito=NULL;
 int etiqueta = 0;
 int tipo_actual = 0;
 int clase_actual = 0;
@@ -182,7 +185,7 @@ final_programa : {
 		;
 
 inicioTabla : {
-		simbolos_p simbol = createSimbolos("Programa");
+		simbol = createSimbolos("Programa");
 			if (simbol->main_principal == NULL){
 				fprintf(salida, "Error al inicializar la tabla\n");
 				return -1;
@@ -203,18 +206,17 @@ declaraciones: declaracion
 declaracion: modificador_acceso clase identificadores ';'
 		{
 			nombre_actual_simbolo = $3.lexema;
-			/*if(buscarIdNoCualificado(simbol, $3.lexema, "main", NULL)){
+			if(buscarParaDeclararIdTablaSimbolosAmbitos(simbol, $3.lexema, &s, id_ambito)){
 				fprintf(salida, "Error al declarar el el elemento, ya esta declarado\n");
 			}
 			else{
-				nuevoSimboloEnMain(simbol, $3.lexema, "main",clase_actual,tipo_actual,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
-			}*/
+				nuevoSimboloEnMain(simbol, $3.lexema, clase_actual,tipo_actual,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
+			}
 		}
 		|
 		modificador_acceso declaracion_clase ';'
 		{
 			/*nuevaClase(simbol, NULL, 0, $2.lexema);*/
-			/*No sé si deberiamos de comprobar que la calse que estamos creada haya sido ya creada*/
 		}
 		;
 
@@ -435,7 +437,10 @@ bloque: condicional
 
 asignacion: TOK_IDENTIFICADOR '=' exp
 		{
-			gc_asigexp_ident(salida, $3.direcciones, $1.lexema);
+			if(buscarIdNoCualificado(simbol, $1.lexema, "main", &s, id_ambito)){
+				gc_asigexp_ident(salida, $3.direcciones, $1.lexema);
+			}
+			printf("****Error semántico en lin %d: Acceso a variable no declarada (%s)\n", linea, $1.lexema);
 		}
 		|
 		elemento_vector '=' exp
