@@ -14,11 +14,20 @@
 que refieren al ámbito de la tabla de simbolos
 */
 
+typedef struct _metodos
+{
+	int num;
+	char** nombres;
+	
+}metodos_t, *metodos_p;
+
 typedef struct _simbolos
 {
     hash_table_p main_principal;  /*Hash table for main*/
     hash_table_p main_local; /*Hash table for methods in main*/
 	graph_p graph; /*Graph class*/
+
+	metodos_p metodos; /*Métodos sobreescribibles*/;
 
 }simbolos_t, *simbolos_p;
 

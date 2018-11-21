@@ -10,6 +10,9 @@ simbolos_p createSimbolos(char* name){
 	sim->graph = createGraph(name);
 	sim->main_principal = ht_new("main");
 	sim->main_local = NULL;
+	sim->metodos = (metodos_p)malloc(sizeof(metodos_t));
+	sim->metodos->nombres = (char**)malloc(sizeof(char*));
+
 
 	return sim;
 }
@@ -56,6 +59,11 @@ void eliminaSimbolos(simbolos_p simbolos){
 	}
 	free(keys);
 
+	for(i = 0; i < simbolos->metodos->num; i++){
+		free(simbolos->metodos->nombres[i]);
+	}
+	free(simbolos->metodos);
+
 	ht_del_hash_table(simbolos->main_principal);
 	destroyGraph(simbolos->graph);
 	free(simbolos);
@@ -69,6 +77,8 @@ void nuevaClase(simbolos_p simbolos, char** parents, int numparents, char* name)
 		padres[i] = searchNode(simbolos->graph, parents[i]);
 	}
 	addNode(simbolos->graph, padres, numparents, name);
+	node_p nuevo = searchNode(simbolos->graph, name);
+	nuevo->numms = simbolos->metodos->num;
 }
 
 /*Cierra una clase*/
