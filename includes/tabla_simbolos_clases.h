@@ -18,7 +18,7 @@ typedef struct _metodos
 {
 	int num;
 	char** nombres;
-	
+
 }metodos_t, *metodos_p;
 
 typedef struct _simbolos
@@ -27,7 +27,7 @@ typedef struct _simbolos
     hash_table_p main_local; /*Hash table for methods in main*/
 	graph_p graph; /*Graph class*/
 
-	metodos_p metodos; /*Métodos sobreescribibles*/;
+	metodos_p metodos; /*Métodos sobreescribibles*/
 
 }simbolos_t, *simbolos_p;
 
