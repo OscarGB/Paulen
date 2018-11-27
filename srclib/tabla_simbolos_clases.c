@@ -10,7 +10,9 @@ simbolos_p createSimbolos(char* name){
 	sim->graph = createGraph(name);
 	sim->main_principal = ht_new("main");
 	sim->main_local = NULL;
-
+	sim->metodos = (metodos_p)malloc(sizeof(metodos_t));
+	sim->metodos->nombres = (char**)malloc(sizeof(char*));
+	sim->metodos->num = 0;
 
 	return sim;
 }
@@ -40,6 +42,11 @@ void eliminaSimbolos(simbolos_p simbolos){
 		free(keys);
 		lelem=lelem->next;
 	}
+	for(i = 0; i < simbolos->metodos->num; i++){
+		free(simbolos->metodos->nombres[i]);
+	}
+	free(simbolos->metodos->nombres);
+	free(simbolos->metodos);
 	if(simbolos->main_local != NULL){
 		keys =  ht_get_keys(simbolos->main_local);
 		i = 0;
@@ -71,6 +78,7 @@ void nuevaClase(simbolos_p simbolos, char** parents, int numparents, char* name)
 	}
 	addNode(simbolos->graph, padres, numparents, name);
 	node_p nuevo = searchNode(simbolos->graph, name);
+	nuevo->num_ms = simbolos->metodos->num;
 }
 
 /*Devuelve todos los simbolos de una clase*/
@@ -94,7 +102,7 @@ void cerrarClase(simbolos_p simbolos,
 	char * node_name;
 	char* next_name;
 	char* parent_name;
-	int i = 0, tipo;
+	int i = 0, tipo, j = 0;
 	simbolo_p * simbolos_clase;
 	simbolo_p s_actual;
 	int ms = 0, mns = 0, ai = 0, ac = 0, len = 0;
@@ -106,7 +114,7 @@ void cerrarClase(simbolos_p simbolos,
 	/*Reservamos memoria para los arrays que almacenaran los nombres
 	  de los metodos y los atributos para imprimirlos*/
 	if(node->num_ms > 0)
-		node->ms = (char**)malloc(sizeof(char*) * node->num_ms);
+		node->ms = (char**)calloc(sizeof(char*), node->num_ms);
 	if(node->num_mns > 0)
 		node->mns = (char**)malloc(sizeof(char*) * node->num_mns);
 	if(node->num_ai > 0)
@@ -124,9 +132,12 @@ void cerrarClase(simbolos_p simbolos,
 	while(s_actual){
 		switch(s_actual->tipo){
 			case MS:
-				(node->ms)[ms] = (char*) malloc(sizeof(char) * strlen(s_actual->id) + 1);
-				strcpy((node->ms)[ms], s_actual->id);
-				ms++;
+				for(j=0; j < simbolos->metodos->num; j++){
+					if(strcmp(simbolos->metodos->nombres[j], s_actual->nombre) == 0){
+						node->ms[j] = strdup(s_actual->id);
+						break;
+					}
+				}
 				break;
 
 			case MNS:
@@ -223,12 +234,28 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 ){
 	char * nombre_prefijo = NULL;
 	char * nombre_ambito = NULL;
+	int flag = 0, i = 0;
 	node_p node = searchNode(simbolos->graph, nombre_clase);
 
+	if(tipo == FUNCION || tipo == MS || tipo == MNS) {
+		simbolo_a_insertar = crearNombreFuncion(simbolo_a_insertar, numero_parametros, tipo_args);
+	}
 	if(!node->local){
 		switch(tipo){
 			case MS:
-				node->num_ms++;
+				for(i = 0; i < simbolos->metodos->num; i++){
+					printf("comparando %s con %s\n",simbolo_a_insertar, simbolos->metodos->nombres[i]);
+					if(strcmp(simbolo_a_insertar, simbolos->metodos->nombres[i]) == 0){
+						flag = 1;
+						break;
+					}
+				}
+				if(!flag){
+					simbolos->metodos->nombres = (char**)realloc(simbolos->metodos->nombres, sizeof(char*)*(simbolos->metodos->num + 1));
+					simbolos->metodos->nombres[simbolos->metodos->num] = simbolo_a_insertar;
+					simbolos->metodos->num++; 
+					node->num_ms++;
+				}	
 				break;
 			case MNS:
 				node->num_mns++;
@@ -244,9 +271,6 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 
 	/*Metemos los parametros de la funcion en el nombre del simbolo
 	ATENCION: sobreescribimos simbolo_a_insertar*/
-	if(tipo == FUNCION || tipo == MS || tipo == MNS) {
-		simbolo_a_insertar = crearNombreFuncion(simbolo_a_insertar, numero_parametros, tipo_args);
-	}
 
 	nombre_ambito = getAmbito(node);
 
@@ -646,7 +670,8 @@ void printGlobalHeaderNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos
 		simbolos_clase = current->node->ms;
 
 		for(i = 0; i < current->node->num_ms; i++){
-			fprintf(file, "_%s, ", simbolos_clase[i]);
+			if(simbolos_clase[i] != NULL)
+				fprintf(file, "_%s, ", simbolos_clase[i]);
 		}
 
 		current = next;
@@ -679,19 +704,22 @@ void printGlobalHeaderNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos
 	/*Offsets ms*/
 
 	/*Itera sobre clases linealizadas*/
-	current = graph->nodes_list->head;
-	next = current->next;
-	while(current) {
+	// current = graph->nodes_list->head;
+	// next = current->next;
+	// while(current) {
 
-		simbolos_clase = current->node->ms;
+	// 	simbolos_clase = current->node->ms;
 
-		for(i = 0; i < current->node->num_ms; i++){
-			fprintf(file, "_offset_%s, ", simbolos_clase[i]);
-		}
+	// 	for(i = 0; i < current->node->num_ms; i++){
+	// 		fprintf(file, "_offset_%s, ", simbolos_clase[i]);
+	// 	}
 
-		current = next;
-		if(current)
-			next = current->next;
+	// 	current = next;
+	// 	if(current)
+	// 		next = current->next;
+	// }
+	for(i=0; i < tabla_simbolos->metodos->num; i++){
+		fprintf(file, "_offset_%s, ", tabla_simbolos->metodos->nombres[i]);
 	}
 
 	/*Offsets ai*/
@@ -756,27 +784,31 @@ void printSegmentDataNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos)
 	fprintf(file, "segment .data\n");
 	fprintf(file, "\t\tmsg_error_indice_vector     db \"Indice de vector fuera de rango\", 0\n\t\tmsg_asignacion     db \"Asignacion\", 0\n\t\t__auxfloat dd 0.0\n\t\t__auxint dd 0.0\n");
 
-	fprintf(file, ";METODOS SOBREESCRIBIBLES OFFSET\n");
+	fprintf(file, "\n;METODOS SOBREESCRIBIBLES OFFSET\n");
 
-	current = graph->nodes_list->head;
-	next = current->next;
-	while(current) {
+	// current = graph->nodes_list->head;
+	// next = current->next;
+	// while(current) {
 
-		simbolos_clase = current->node->ms;
+	// 	simbolos_clase = current->node->ms;
 
-		for(i = 0; i < current->node->num_ms; i++){
-			fprintf(file, "\t\t_offset_%s, dd %d\n", simbolos_clase[i], offset*4);
-			offset++;
-		}
+	// 	for(i = 0; i < current->node->num_ms; i++){
+	// 		fprintf(file, "\t\t_offset_%s, dd %d\n", simbolos_clase[i], offset*4);
+	// 		offset++;
+	// 	}
 
 
-		// free(simbolos_clase);
-		current = next;
-		if(current)
-			next = current->next;
+	// 	// free(simbolos_clase);
+	// 	current = next;
+	// 	if(current)
+	// 		next = current->next;
+	// }
+
+	for(i=0; i < tabla_simbolos->metodos->num; i++){
+		fprintf(file, "\t\t_offset_%s, dd %d\n", tabla_simbolos->metodos->nombres[i], i*4);
 	}
 
-	fprintf(file, ";ATRIBUTOS INSTANCIA OFFSET\n");
+	fprintf(file, "\n;ATRIBUTOS INSTANCIA OFFSET\n");
 	offset = 1;
 
 	current = graph->nodes_list->head;
@@ -826,7 +858,7 @@ void printSegmentBssNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos){
 		node_name = current->node->name;
 
 		fprintf(file, ";CLASS %s\n", node_name);
-		fprintf(file, "\t\t_%s resd %d\n", node_name, offset * 2);
+		fprintf(file, "\t\t_%s resd %d\n", node_name, current->node->num_ms);
 		offset++;
 
 
@@ -859,6 +891,46 @@ void printSegmentBssNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos){
 	}
 }
 
+void printSegmentTextNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos){
+	list_elem_p current = NULL;
+	list_elem_p next = NULL;
+	char * node_name;
+	char* next_name;
+	char* parent_name;
+	int i = 0, offset = 1, numclases = 0;
+	char ** simbolos_clase;
+	simbolo_p sim = NULL;
+	char nombre_ambito_encontrado[100];
+
+	fprintf(file, "segment .text\n\t\t;global main\n\n\n");
+	/*Itera sobre clases linealizadas*/
+	fprintf(file, "_create_ms_table:\n");
+	current = graph->nodes_list->head;
+	next = current->next;
+	while(current) {
+
+		for(i = 0; i < current->node->num_ms; i++){
+			if(buscarIdNoCualificado(tabla_simbolos, tabla_simbolos->metodos->nombres[i], current->node->name, &sim, nombre_ambito_encontrado)){
+				if(i == 0)
+					fprintf(file, "\t\tmov dword [_%s], _%s\n",current->node->name, sim->id);
+				else
+					fprintf(file, "\t\tmov dword [_%s+%d], _%s\n", current->node->name, i*4, sim->id);
+			}
+			else{
+				if(i == 0)
+					fprintf(file, "\t\tmov dword [_%s], _no_defined_method\n",current->node->name);
+				else
+					fprintf(file, "\t\tmov dword [_%s+%d], _no_defined_method\n", current->node->name, i*4);
+			}
+		}
+
+		current = next;
+		if(current)
+			next = current->next;
+	}
+
+}
+
 /*Crea un fichero .asm con el nombre del grafo*/
 simbolos_p tablaSimbolosClasesToNASM(simbolos_p tabla_simbolos){
 	FILE * nasm = NULL;
@@ -885,6 +957,11 @@ simbolos_p tablaSimbolosClasesToNASM(simbolos_p tabla_simbolos){
 	fprintf(nasm, "\n\n");
 
 	printSegmentBssNASM(nasm, tabla_simbolos->graph, tabla_simbolos);
+
+	fprintf(nasm, "\n\n");
+
+	printSegmentTextNASM(nasm, tabla_simbolos->graph, tabla_simbolos);
+
 
 	// printTestNASM(nasm, tabla_simbolos->graph, tabla_simbolos);
 

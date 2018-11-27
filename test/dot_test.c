@@ -143,6 +143,7 @@ int main(){
 	cerrarClase(simbol, "AA", 0,0,0,0);
 	nuevaClase(simbol, NULL, 0, "BB");
 
+	// nuevoSimboloEnClase(simbol, "ma1", "BB", 0,MS,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,args);
 	nuevoSimboloEnClase(simbol, "bbb1", "BB", 0,AC,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,HIDDEN,0,0,0,0,0,0,0,NULL);
 	nuevoSimboloEnClase(simbol, "bbb2", "BB", 0,AC,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,HIDDEN,0,0,0,0,0,0,0,NULL);
 	nuevoSimboloEnClase(simbol, "bbb3", "BB", 0,AC,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,HIDDEN,0,0,0,0,0,0,0,NULL);
