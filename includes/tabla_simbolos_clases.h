@@ -134,6 +134,9 @@ void printDiagram(FILE * file, graph_p graph, simbolos_p tabla_simbolos);
 /*Crea un fichero .dot con el nombre del grafo*/
 simbolos_p tablaSimbolosClasesToDot(simbolos_p tabla_simbolos);
 
+/*Crea un fichero .asm con el nombre del grafo*/
+simbolos_p tablaSimbolosClasesToNASM(simbolos_p tabla_simbolos);
+
 /*Cierra la tabla de simbolos de clases*/
 void cerrarTablaSimbolosClases(simbolos_p simbolos);
 

@@ -3,7 +3,7 @@
 
 typedef struct _simbolo {
 	char* id;
-	char* nombre_prefijo;
+	char* nombre;
 	int clase;
     int tipo;
     int estructura;
@@ -33,6 +33,7 @@ typedef struct _simbolo {
 } simbolo_t, *simbolo_p;
 
 simbolo_p createSimbolo(	char* id,
+							char* nombre,
 							int clase,
 						    int tipo,
 						    int estructura,

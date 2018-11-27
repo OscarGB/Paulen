@@ -20,7 +20,14 @@ typedef struct node
     hash_table_p local; /*Tabla simbolos local*/
     hash_table_p principal; /*Tabla simbolos principal*/
     int numparents;
-    int numms; /*Numero metodos sobreescribibles*/
+    int num_ms;
+    int num_mns;
+    int num_ac;
+    int num_ai;
+    char** ms; /*Array de nombres de metodos sobreescribibles*/
+    char** mns; /*Array de nombres de metodos no sobreescribibles*/
+    char** ac; /*Array de nombres de atributos de clase*/
+    char** ai; /*Array de nombres de atributos de instancia*/
 }node_t, *node_p;
 
 typedef struct list_elem list_elem_t, *list_elem_p;

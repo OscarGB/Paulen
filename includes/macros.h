@@ -19,6 +19,11 @@
 #define BOOLEANO 3
 #define OBJETO 4
 #define FUNCION 5
+#define MS 6 /*Tipo metodo sobrees.*/
+#define MNS 7 /*Tipo metodo no sobrees.*/
+#define AC 8 /*Tipo atrib. clsae*/
+#define AI 9 /*Tipo atrib. instancia*/
+
 // Recuerdo que las clases tienen tipo como el - indice que tienen en el grafo
 
 

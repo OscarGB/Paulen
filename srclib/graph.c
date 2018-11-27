@@ -79,6 +79,39 @@ void destroyRelatives(adjlist_p list){
     free(list);
 }
 
+void destroyArrays(node_p node){
+    int i;
+    char* aux;
+    if(node->ms){
+        for(i = 0; i < node->num_ms; i++ ){
+            free(node->ms[i]);
+        }
+        free(node->ms);
+        node->ms = NULL;
+    }
+    if(node->mns){
+        for(i = 0; i < node->num_mns; i++ ){
+            free(node->mns[i]);
+        }
+        free(node->mns);
+        node->mns = NULL;
+    }
+    if(node->ac){
+        for(i = 0; i < node->num_ac; i++ ){
+            free(node->ac[i]);
+        }
+        free(node->ac);
+        node->ac = NULL;
+    }
+    if(node->ai){
+        for(i = 0; i < node->num_ai; i++ ){
+            free(node->ai[i]);
+        }
+        free(node->ai);
+        node->ai = NULL;
+    }
+}
+
 void destroyNode(node_p node)
 {
     if(node)
@@ -93,6 +126,7 @@ void destroyNode(node_p node)
             destroyRelatives(node->children);
         if(node->padres)
             free(node->padres);
+        destroyArrays(node);
         free(node);
     }
 
@@ -259,6 +293,16 @@ node_p addNode(graph_t *graph, node_p* node_parents, int numparents, char* name)
         aux -> prev = graph_element;
         graph -> nodes_list -> num_members ++;
     }
+
+    new_node->num_ms = 0;
+    new_node->num_mns = 0;
+    new_node->num_ac = 0;
+    new_node->num_ai = 0;
+
+    new_node->ms = NULL;
+    new_node->mns = NULL;
+    new_node->ac = NULL;
+    new_node->ai = NULL;
 
     ht_insert(graph -> nodes_hash_table, new_node -> name, new_node);
 

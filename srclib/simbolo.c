@@ -3,6 +3,7 @@
 #include <string.h>
 
 simbolo_p createSimbolo(	char* id,
+							char* nombre,
 							int clase,
 						    int tipo,
 						    int estructura,
@@ -33,6 +34,8 @@ simbolo_p createSimbolo(	char* id,
 	simbolo_p s = (simbolo_p)malloc(sizeof(simbolo_t));
 	s->id = (char*)malloc(sizeof(char)*strlen(id) + 1);
 	strcpy(s->id, id);
+	s->nombre = (char*)malloc(sizeof(char)*strlen(nombre) + 1);
+	strcpy(s->nombre, nombre);
 	s->clase = clase;
     s->tipo = tipo;
     s->estructura = estructura;
@@ -65,6 +68,7 @@ simbolo_p createSimbolo(	char* id,
 
 void eliminaSimbolo(simbolo_p s){
 	free(s->id);
+	free(s->nombre);
 	free(s);
 	return;
 }
