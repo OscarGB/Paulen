@@ -124,26 +124,26 @@ void cerrarClase(simbolos_p simbolos,
 	while(s_actual){
 		switch(s_actual->tipo){
 			case MS:
-				(node->ms)[ms] = (char*) malloc(sizeof(char) * strlen(s_actual->nombre) + 1);
-				strcpy((node->ms)[ms], s_actual->nombre);
+				(node->ms)[ms] = (char*) malloc(sizeof(char) * strlen(s_actual->id) + 1);
+				strcpy((node->ms)[ms], s_actual->id);
 				ms++;
 				break;
 
 			case MNS:
-				(node->mns)[mns] = (char*) malloc(sizeof(char) * strlen(s_actual->nombre) + 1);
-				strcpy((node->mns)[mns], s_actual->nombre);
+				(node->mns)[mns] = (char*) malloc(sizeof(char) * strlen(s_actual->id) + 1);
+				strcpy((node->mns)[mns], s_actual->id);
 				mns++;
 				break;
 
 			case AC:
-				(node->ac)[ac] = (char*) malloc(sizeof(char) * strlen(s_actual->nombre) + 1);
-				strcpy((node->ac)[ac], s_actual->nombre);
+				(node->ac)[ac] = (char*) malloc(sizeof(char) * strlen(s_actual->id) + 1);
+				strcpy((node->ac)[ac], s_actual->id);
 				ac++;
 				break;
 
 			case AI:
-				(node->ai)[ai] = (char*) malloc(sizeof(char) * strlen(s_actual->nombre) + 1);
-				strcpy((node->ai)[ai], s_actual->nombre);
+				(node->ai)[ai] = (char*) malloc(sizeof(char) * strlen(s_actual->id) + 1);
+				strcpy((node->ai)[ai], s_actual->id);
 				ai++;
 				break;
 		}
