@@ -244,7 +244,6 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 		switch(tipo){
 			case MS:
 				for(i = 0; i < simbolos->metodos->num; i++){
-					printf("comparando %s con %s\n",simbolo_a_insertar, simbolos->metodos->nombres[i]);
 					if(strcmp(simbolo_a_insertar, simbolos->metodos->nombres[i]) == 0){
 						flag = 1;
 						break;
@@ -252,7 +251,7 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 				}
 				if(!flag){
 					simbolos->metodos->nombres = (char**)realloc(simbolos->metodos->nombres, sizeof(char*)*(simbolos->metodos->num + 1));
-					simbolos->metodos->nombres[simbolos->metodos->num] = simbolo_a_insertar;
+					simbolos->metodos->nombres[simbolos->metodos->num] = strdup(simbolo_a_insertar);
 					simbolos->metodos->num++; 
 					node->num_ms++;
 				}	
@@ -313,6 +312,7 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 		ht_insert(node->principal, nombre_prefijo, s);
 	}
 	free(nombre_prefijo);
+	// if(tipo == MNS) free(simbolo_a_insertar);
 	if(tipo == FUNCION || tipo == MS || tipo == MNS)
 		free(simbolo_a_insertar);
 }
@@ -891,6 +891,11 @@ void printSegmentBssNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos){
 	}
 }
 
+void instance_of(FILE *file, char * nombre_clase, int num_ai){
+	fprintf(file, "\t\tpush %d\n", (num_ai+1)*4);
+	fprintf(file, "\t\tcall malloc\n\t\tadd esp, 4\n")
+}
+
 void printSegmentTextNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos){
 	list_elem_p current = NULL;
 	list_elem_p next = NULL;
@@ -903,6 +908,10 @@ void printSegmentTextNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos)
 	char nombre_ambito_encontrado[100];
 
 	fprintf(file, "segment .text\n\t\t;global main\n\n\n");
+	fprintf(file, "\t\textern malloc, free\n
+	\t\textern scan_int, print_int, scan_float, print_float, scan_boolean, print_boolean\n
+	\t\textern print_endofline, print_blank, print_string\n
+	\t\textern alfa_malloc, alfa_free, ld_float\n")
 	/*Itera sobre clases linealizadas*/
 	fprintf(file, "_create_ms_table:\n");
 	current = graph->nodes_list->head;
@@ -1022,6 +1031,7 @@ int buscarIdEnJerarquiaDesdeClase( simbolos_p simbolos,
 	char * nombre_prefijo = NULL;
 	char * nombre_ambito = NULL;
 	char * main_name = "main";
+	node_p node1;
 	node_p node = searchNode(simbolos->graph, nombre_clase);
 
 	/*Busca en al ambito actual, tabla local*/
@@ -1052,11 +1062,11 @@ int buscarIdEnJerarquiaDesdeClase( simbolos_p simbolos,
 		int i = 0;
 		/*Busca el simbolo en la jerarquia linealizada de padres*/
 		while(node->padres[i] != NULL){
-			node = searchNode(simbolos->graph, node->padres[i]);
-			nombre_ambito = getAmbito(node);
+			node1 = searchNode(simbolos->graph, node->padres[i]);
+			nombre_ambito = getAmbito(node1);
 			nombre_prefijo = addPrefijo(nombre_ambito, simbolo_a_buscar);
-            if(ht_isin(node->principal, nombre_prefijo)){
-				*s = ht_search(node->principal,nombre_prefijo);
+            if(ht_isin(node1->principal, nombre_prefijo)){
+				*s = ht_search(node1->principal,nombre_prefijo);
 				strcpy(nombre_ambito_encontrado, node->padres[i]);
 				free(nombre_prefijo);
 				return aplicarAccesos(simbolos, nombre_clase, node->padres[i], *s);

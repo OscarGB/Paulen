@@ -153,6 +153,15 @@ int main(){
 
 	cerrarClase(simbol, "BB", 0,0,0,0);
 
+	char* p[1] = {"AA"};
+
+	nuevaClase(simbol, p, 1, "CC");
+	nuevoSimboloEnClase(simbol, "mc1", "CC", 0,MS,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,args);
+
+
+
+	cerrarClase(simbol, "CC", 0,0,0,0);
+
 	nuevoSimboloEnMain(simbol, "f1", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 	iniciaLocal(simbol, "f1");
 	nuevoSimboloEnMain(simbol, "f1", 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
@@ -180,7 +189,7 @@ int main(){
 	check_simbol(simbol, "a1", "main", "BB", 0, CLASE);
 	check_simbol(simbol, "a1", "main", "AA", 1, CLASE);
 	check_simbol(simbol, "sa1", "main", "AA", 0, CLASE);
-	check_simbol(simbol, "sa1", "main", "CC", 0, CLASE);
+	check_simbol(simbol, "sa1", "main", "DD", 0, CLASE);
 
 	check_simbol(simbol, "a1", "AA", "", 1, BUSCAR_PARA_CLASE);
 	check_simbol(simbol, "ba1", "AA", "", 0, BUSCAR_PARA_CLASE);

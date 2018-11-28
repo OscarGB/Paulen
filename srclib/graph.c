@@ -207,7 +207,7 @@ node_p addNode(graph_t *graph, node_p* node_parents, int numparents, char* name)
     new_node -> principal = ht_new(name);
     new_node -> local = NULL;
     
-    char* nombres_padres[numparents];
+    char* nombres_padres[numparents+1];
     for(i = 0; i < numparents;i++){
         nombres_padres[i] = node_parents[i]->name;
     }
