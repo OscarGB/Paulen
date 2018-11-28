@@ -908,7 +908,7 @@ void printSegmentTextNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos)
 	char nombre_ambito_encontrado[100];
 
 	fprintf(file, "segment .text\n\t\t;global main\n\n\n");
-	fprintf(file, "\t\textern malloc, free\n\t\textern scan_int, print_int, scan_float, print_float, scan_boolean, print_boolean\n\t\textern print_endofline, print_blank, print_string\n\t\textern alfa_malloc, alfa_free, ld_float\n");
+	fprintf(file, "\t\textern malloc, free\n\t\textern scan_int, print_int, scan_float, print_float, scan_boolean, print_boolean\n\t\textern print_endofline, print_blank, print_string\n\t\textern alfa_malloc, alfa_free, ld_float\n\n");
 	/*Itera sobre clases linealizadas*/
 	fprintf(file, "_create_ms_table:\n");
 	current = graph->nodes_list->head;
