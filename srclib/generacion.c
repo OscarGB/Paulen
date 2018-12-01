@@ -1,10 +1,6 @@
 #include <stdio.h>
 #include "generacion.h"
 
-/* Declaraciones de tipos de datos del compilador */
-#define ENTERO    0
-#define BOOLEANO     1
-
 
 /* OBSERVACIÓN GENERAL A TODAS LAS FUNCIONES:
 Todas ellas escriben el código NASM a un FILE* proporcionado como primer argumento.

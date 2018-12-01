@@ -12,9 +12,9 @@ extern int columna;
 extern FILE * salida;
 
 
-simbolos_p simbol = NULL;
+simbolos_p simbolos = NULL;
 simbolo_p s =NULL;
-char * id_ambito=NULL;
+char id_ambito[100];
 int etiqueta = 0;
 int tipo_actual = 0;
 int clase_actual = 0;
@@ -45,6 +45,15 @@ void gc_printf_vectores(FILE *salida, int etiqueta, int tamanio, int tipo);
 void gc_printf(FILE *salida, int es_direccion_op1, int tipo);
 void gc_ident_asiglocal(FILE *salida, int es_direccion, int categoria, int nPar, int pos);
 void gc_asigexp_ident(FILE *salida, int es_direccion_op1, char *lexema);
+void ifthenelse_inicio(FILE * fpasm, int exp_es_variable, int etiqueta);
+void ifthen_inicio(FILE * fpasm, int exp_es_variable, int etiqueta);
+void ifthen_fin(FILE* fpasm, int etiqueta);
+void ifthenelse_fin_then(FILE* fpasm, int etiqueta);
+void ifthenelse_fin( FILE * fpasm, int etiqueta);
+void ifthenelse_fin( FILE * fpasm, int etiqueta);
+void asignarDestinoEnPila(FILE* fpasm, int es_variable, char * eax, char * ebx);
+void gc_scanf_funcion(FILE *salida, int num_param_actual, int posicion_parametro, int categoria, int tipo);
+void gc_lectura(FILE * salida, char * nombre, int tipo);
 void imprimir_error(FILE * salida);
 void yyerror();
 
@@ -114,10 +123,9 @@ void yyerror();
 %token <atributos> TOK_CONSTANTE_ENTERA
 
 
-
 %type <atributos> programa
 %type <atributos> escritura_main
-/*%type <atributos> inicioTabla*/
+%type <atributos> inicioTabla
 %type <atributos> declaraciones
 %type <atributos> declaracion
 %type <atributos> clase
@@ -136,6 +144,8 @@ void yyerror();
 %type <atributos> bloque
 %type <atributos> asignacion
 %type <atributos> elemento_vector
+%type <atributos> if_exp
+%type <atributos> if_exp_sentencias
 %type <atributos> bucle
 %type <atributos> lectura
 %type <atributos> escritura
@@ -157,11 +167,7 @@ void yyerror();
 
 %%
 
-programa: inicioTabla TOK_MAIN '{' declaraciones escritura_TS funciones escritura_main sentencias final_programa'}'
-		{
-		}
-		|
-		TOK_MAIN '{' funciones sentencias '}'
+programa: inicioTabla TOK_MAIN '{' declaraciones escritura_TS funciones escritura_main sentencias final_programa '}'
 		{
 		}
 		;
@@ -185,11 +191,11 @@ final_programa : {
 		;
 
 inicioTabla : {
-		simbol = createSimbolos("Programa");
-			if (simbol->main_principal == NULL){
-				fprintf(salida, "Error al inicializar la tabla\n");
-				return -1;
-			}
+			simbolos = createSimbolos("Programa");
+				if (simbolos->main_principal == NULL){
+					fprintf(salida, "Error al inicializar la tabla\n");
+					return -1;
+				}
 		}
 		;
 
@@ -436,41 +442,17 @@ bloque: condicional
 		;
 
 asignacion: TOK_IDENTIFICADOR '=' exp
-		{
+		{	
 			if(buscarIdNoCualificado(simbol, $1.lexema, "main", &s, id_ambito)){
 				gc_asigexp_ident(salida, $3.direcciones, $1.lexema);
 			}
-			printf("****Error semántico en lin %d: Acceso a variable no declarada (%s)\n", linea, $1.lexema);
+			else{
+				printf("****Error semántico en lin %d: Acceso a variable no declarada (%s)\n", linea, $1.lexema);
+			}
 		}
 		|
 		elemento_vector '=' exp
 		{
-			/*simbolo_p sim=NULL;
-			if(simbol-> main_local != NULL){
-				buscarIdCualificadoInstancia(simbol, $1.lexema, nombre_funcion_actual, "main", &sim, INSTANCIA);
-				if(sim == NULL){
-					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s)\n", linea, $1.lexema);
-					return -1;
-				}
-			}else{
-				buscarIdNoCualificado(simbol, $1.lexema, "main", &sim, NULL);
-				if(sim == NULL){
-					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $1.lexema);
-					return -1;
-				}
-			}
-
-			if($3.tipo != INT){
-				printf("****Error semántico en lin %d: El indice en una operacion de indexacion tiene que ser de tipo entero.\n", linea);
-				return -1;
-			}
-			if ($3.clase != VECTOR){
-				printf("****Error semántico en lin %d: Intento de indexacion de una variable que no es de tipo vector.\n", linea);
-				return -1;
-			}
-			$$.direcciones = 1;
-			$$.tipo = sim->tipo;
-			gc_vectores_indice(salida, $3.direcciones, $1.lexema, node->tamanio); */
 		}
 		|
 		elemento_vector '=' TOK_INSTANCE_OF TOK_IDENTIFICADOR '(' lista_expresiones ')'
@@ -493,12 +475,35 @@ elemento_vector: TOK_IDENTIFICADOR '[' exp ']'
 
 condicional: TOK_IF '(' exp ')' '{' sentencias '}'
 		{
+			fprintf(salida, "fin_ifelse%d:\n", $1.etiqueta);
+
 		}
 		|
-		TOK_IF '(' exp ')' '{' sentencias '}' TOK_ELSE '{' sentencias '}'
+		if_exp_sentencias TOK_ELSE '{' sentencias '}'
 		{
 		}
 		;
+if_exp_sentencias:if_exp sentencias '}'{
+			$$.etiqueta = $1.etiqueta;
+			fprintf(salida, "jmp near fin_ifelse%d\n", $1.etiqueta);
+			fprintf(salida, "fin_then%d:\n", $1.etiqueta);
+		}
+
+if_exp: TOK_IF '(' exp ')' '{'{
+			if ($3.tipo != BOOLEAN){
+				printf("****Error semántico en lin %d: Comparacion con operandos boolean.\n", linea);
+				return -1;
+			}
+			
+			$$.etiqueta = etiqueta++;
+			fprintf(salida, "pop eax\n");
+			if($3.es_direccion == 1){
+				fprintf(salida, "mov eax, [eax]\n");
+			}
+			fprintf(salida, "cmp eax, 0\n");
+			fprintf(salida, "je near fin_then%d\n", $$.etiqueta);
+		}
+
 
 bucle: TOK_WHILE '(' exp ')' '{' sentencias '}'
 		{
@@ -507,6 +512,38 @@ bucle: TOK_WHILE '(' exp ')' '{' sentencias '}'
 
 lectura: TOK_SCANF TOK_IDENTIFICADOR
 		{
+			if(simbolos->main_local != NULL){
+				buscarIdNoCualificado(simbol, $2.lexema, "main", &s, id_ambito);
+				if(simbol==NULL){
+					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $2.lexema)
+					return -1;
+				}
+				if(simbol->clase != ESCALAR){
+					printf("****Error semántico en lin %d: Variable local de tipo no escalar.\n", linea);
+					return -1;
+				}
+				if(simbol->categoria == PARAMETRO){
+					gc_scanf_funcion(salida, num_parametros_actual, simbol->posicion_parametro, simbol->categoria, simbol->tipo);
+				}
+				else{
+					gc_scanf_funcion(salida, num_variables_locales_actual, simbol->posicion_variable_local, simbol->categoria, simbol->tipo);
+				}
+			else{
+				buscarIdNoCualificado(simbol, $2.lexema, "main", &s, id_ambito);
+				if(simbol==NULL){
+					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $2.lexema)
+					return -1;
+				}
+				if(simbol->clase == VECTOR){
+					printf("****Error semántico en lin %d: Variable local de tipo no escalar.\n", linea);
+					return -1;
+				}
+				if(simbol->clase != ESCALAR){
+					printf("****Error semántico en lin %d: Variable local de tipo no escalar.\n", linea);
+					return -1;
+				}
+				gc_lectura(salida, $2.lexema, simbol->tipo);
+			}
 		}
 		|
 		TOK_SCANF elemento_vector
@@ -515,7 +552,7 @@ lectura: TOK_SCANF TOK_IDENTIFICADOR
 		;
 
 escritura: TOK_PRINTF exp
-		{
+		{	
 			gc_printf(salida, $2.direcciones, $2.tipo);
 		}
 		;
@@ -976,6 +1013,82 @@ void gc_asigexp_ident(FILE *salida, int es_direccion_op1, char *lexema){
 void gc_printf(FILE *salida, int es_direccion_op1, int tipo){
 	escribir(salida, es_direccion_op1, tipo);
 	return;
+}
+
+void ifthenelse_inicio(FILE * fpasm, int exp_es_variable, int etiqueta){
+	fprintf(salida,"; Comprobamos la condicion: if (%d) para ver que es algo asimilable a una variable", etiqueta);
+    fprintf(salida, "pop eax\n");
+    if (exp_es_variable)
+        fprintf(salida, "mov eax, [eax]\n");
+
+    fprintf(salida, "cmp eax, 0\n");
+    fprintf(salida, "; En caso de que no se cumpla la condicion nos vamos al else\n");
+    fprintf(salida,"je __else_%d\n", etiqueta);
+	fprintf(salida, ";Nos metemos en el caso del then (%i) ya que se cumple la condicion", etiqueta);
+}
+
+
+void ifthen_inicio(FILE * fpasm, int exp_es_variable, int etiqueta){
+	fprintf(salida,"; Comprobamos la condicion: if (%d) para ver que es algo asimilable a una variable", etiqueta);
+    fprintf(salida, "pop eax\n");
+    if (exp_es_variable)
+        fprintf(salida, "mov eax, [eax]\n");
+
+    fprintf(salida, "cmp eax, 0\n");
+    fprintf(salida, "; En caso de que no se cumpla la condicion nos vamos al final del ifthen\n");
+    fprintf(salida, "je __endifthen_%d\n", etiqueta);
+	fprintf(salida, "; En caso de que se cumpla nos metemos en el caso del then (%i) ya que se cumple la condicion", etiqueta);
+}
+
+
+void ifthen_fin(FILE* fpasm, int etiqueta){
+    fprintf(salida, "; Estamos en la parte del final del then (%d) del ifthen", etiqueta);
+    fprintf(salida, "__endifthen_%d:", etiqueta);
+}
+
+
+void ifthenelse_fin_then(FILE* fpasm, int etiqueta){
+    fprintf(salida, "; Estamos en la parte del final del then (%d) del ifthen_else", etiqueta);
+    fprintf(salida, "jmp __endifthen_else_%d", etiqueta);
+}
+
+void ifthenelse_fin( FILE * fpasm, int etiqueta){
+	fprintf(salida, "; Estamos en la parte del final del else (%d) del ifthen_else", etiqueta);
+	fprintf(salida, "__endifthen_else_%d:\n", etiqueta);
+}
+
+
+void asignarDestinoEnPila(FILE* fpasm, int es_variable, char * eax, char * ebx){
+	/*Hay algo mas que hacer pero no se el que*/
+	fprintf(fpasm, "\n\t; Asignacion de a pila a %s\n", nombre);
+	fprintf(fpasm, "\tpop dword eax\n");
+	if(es_variable){
+		fprintf(fpasm, "\tmov eax,dword [eax]\n");
+	}
+	else{
+		fprintf(fpasm, "\tmov dword [_%s], eax\n", nombre);
+	}
+	fprintf(salida, "; Apilando %s de variable local %d", (es_variable) ? "direccion" : "valor", posicion_variable);
+}
+
+void gc_scanf_funcion(FILE *salida, int num_param_actual, int posicion_parametro, int categoria, int tipo){
+	if (categoria == PARAMETRO){
+		fprintf(salida,"lea eax, [ebp+4+4*(%d)]\n",num_param_actual - posicion_parametro);
+		fprintf(salida,"push dword eax\n");
+	}else {
+		fprintf(salida,"lea eax, [ebp-4*%d]\n",posicion_parametro);
+		fprintf(salida,"push dword eax\n");
+	}
+
+	if(tipo==INT)
+		fprintf(salida,"call scan_int\n");
+	else 
+		fprintf(salida,"call scan_boolean\n");
+	fprintf(salida,"add esp,4\n");
+}
+
+void gc_lectura(FILE * salida, char * nombre, int tipo){
+	leer(salida, nombre, tipo);
 }
 
 void yyerror(const char * s) {

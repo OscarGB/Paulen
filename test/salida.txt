@@ -21,7 +21,7 @@ mov dword [_x], eax
 push dword [_x]
 
 ; Escritura
-call print_int
+call print_boolean
 call print_endofline
 add esp, 4
 
