@@ -4,7 +4,10 @@ mensaje_2 db "Division por cero", 0
 
 segment .bss
 __esp resd 1
-_x resd 1
+_x2 resd 1
+_y2 resd 1
+_y1 resd 1
+_x1 resd 1
 
 segment .text
 global main
@@ -13,30 +16,15 @@ extern print_int, print_boolean, print_string, print_blank, print_endofline, sca
 ; PROCEDIMIENTO PRINCIPAL
 main:
 mov dword [__esp], esp
-	push dword 8
-; Cargamos en el registro eax la parte derecha de la asignacion
-pop dword eax
-; Efectuamos la asignacion
-mov dword [_x], eax
-push dword [_x]
 
-; Escritura
-call print_int
-call print_endofline
-add esp, 4
+	; Lectura
+	push dword _x1
+	call scan_int
+	add esp, 4
 
-jmp near fin
-
-error_1: push dword mensaje_1
-	  call print_string
-	  add esp, 4
-	  jmp near fin
-
-error_2: push dword mensaje_2
-         call print_string
-         add esp, 4
-         jmp near fin
-
-fin:
-mov dword esp, [__esp]
-ret
+	; Lectura
+	push dword _x2
+	call scan_int
+	add esp, 4
+	push dword 3
+push dword _x1
