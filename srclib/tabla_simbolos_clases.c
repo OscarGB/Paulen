@@ -893,7 +893,31 @@ void printSegmentBssNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos){
 
 void instance_of(FILE *file, char * nombre_clase, int num_ai){
 	fprintf(file, "\t\tpush %d\n", (num_ai+1)*4);
-	fprintf(file, "\t\tcall malloc\n\t\tadd esp, 4\n");
+	fprintf(file, "\t\tcall malloc\n\t\tadd esp, 4\n\t\tpush eax\n");
+	fprintf(file, "\t\tmov dword [eax], %s\n", nombre_clase);
+}
+
+void asignarDestinoEnPila(FILE* file, int es_variable) {
+	/*
+		pop eax
+		pop ebx
+		if es_variable = 0:
+			mov [ebx], eax
+		else:
+			mov eax, [eax]
+			mov [ebx], eax
+	*/
+	fprintf(file, "\t\tpop eax\n\t\tpop ebx\n");
+	if(es_variable == 0){
+		fprintf(file, "\t\tmov [ebx], eax\n");
+	}
+	else {
+		fprintf(file, "\t\tmov eax, [eax]\n\t\tmov [ebx], [eax]\n");
+	}
+}
+
+void discardPila (FILE * fd_asm){
+	fprintf(fd_asm, "\t\tcall free\n\t\tadd esp, 4\n");
 }
 
 void printSegmentTextNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos){
