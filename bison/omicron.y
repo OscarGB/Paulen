@@ -202,6 +202,7 @@ inicioTabla : {
 
 declaraciones: declaracion
 		{
+
 		}
 		|
 		declaracion declaraciones
@@ -212,11 +213,11 @@ declaraciones: declaracion
 declaracion: modificador_acceso clase identificadores ';'
 		{
 			nombre_actual_simbolo = $3.lexema;
-			if(buscarParaDeclararIdTablaSimbolosAmbitos(simbol, $3.lexema, &s, id_ambito)){
+			if(buscarParaDeclararIdTablaSimbolosAmbitos(simbolos, $3.lexema, &s, id_ambito)){
 				fprintf(salida, "Error al declarar el el elemento, ya esta declarado\n");
 			}
 			else{
-				nuevoSimboloEnMain(simbol, $3.lexema, clase_actual,tipo_actual,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
+				nuevoSimboloEnMain(simbolos, $3.lexema, clase_actual,tipo_actual,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 			}
 		}
 		|
@@ -443,7 +444,7 @@ bloque: condicional
 
 asignacion: TOK_IDENTIFICADOR '=' exp
 		{	
-			if(buscarIdNoCualificado(simbol, $1.lexema, "main", &s, id_ambito)){
+			if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)){
 				gc_asigexp_ident(salida, $3.direcciones, $1.lexema);
 			}
 			else{
@@ -473,7 +474,7 @@ elemento_vector: TOK_IDENTIFICADOR '[' exp ']'
 		}
 		;
 
-condicional: TOK_IF '(' exp ')' '{' sentencias '}'
+condicional: if_exp '(' exp ')' '{' sentencias '}'
 		{
 			fprintf(salida, "fin_ifelse%d:\n", $1.etiqueta);
 
@@ -497,7 +498,7 @@ if_exp: TOK_IF '(' exp ')' '{'{
 			
 			$$.etiqueta = etiqueta++;
 			fprintf(salida, "pop eax\n");
-			if($3.es_direccion == 1){
+			if($3.direcciones == 1){
 				fprintf(salida, "mov eax, [eax]\n");
 			}
 			fprintf(salida, "cmp eax, 0\n");
@@ -513,42 +514,43 @@ bucle: TOK_WHILE '(' exp ')' '{' sentencias '}'
 lectura: TOK_SCANF TOK_IDENTIFICADOR
 		{
 			if(simbolos->main_local != NULL){
-				buscarIdNoCualificado(simbol, $2.lexema, "main", &s, id_ambito);
-				if(simbol==NULL){
-					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $2.lexema)
+				buscarIdNoCualificado(simbolos, $2.lexema, "main", &s, id_ambito);
+				if(s==NULL){
+					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $2.lexema);
 					return -1;
 				}
-				if(simbol->clase != ESCALAR){
+				if(s->clase != ESCALAR){
 					printf("****Error semántico en lin %d: Variable local de tipo no escalar.\n", linea);
 					return -1;
 				}
-				if(simbol->categoria == PARAMETRO){
-					gc_scanf_funcion(salida, num_parametros_actual, simbol->posicion_parametro, simbol->categoria, simbol->tipo);
+				if(s->clase == PARAMETRO){
+					gc_scanf_funcion(salida, num_parametros_actual, s->posicion_parametro, s->clase, s->tipo);
 				}
 				else{
-					gc_scanf_funcion(salida, num_variables_locales_actual, simbol->posicion_variable_local, simbol->categoria, simbol->tipo);
+					gc_scanf_funcion(salida, num_variables_locales_actual, s->posicion_variable_local, s->clase, s->tipo);
 				}
-			else{
-				buscarIdNoCualificado(simbol, $2.lexema, "main", &s, id_ambito);
-				if(simbol==NULL){
-					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $2.lexema)
+			}else{
+				buscarIdNoCualificado(simbolos, $2.lexema, "main", &s, id_ambito);
+				if(s==NULL){
+					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $2.lexema);
 					return -1;
 				}
-				if(simbol->clase == VECTOR){
+				if(s->clase == VECTOR){
 					printf("****Error semántico en lin %d: Variable local de tipo no escalar.\n", linea);
 					return -1;
 				}
-				if(simbol->clase != ESCALAR){
+				if(s->clase != ESCALAR){
 					printf("****Error semántico en lin %d: Variable local de tipo no escalar.\n", linea);
 					return -1;
 				}
-				gc_lectura(salida, $2.lexema, simbol->tipo);
+				gc_lectura(salida, $2.lexema, s->tipo);
 			}
 		}
 		|
 		TOK_SCANF elemento_vector
 		{
 		}
+		
 		;
 
 escritura: TOK_PRINTF exp
@@ -869,6 +871,7 @@ constante_entera: TOK_CONSTANTE_ENTERA
 
 identificador: TOK_IDENTIFICADOR
 		{
+
 		}
 		;
 %%
@@ -1060,15 +1063,15 @@ void ifthenelse_fin( FILE * fpasm, int etiqueta){
 
 void asignarDestinoEnPila(FILE* fpasm, int es_variable, char * eax, char * ebx){
 	/*Hay algo mas que hacer pero no se el que*/
-	fprintf(fpasm, "\n\t; Asignacion de a pila a %s\n", nombre);
+	/*fprintf(fpasm, "\n\t; Asignacion de a pila a %s\n", nombre);*/
 	fprintf(fpasm, "\tpop dword eax\n");
 	if(es_variable){
 		fprintf(fpasm, "\tmov eax,dword [eax]\n");
 	}
 	else{
-		fprintf(fpasm, "\tmov dword [_%s], eax\n", nombre);
+		/*printf(fpasm, "\tmov dword [_%s], eax\n", nombre);*/
 	}
-	fprintf(salida, "; Apilando %s de variable local %d", (es_variable) ? "direccion" : "valor", posicion_variable);
+	/*fprintf(salida, "; Apilando %s de variable local %d", (es_variable) ? "direccion" : "valor", posicion_variable);*/
 }
 
 void gc_scanf_funcion(FILE *salida, int num_param_actual, int posicion_parametro, int categoria, int tipo){
