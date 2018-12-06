@@ -5,7 +5,6 @@ mensaje_2 db "Division por cero", 0
 segment .bss
 __esp resd 1
 _x2 resd 1
-_y2 resd 1
 _y1 resd 1
 _x1 resd 1
 
@@ -26,29 +25,11 @@ mov dword [__esp], esp
 	push dword _x2
 	call scan_int
 	add esp, 4
-	push dword 3
-push dword _x1
 
-	; Suma
-	pop dword ebx
-	pop dword eax
-	mov dword ebx, [ebx]
-	add eax, ebx
-	push dword eax
-push dword _x2
-
-	; Suma
-	pop dword ebx
-	pop dword eax
-	mov dword ebx, [ebx]
-	add eax, ebx
-	push dword eax
-
-; Escritura
-call print_int
-call print_endofline
-add esp, 4
-
+	; Lectura
+	push dword _y1
+	call scan_boolean
+	add esp, 4
 push dword _x1
 push dword _x2
 
@@ -63,37 +44,68 @@ push dword _x2
 	__igual_0:
 		push dword 1
 	__fin_igual_0:
-; Cargamos en el registro eax la parte derecha de la asignacion
-pop dword eax
-; Efectuamos la asignacion
-mov dword [_y1], eax
+pop eax
+cmp eax, 0
+je near fin_then1
 push dword _y1
+pop eax
+mov eax, [eax]
+cmp eax, 0
+je near fin_then2
+	push dword 110
 
 ; Escritura
-pop eax
-push dword [eax]
-call print_boolean
+call print_int
 call print_endofline
 add esp, 4
 
-
-	; Lectura
-	push dword _y1
-	call scan_boolean
-	add esp, 4
-
-	; Lectura
-	push dword _y2
-	call scan_boolean
-	add esp, 4
-push dword _y1
+jmp near fin_ifelse2
+fin_then2:
+	push dword 111
 
 ; Escritura
-pop eax
-push dword [eax]
-call print_boolean
+call print_int
 call print_endofline
 add esp, 4
 
+fin_ifelse2:
+jmp near fin_ifelse1
+fin_then1:
 push dword _y1
-push dword _y2
+pop eax
+mov eax, [eax]
+cmp eax, 0
+je near fin_then3
+	push dword 10
+
+; Escritura
+call print_int
+call print_endofline
+add esp, 4
+
+jmp near fin_ifelse3
+fin_then3:
+	push dword 11
+
+; Escritura
+call print_int
+call print_endofline
+add esp, 4
+
+fin_ifelse3:
+fin_ifelse1:
+jmp near fin
+
+error_1: push dword mensaje_1
+	  call print_string
+	  add esp, 4
+	  jmp near fin
+
+error_2: push dword mensaje_2
+         call print_string
+         add esp, 4
+         jmp near fin
+
+fin:
+mov dword esp, [__esp]
+ret

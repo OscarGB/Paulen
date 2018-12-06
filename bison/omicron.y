@@ -54,7 +54,7 @@ void ifthen_fin(FILE* fpasm, int etiqueta);
 void ifthenelse_fin_then(FILE* fpasm, int etiqueta);
 void ifthenelse_fin( FILE * fpasm, int etiqueta);
 void ifthenelse_fin( FILE * fpasm, int etiqueta);
-void asignarDestinoEnPila(FILE* fpasm, int es_variable, char * eax, char * ebx);
+void asignarDestinoPila(FILE* fpasm, int es_variable, char * eax, char * ebx);
 void gc_scanf_funcion(FILE *salida, int num_param_actual, int posicion_parametro, int categoria, int tipo);
 void gc_lectura(FILE * salida, char * nombre, int tipo);
 void imprimir_error(FILE * salida);
@@ -260,17 +260,17 @@ modificador_acceso: /*vacio*/
 
 clase: clase_escalar
 		{
-			clase_actual=1;
+			clase_actual=ESCALAR;
 		}
 		|
 		clase_vector
 		{
-			clase_actual=3;
+			clase_actual=VECTOR;
 		}
 		|
 		clase_objeto
 		{
-			clase_actual=5;
+			clase_actual=OBJETO;
 		}
 		;
 
@@ -315,30 +315,12 @@ clase_vector: TOK_ARRAY tipo '[' TOK_CONSTANTE_ENTERA ']'
 		}
 		;
 
-identificadores: identificador ',' identificadores
+identificadores: identificador
 		{
-			nombre_actual_simbolo = $1.lexema;
-			if(buscarParaDeclararIdTablaSimbolosAmbitos(simbolos, $1.lexema, &s, id_ambito)){
-				fprintf(salida, "Error al declarar el el elemento, ya esta declarado\n");
-			}
-			else{
-				printf("hola: %d\n", tipo_actual);
-				$1.tipo =tipo_actual;
-				nuevoSimboloEnMain(simbolos, $1.lexema, clase_actual,tipo_actual,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
-			}
 		}
 		|
- 		identificador
+		identificador ',' identificadores
 		{
-			nombre_actual_simbolo = $1.lexema;
-			if(buscarParaDeclararIdTablaSimbolosAmbitos(simbolos, $1.lexema, &s, id_ambito)){
-				fprintf(salida, "Error al declarar el el elemento, ya esta declarado\n");
-			}
-			else{
-				printf("hola: %d\n", tipo_actual);
-				$1.tipo =tipo_actual;
-				nuevoSimboloEnMain(simbolos, $1.lexema, clase_actual,tipo_actual,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
-			}
 		}
 		;
 
@@ -498,15 +480,20 @@ condicional: if_exp '(' exp ')' '{' sentencias '}'
 		|
 		if_exp_sentencias TOK_ELSE '{' sentencias '}'
 		{
+			fprintf(salida, "fin_ifelse%d:\n", $1.etiqueta);
 		}
 		;
-if_exp_sentencias:if_exp sentencias '}'{
+
+if_exp_sentencias: if_exp sentencias '}'
+		{
 			$$.etiqueta = $1.etiqueta;
 			fprintf(salida, "jmp near fin_ifelse%d\n", $1.etiqueta);
 			fprintf(salida, "fin_then%d:\n", $1.etiqueta);
 		}
+		;
 
-if_exp: TOK_IF '(' exp ')' '{'{
+if_exp: TOK_IF '(' exp ')' '{'
+		{
 			if ($3.tipo != BOOLEAN){
 				printf("****Error semántico en lin %d: Comparacion con operandos boolean.\n", linea);
 				return -1;
@@ -514,12 +501,14 @@ if_exp: TOK_IF '(' exp ')' '{'{
 
 			$$.etiqueta = etiqueta++;
 			fprintf(salida, "pop eax\n");
+
 			if($3.direcciones == 1){
 				fprintf(salida, "mov eax, [eax]\n");
 			}
 			fprintf(salida, "cmp eax, 0\n");
 			fprintf(salida, "je near fin_then%d\n", $$.etiqueta);
 		}
+		;
 
 
 bucle: TOK_WHILE '(' exp ')' '{' sentencias '}'
@@ -559,7 +548,6 @@ lectura: TOK_SCANF TOK_IDENTIFICADOR
 					printf("****Error semántico en lin %d: Variable local de tipo no escalar.\n", linea);
 					return -1;
 				}
-				printf("tipo: %d", s->tipo);
 				gc_lectura(salida, $2.lexema, s->tipo);
 			}
 		}
@@ -567,7 +555,6 @@ lectura: TOK_SCANF TOK_IDENTIFICADOR
 		TOK_SCANF elemento_vector
 		{
 		}
-
 		;
 
 escritura: TOK_PRINTF exp
@@ -587,8 +574,6 @@ retorno_funcion: TOK_RETURN exp
 
 exp: exp '+' exp
 		{
-			printf("%s, %d", $1.lexema, $1.tipo);
-			printf("%s, %d", $3.lexema, $3.tipo);
 			if ($1.tipo != INT || $3.tipo != INT){
 				printf("****Error semántico en lin %d: Operacion aritmetica con operandos boolean.\n", linea);
 				return -1;
@@ -684,8 +669,13 @@ exp: exp '+' exp
 			else{
 				fprintf(salida,"push dword _%s\n", $1.lexema);
 			}
-			$$.tipo = $1.tipo;
-			$$.direcciones = $1.direcciones;
+			if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)){
+				$$.tipo = s->tipo;
+				$$.direcciones = s->direcciones;
+			}
+			else{
+				printf("****Error semántico en lin %d: Acceso a variable no declarada (%s)\n", linea, $1.lexema);
+			}
 		}
 		|
 		constante
@@ -892,6 +882,14 @@ constante_entera: TOK_CONSTANTE_ENTERA
 
 identificador: TOK_IDENTIFICADOR
 		{
+		nombre_actual_simbolo = $1.lexema;
+		if(buscarParaDeclararIdTablaSimbolosAmbitos(simbolos, $1.lexema, &s, id_ambito)){
+			fprintf(salida, "Error al declarar el el elemento, ya esta declarado\n");
+		}
+		else{
+			$1.tipo = tipo_actual;
+			nuevoSimboloEnMain(simbolos, $1.lexema, clase_actual,tipo_actual,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
+		}
 		}
 		;
 %%
@@ -1081,7 +1079,7 @@ void ifthenelse_fin( FILE * fpasm, int etiqueta){
 }
 
 
-void asignarDestinoEnPila(FILE* fpasm, int es_variable, char * eax, char * ebx){
+void asignarDestinoPila(FILE* fpasm, int es_variable, char * eax, char * ebx){
 	/*Hay algo mas que hacer pero no se el que*/
 	/*fprintf(fpasm, "\n\t; Asignacion de a pila a %s\n", nombre);*/
 	fprintf(fpasm, "\tpop dword eax\n");

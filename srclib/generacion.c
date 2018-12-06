@@ -97,7 +97,7 @@ es_variable indica si este operando es una variable (como por ejemplo b1) con un
 
 void escribir_operando(FILE* fpasm, char* nombre, int es_variable){
   fprintf(fpasm, "\n\t; Guarda el operando %s en la pila\n", nombre);
-  fprintf(fpasm, "\tpush dword %s%s\n", (es_variable == 3) ? "_" : "", nombre);
+  fprintf(fpasm, "\tpush dword %s%s\n", es_variable ? "_" : "", nombre);
 }
 
 
@@ -130,21 +130,17 @@ Deben tenerse en cuenta las peculiaridades de cada operación. En este sentido s
 */
 void sumar(FILE* fpasm, int es_variable_1, int es_variable_2){
   fprintf(fpasm, "\n\t; Suma\n");
-  if(es_variable_1 && !es_variable_2){/*Caso en el que solo es variable el primer operando*/
-    fprintf(fpasm, "\tpop dword eax\n");
-    fprintf(fpasm, "\tpop dword ebx\n");
-    fprintf(fpasm, "\tadd eax, [ebx]\n");
-  }else{
-    /*Caso en el que son ambos variables, solo el segundo operando es una variable o en el que ninguno lo es*/
-    fprintf(fpasm, "\tpop dword ebx\n");
-    fprintf(fpasm, "\tpop dword eax\n");
+  fprintf(fpasm, "\tpop dword ebx\n");
+  fprintf(fpasm, "\tpop dword eax\n");
 
-    if(es_variable_1){
-      fprintf(fpasm, "\tmov dword eax, [eax]\n");
-    }
-
-    fprintf(fpasm,"\tadd eax, %s\n", (es_variable_2 != 1) ? "[ebx]" : "ebx");
+  if(es_variable_1){
+    fprintf(fpasm, "\tmov dword eax, [eax]\n");
   }
+  if(es_variable_2){
+    fprintf(fpasm, "\tmov dword ebx, [ebx]\n");
+  }
+
+  fprintf(fpasm,"\tadd eax, ebx\n");
   fprintf(fpasm, "\tpush dword eax\n");
 }
 
@@ -156,7 +152,7 @@ void restar(FILE* fpasm, int es_variable_1, int es_variable_2){
   if(es_variable_1){
     fprintf(fpasm, "\tmov dword eax, [eax]\n");
   }
-  fprintf(fpasm, "\tsub eax, %s\n", (es_variable_2 != 1) ? "[ebx]" : "ebx");
+  fprintf(fpasm, "\tsub eax, %s\n", es_variable_2 ? "[ebx]" : "ebx");
   fprintf(fpasm, "\tpush dword eax\n");
 }
 
@@ -168,7 +164,7 @@ void multiplicar(FILE* fpasm, int es_variable_1, int es_variable_2){
   if(es_variable_1){
     fprintf(fpasm, "\tmov eax, [eax]\n");
   }
-  fprintf(fpasm, "\timul dword %s\n", (es_variable_2 != 1) ? "[ebx]" : "ebx");
+  fprintf(fpasm, "\timul dword %s\n", es_variable_2 ? "[ebx]" : "ebx");
   fprintf(fpasm, "\tpush dword eax\n");
 }
 
@@ -204,7 +200,7 @@ void o(FILE* fpasm, int es_variable_1, int es_variable_2){
     if(es_variable_1){
       fprintf(fpasm, "\tmov dword eax, [eax]\n");
     }
-    fprintf(fpasm, "\tor eax, %s\n", (es_variable_2 != 1) ? "[ebx]" : "ebx");
+    fprintf(fpasm, "\tor eax, %s\n", es_variable_2 ? "[ebx]" : "ebx");
   }
   fprintf(fpasm, "\tpush dword eax\n");
 }
@@ -223,7 +219,7 @@ void y(FILE* fpasm, int es_variable_1, int es_variable_2){
     if(es_variable_1){
       fprintf(fpasm, "\tmov dword eax, [eax]\n");
     }
-    fprintf(fpasm, "\tand eax, %s\n", (es_variable_2 != 1) ? "[ebx]" : "ebx");
+    fprintf(fpasm, "\tand eax, %s\n", es_variable_2 ? "[ebx]" : "ebx");
   }
   fprintf(fpasm, "\tpush dword eax\n");
 }
@@ -253,7 +249,7 @@ El último argumento es el valor de etiqueta que corresponde (sin lugar a dudas,
 void no(FILE* fpasm, int es_variable, int cuantos_no){
   fprintf(fpasm, "\n\t; Negacion logica\n");
   fprintf(fpasm,"\tpop eax\n");
-  fprintf(fpasm, "\tcmp dword %s, 0\n", (es_variable != 1) ? "[eax]" : "eax");
+  fprintf(fpasm, "\tcmp dword %s, 0\n", es_variable ? "[eax]" : "eax");
   fprintf(fpasm, "\tje __uno_%d\n", cuantos_no);
   fprintf(fpasm, "\tpush dword 0\n");
   fprintf(fpasm, "\tjmp __fin_no_%d\n", cuantos_no);
@@ -280,7 +276,7 @@ void igual(FILE* fpasm, int es_variable1, int es_variable2, int etiqueta){
     if(es_variable1){
       fprintf(fpasm, "\tmov dword eax, [eax]\n");
     }
-    fprintf(fpasm, "\tcmp eax, %s\n", (es_variable2 != 1) ? "[ebx]" : "ebx");
+    fprintf(fpasm, "\tcmp eax, %s\n", es_variable2 ? "[ebx]" : "ebx");
   }
 
   fprintf(fpasm, "\tje __igual_%d\n", etiqueta);/* Comprobamos igualdad */
@@ -307,7 +303,7 @@ void distinto(FILE* fpasm, int es_variable1, int es_variable2, int etiqueta){
     if(es_variable1){
       fprintf(fpasm, "\tmov dword eax, [eax]\n");
     }
-    fprintf(fpasm, "\tcmp eax, %s\n", (es_variable2 != 1) ? "[ebx]" : "ebx");
+    fprintf(fpasm, "\tcmp eax, %s\n", es_variable2 ? "[ebx]" : "ebx");
   }
   fprintf(fpasm, "\tje __distinto_%d\n", etiqueta);/* Comprobamos igualdad */
   fprintf(fpasm, "\tpush dword 1\n");/*Caso en el que se cumple la igualdad*/
