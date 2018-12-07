@@ -1,10 +1,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "omicron.h"
 
-FILE * yyout;
+FILE * salida;
+FILE * sintactico;
 extern FILE* yyin;
 extern int yylex();
+extern int yyparse();
 
 int main(int argc, char const *argv[]) {
 	int ret=1;
@@ -16,13 +19,15 @@ int main(int argc, char const *argv[]) {
   }
 
   yyin = fopen(argv[1], "r");
-  yyout = fopen(argv[2], "w");
+  salida = fopen(argv[2], "w");
+  sintactico = fopen("salida_sintactico.txt", "w");
   
   while(ret){
   	ret = yylex();
   };
   fclose(yyin);
-  fclose(yyout);
+  fclose(salida);
+  fclose(sintactico);
   return 0;
 }
 
