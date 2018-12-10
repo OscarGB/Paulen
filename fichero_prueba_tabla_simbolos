@@ -2,16 +2,16 @@ inicia_tsc    grafo_enunciado
 inicia_tsa_main
 abrir_ambito_ppal_main
 buscar    declarar_main    main_v1
-insertar_tsa_main    main_v1    1    1    1    3    2        
+insertar_tsa_main    main_v1    1    1    1    1    2        
 abrir_clase    AA
 buscar    declarar_miembro_instancia    AA    AA_a1
-insertar_tsc    AA    AA_a1    8    1    1    3    2        
+insertar_tsc    AA    AA_a1    8    1    1    1    2        
 buscar    declarar_miembro_instancia    AA    AA_sa1
 insertar_tsc    AA    AA_sa1    7    1    1    1    1        
 buscar    declarar_miembro_clase    A    A_a2
-insertar_tsc    AA    AA_a2    7    1    1    3    1        
+insertar_tsc    AA    AA_a2    7    1    1    1    1        
 buscar    declarar_miembro_instancia    AA    AA_mA1@1
-abrir_ambito_tsc    AA    AA_mA1@1    5    3    3    2
+abrir_ambito_tsc    AA    AA_mA1@1    5    3    1    2
 buscar    declarar_id_local_metodo    AA    mA1@1_pmA1
 insertar_tsc    AA    mA1@1_pmA1    2    1    1    3    2        
 buscar    id_no_cualificado    a1    AA
