@@ -140,6 +140,8 @@ int process_line(FILE * f){
 			printf("%s: ", to_print);
 			tok = strtok(NULL, " \t\n");
 			tok1 = strtok(NULL, " \t\n");
+			tok1 = strtok(tok1, "_");
+			tok1 = strtok(NULL, "_ \t\n");
 			if(buscarParaDeclararMiembroInstancia(simbolos,tok, tok1, &s, ambito) == ERROR){
 				printf("No encontrado: se puede declarar\n");
 			}
