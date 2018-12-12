@@ -1178,14 +1178,14 @@ int buscarParaDeclararMiembroClase(	simbolos_p simbolos,
 		return OK;
 	}
 
-	// s = NULL;
-	// nombre_ambito_encontrado = NULL;
+	s = NULL;
+	nombre_ambito_encontrado = NULL;
 	// free(nombre_prefijo);
-	tok = strtok(nombre_prefijo, "_\n");
-	tok = strtok(NULL, "_\n");
-	printf("\nTOK:  %s\n\n\n", tok);
-
-	return buscarIdEnJerarquiaDesdeClase(simbolos, tok, nombre_clase, s, nombre_ambito_encontrado);
+	// tok = strtok(nombre_prefijo, "_\n");
+	// tok = strtok(NULL, "_\n");
+	// printf("\nTOK:  %s\n\n\n", tok);
+	return ERROR;
+	// return buscarIdEnJerarquiaDesdeClase(simbolos, tok, nombre_clase, s, nombre_ambito_encontrado);
 
 }
 
@@ -1267,6 +1267,9 @@ int buscarIdCualificadoClase(    simbolos_p simbolos, char * nombre_clase_cualif
 		if(!buscarIdEnJerarquiaDesdeClase(simbolos, nombre_id, nombre_clase_cualifica, s, nombre_ambito_encontrado)){
 			return ERROR;
 		}
+		if((*s)->clase != AC){
+			return ERROR;
+		}
 		return aplicarAccesos(simbolos, nombre_clase_desde, nombre_ambito_encontrado, *s);
 	}
 }
@@ -1280,9 +1283,9 @@ int buscarIdCualificadoInstancia(simbolos_p simbolos,
 	char nombre_clase_cualifica[100];
 	if(buscarIdNoCualificado(simbolos, nombre_instancia_cualifica, nombre_clase_desde, s, nombre_ambito_encontrado)){
 		strcpy(nombre_clase_cualifica, nombre_ambito_encontrado);
-		if((*s)->tipo>=0){
-			return ERROR;
-		}
+		// if((*s)->tipo>=0){
+		// 	return ERROR;
+		// }
 		node_p node = getINode(simbolos->graph, -(*s)->tipo);
 		strcpy(nombre_clase_cualifica, node->name);
 		if(!aplicarAccesos(simbolos, nombre_clase_desde, nombre_ambito_encontrado, *s)){
