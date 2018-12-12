@@ -144,7 +144,7 @@ int process_line(FILE * f){
 				printf("No encontrado: se puede declarar\n");
 			}
 			else{
-				printf("Existe id: no se puede declarar\n");
+				printf("Encontrado en %s: no se puede declarar\n", ambito);
 			}
 		}
 		else if(strcmp(tok, "id_no_cualificado") == 0){
@@ -201,7 +201,7 @@ int process_line(FILE * f){
 				printf("No encontrado: se puede declarar\n");
 			}
 			else{
-				printf("Existe id: no se puede declarar\n");
+				printf("Encontrado en %s: no se puede declarar\n", ambito);
 			}
 		}
 		else if(strcmp(tok, "declarar_id_local_metodo") == 0){
@@ -212,7 +212,7 @@ int process_line(FILE * f){
 				printf("No encontrado: se puede declarar\n");
 			}
 			else{
-				printf("Existe id: no se puede declarar\n");
+				printf("Encontrado en %s: no se puede declarar\n", ambito);
 			}
 		}
 	}

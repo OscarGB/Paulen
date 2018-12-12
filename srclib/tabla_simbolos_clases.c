@@ -1300,9 +1300,10 @@ int buscarParaDeclararIdTablaSimbolosAmbitos(simbolos_p simbolos,
 	nombre_prefijo = id;
 	if(simbolos->main_local){
 		*s = NULL;
+		nombre_prefijo = addPrefijo("main", nombre_prefijo);
 		// nombre_prefijo = addPrefijo(ht_get_name(simbolos->main_local), id);
 		*s = ht_search(simbolos->main_local, nombre_prefijo);
-		// free(nombre_prefijo);
+		free(nombre_prefijo);
 		if(*s == NULL){
 			return ERROR;
 		}
@@ -1335,11 +1336,11 @@ int buscarParaDeclararIdLocalEnMetodo(simbolos_p simbolos,
 	if(!node || !node->local){
 		return ERROR;
 	}
-
-	nombre_prefijo = addPrefijo(ht_get_name(node->local), nombre_id);
-
+	nombre_prefijo = addPrefijo(nombre_clase, nombre_id);
+	// nombre_prefijo = addPrefijo(ht_get_name(node->local), nombre_id);
+	// nombre_prefijo = nombre_id;
 	*s = ht_search(node->local, nombre_prefijo);
-	free(nombre_prefijo);
+	// free(nombre_prefijo);
 	if(*s == NULL){
 		return ERROR;
 	}
