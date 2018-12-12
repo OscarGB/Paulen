@@ -33,7 +33,6 @@
 *.dylib
 
 # Executables
-*.out
 *.app
 *.i*86
 *.x86_64
