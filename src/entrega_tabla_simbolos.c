@@ -219,7 +219,7 @@ int process_line(FILE * f){
 	else{
 		printf("%s\n", to_print);
 	}
-	return 0;
+		return 0;
 }
 
 int main(int argc, char const *argv[])

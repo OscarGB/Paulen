@@ -2,165 +2,225 @@ inicial_tsc
 inicia_tsa_main
 abrir_ambito_ppal_main
 abrir_clase    AA
-buscar    declarar_miembro_instancia    AA    AA_mA1@1: No encontrado: se puede declarar
-abrir_ambito_tsc    AA    AA_mA1@1    5    1    3    2
+buscar    declarar_miembro_clase    AA    AA_hA1: 
+TOK:  hA1
 
-=================== AA_mA1@1 =================
 
-FALTA LLENAR ESTE TROZO
-
-buscar    declarar_id_local_metodo    AA    mA1@1_p1: No encontrado: se puede declarar
-insertar_tsc    AA    mA1@1_p1    2    1    1    3    2
+No encontrado: se puede declarar
+insertar_tsc    AA    AA_hA1    7    1    1    2    1
 
 =================== AA =================
 
 FALTA LLENAR ESTE TROZO
 
+buscar    declarar_miembro_clase    AA    AA_sA1: 
+TOK:  sA1
+
+
+No encontrado: se puede declarar
+insertar_tsc    AA    AA_sA1    7    1    1    1    1
+
+=================== AA =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    declarar_miembro_clase    AA    AA_sA1: Encontrado en AA: no se puede declarar
+buscar    declarar_miembro_clase    AA    AA_xA1: 
+TOK:  xA1
+
+
+No encontrado: se puede declarar
+insertar_tsc    AA    AA_xA1    7    1    1    3    1
+
+=================== AA =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    declarar_miembro_clase    AA    AA_MA1@1: 
+TOK:  MA1@1
+
+
+No encontrado: se puede declarar
+abrir_ambito_tsc    AA    AA_MA1@1    6    1    2    1
+
+=================== AA_MA1@1 =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    declarar_id_local_metodo    AA    MA1@1_p1: No encontrado: se puede declarar
+insertar_tsc    AA    MA1@1_p1    2    1    1    3    2
+
+=================== AA =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    declarar_id_local_metodo    AA    MA1@1_v1: No encontrado: se puede declarar
+insertar_tsc    AA    MA1@1_v1    1    1    1    3    2
+
+=================== AA =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    id_no_cualificado    p1    AA: Encontrado en AA_MA1@1
 cerrar_ambito_tsc    AA
-buscar    declarar_miembro_instancia    AA    AA_mA2@1@1: No encontrado: se puede declarar
-abrir_ambito_tsc    AA    AA_mA2@1@1    5    1    3    2
+buscar    declarar_miembro_clase    AA    AA_MA1@1: Encontrado en AA: no se puede declarar
+buscar    declarar_miembro_clase    AA    AA_MA1@1@1: 
+TOK:  MA1@1@1
 
-=================== AA_mA2@1@1 =================
+
+No encontrado: se puede declarar
+abrir_ambito_tsc    AA    AA_MA1@1@1    6    1    2    1
+
+=================== AA_MA1@1@1 =================
 
 FALTA LLENAR ESTE TROZO
 
-buscar    declarar_id_local_metodo    AA    mA2@1@1_p1: No encontrado: se puede declarar
-insertar_tsc    AA    mA2@1@1_p1    2    1    1    3    2
+buscar    declarar_id_local_metodo    AA    MA1@1@1_p1: No encontrado: se puede declarar
+insertar_tsc    AA    MA1@1@1_p1    2    1    1    3    2
 
 =================== AA =================
 
 FALTA LLENAR ESTE TROZO
 
-buscar    declarar_id_local_metodo    AA    mA2@1@1_p1: Encontrado en AA_mA2@1@1: no se puede declarar
-insertar_tsc    AA    mA2@1@1_p1    2    1    1    3    2
+buscar    declarar_id_local_metodo    AA    MA1@1@1_p2: No encontrado: se puede declarar
+insertar_tsc    AA    MA1@1@1_p2    2    1    1    3    2
 
 =================== AA =================
 
 FALTA LLENAR ESTE TROZO
 
-buscar    id_no_cualificado    p1    AA: Encontrado en AA_mA2@1@1
-cerrar_ambito_tsc    AA
-abrir_ambito_tsc    AA    AA_mA3@1@3    5    1    3    2
-
-=================== AA_mA3@1@3 =================
-
-FALTA LLENAR ESTE TROZO
-
-buscar    declarar_id_local_metodo    AA    mA3@1@3_p1: No encontrado: se puede declarar
-insertar_tsc    AA    mA3@1@3_p1    2    1    1    3    2
+buscar    declarar_id_local_metodo    AA    MA1@1@1_v1: No encontrado: se puede declarar
+insertar_tsc    AA    MA1@1@1_v1    1    1    1    3    2
 
 =================== AA =================
 
 FALTA LLENAR ESTE TROZO
 
-buscar    declarar_id_local_metodo    AA    mA3@1@3_mA3: No encontrado: se puede declarar
-insertar_tsc    AA    mA3@1@3_mA3    2    3    1    3    2
-
-=================== AA =================
-
-FALTA LLENAR ESTE TROZO
-
-buscar    id_no_cualificado    p1    AA: Encontrado en AA_mA3@1@3
-cerrar_ambito_tsc    AA
-buscar    declarar_miembro_instancia    AA    AA_mA4: No encontrado: se puede declarar
-abrir_ambito_tsc    AA    AA_mA4    5    1    3    2
-
-=================== AA_mA4 =================
-
-FALTA LLENAR ESTE TROZO
-
-buscar    declarar_id_local_metodo    AA    mA4_v2: No encontrado: se puede declarar
-insertar_tsc    AA    mA4_v2    1    1    1    3    2
-
-=================== AA =================
-
-FALTA LLENAR ESTE TROZO
-
-buscar    id_no_cualificado    v2    AA: Encontrado en AA_mA4
-cerrar_ambito_tsc    AA
-buscar    declarar_miembro_instancia    AA    AA_mA5: No encontrado: se puede declarar
-abrir_ambito_tsc    AA    AA_mA5    5    1    3    2
-
-=================== AA_mA5 =================
-
-FALTA LLENAR ESTE TROZO
-
-buscar    declarar_id_local_metodo    AA    mA5_v1: No encontrado: se puede declarar
-insertar_tsc    AA    mA5_v1    2    1    1    3    2
-
-=================== AA =================
-
-FALTA LLENAR ESTE TROZO
-
-buscar    declarar_id_local_metodo    AA    mA5_v1: Encontrado en AA_mA5: no se puede declarar
-insertar_tsc    AA    mA5_v1    1    1    1    3    2
-
-=================== AA =================
-
-FALTA LLENAR ESTE TROZO
-
-buscar    id_no_cualificado    v1    AA: Encontrado en AA_mA5
-cerrar_ambito_tsc    AA
-buscar    declarar_miembro_instancia    AA    AA_mA6: No encontrado: se puede declarar
-abrir_ambito_tsc    AA    AA_mA6    5    1    3    2
-
-=================== AA_mA6 =================
-
-FALTA LLENAR ESTE TROZO
-
-buscar    declarar_id_local_metodo    AA    mA6_v1: No encontrado: se puede declarar
-insertar_tsc    AA    mA6_v1    1    1    1    3    2
-
-=================== AA =================
-
-FALTA LLENAR ESTE TROZO
-
-buscar    declarar_id_local_metodo    AA    mA6_v1: Encontrado en AA_mA6: no se puede declarar
-insertar_tsc    AA    mA6_v1    1    3    1    3    2
-
-=================== AA =================
-
-FALTA LLENAR ESTE TROZO
-
-buscar    id_no_cualificado    v1    AA: Encontrado en AA_mA6
-cerrar_ambito_tsc    AA
-buscar    declarar_miembro_instancia    AA    AA_mA7@1: No encontrado: se puede declarar
-abrir_ambito_tsc    AA    AA_mA7@1    5    1    3    2
-
-=================== AA_mA7@1 =================
-
-FALTA LLENAR ESTE TROZO
-
-buscar    declarar_id_local_metodo    AA    mA7@1_p1: No encontrado: se puede declarar
-insertar_tsc    AA    mA1@1_p1    2    1    1    3    2
-
-=================== AA =================
-
-FALTA LLENAR ESTE TROZO
-
-buscar    declarar_id_local_metodo    AA    mA7@1_mA7: No encontrado: se puede declarar
-insertar_tsc    AA    mA1@1_mA7    1    1    1    3    2
-
-=================== AA =================
-
-FALTA LLENAR ESTE TROZO
-
-cerrar_ambito_tsc    AA
-buscar    declarar_miembro_instancia    AA    AA_mA8@1: No encontrado: se puede declarar
-abrir_ambito_tsc    AA    AA_mA8@1    5    1    3    2
-
-=================== AA_mA8@1 =================
-
-FALTA LLENAR ESTE TROZO
-
-buscar    declarar_id_local_metodo    AA    mA8_mA8: No encontrado: se puede declarar
-insertar_tsc    AA    mA1@1_mA8    1    1    1    3    2
-
-=================== AA =================
-
-FALTA LLENAR ESTE TROZO
-
+buscar    id_no_cualificado    p1    AA: Encontrado en AA_MA1@1@1
 cerrar_ambito_tsc    AA
 cerrar_clase    AA
+abrir_clase_hereda    BB    AA
+buscar    declarar_miembro_clase    BB    BB_hA1: 
+TOK:  hA1
+
+
+No encontrado: se puede declarar
+insertar_tsc    BB    BB_hA1    7    1    1    2    1
+
+=================== BB =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    declarar_miembro_clase    BB    BB_sA1: 
+TOK:  sA1
+
+
+Encontrado en AA: no se puede declarar
+insertar_tsc    BB    BB_sA1    7    1    1    1    1
+
+=================== BB =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    declarar_miembro_clase    BB    BB_xA1: 
+TOK:  xA1
+
+
+Encontrado en AA: no se puede declarar
+insertar_tsc    BB    BB_xA1    7    1    1    3    1
+
+=================== BB =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    declarar_miembro_clase    BB    BB_MB1@1: 
+TOK:  MB1@1
+
+
+No encontrado: se puede declarar
+abrir_ambito_tsc    BB    BB_MB1@1    6    1    1    1
+
+=================== BB_MB1@1 =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    declarar_id_local_metodo    BB    MB1@1_p1: No encontrado: se puede declarar
+insertar_tsc    BB    MB1@1_p1    2    1    1    3    2
+
+=================== BB =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    declarar_id_local_metodo    BB    MB1@1_v1: No encontrado: se puede declarar
+insertar_tsc    BB    MB1@1_v1    1    1    1    3    2
+
+=================== BB =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    id_no_cualificado    p1    BB: Encontrado en BB_MB1@1
+cerrar_ambito_tsc    BB
+buscar    declarar_miembro_clase    BB    BB_MA1@1: 
+TOK:  MA1@1
+
+
+No encontrado: se puede declarar
+abrir_ambito_tsc    BB    BB_MA1@1    6    1    1    1
+
+=================== BB_MA1@1 =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    declarar_id_local_metodo    BB    MA1@1_p1: No encontrado: se puede declarar
+insertar_tsc    BB    MA1@1_p1    2    1    1    3    2
+
+=================== BB =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    declarar_id_local_metodo    BB    MA1@1_v1: No encontrado: se puede declarar
+insertar_tsc    BB    MA1@1_v1    1    1    1    3    2
+
+=================== BB =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    id_no_cualificado    p1    BB: Encontrado en BB_MA1@1
+cerrar_ambito_tsc    BB
+buscar    declarar_miembro_clase    BB    BB_MA2@1@1: 
+TOK:  MA2@1@1
+
+
+No encontrado: se puede declarar
+abrir_ambito_tsc    BB    BB_MA2@1@1    6    1    3    1
+
+=================== BB_MA2@1@1 =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    declarar_id_local_metodo    BB    MA1@1_p1: No encontrado: se puede declarar
+insertar_tsc    BB    MA2@1@1_p1    2    1    1    3    2
+
+=================== BB =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    declarar_id_local_metodo    BB    MA1@1_p2: No encontrado: se puede declarar
+insertar_tsc    BB    MA2@1@1_p2    2    1    1    3    2
+
+=================== BB =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    declarar_id_local_metodo    BB    MA1@1_v1: No encontrado: se puede declarar
+insertar_tsc    BB    MA2@1@1_v1    1    1    1    3    2
+
+=================== BB =================
+
+FALTA LLENAR ESTE TROZO
+
+buscar    id_no_cualificado    p1    BB: Encontrado en BB_MA2@1@1
+cerrar_ambito_tsc    BB
+cerrar_clase    BB
 cerrar_tsa_main
 cerrar_tsc

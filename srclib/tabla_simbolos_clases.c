@@ -1141,45 +1141,51 @@ int buscarParaDeclararMiembroClase(	simbolos_p simbolos,
 	char * nombre_prefijo = NULL;
 	node_p node = searchNode(simbolos->graph, nombre_clase);
 
+	char* tok,tok1;
+
 	if(!node){
 		return ERROR;
 	}
 	/*Busca en al ambito actual, tabla local*/
-	if(node->local != NULL){
-		nombre_ambito = getAmbito(node);
-        nombre_prefijo = addPrefijo(nombre_ambito, nombre_simbolo);
-		if(ht_isin(node->local, nombre_prefijo)){
-			*s = ht_search(node->local, nombre_prefijo);
-			strcpy(nombre_ambito_encontrado, nombre_ambito);
-			// return aplicarAccesos(simbolos, nombre_clase, nombre_ambito_encontrado, *s);
-			free(nombre_prefijo);
-			return OK;
-		}
+	// if(node->local != NULL){
+	// 	nombre_ambito = getAmbito(node);
+ //        nombre_prefijo = addPrefijo(nombre_ambito, nombre_simbolo);
+	// 	if(ht_isin(node->local, nombre_prefijo)){
+	// 		*s = ht_search(node->local, nombre_prefijo);
+	// 		strcpy(nombre_ambito_encontrado, nombre_ambito);
+	// 		// return aplicarAccesos(simbolos, nombre_clase, nombre_ambito_encontrado, *s);
+	// 		free(nombre_prefijo);
+	// 		return OK;
+	// 	}
 
-		s = NULL;
-		nombre_ambito_encontrado = NULL;
-		free(nombre_prefijo);
+	// 	s = NULL;
+	// 	nombre_ambito_encontrado = NULL;
+	// 	free(nombre_prefijo);
 
-		return ERROR;
-	}
+	// 	return ERROR;
+	// }
 
 
 	nombre_ambito = ht_get_name(node->principal);
-    nombre_prefijo = addPrefijo(nombre_ambito, nombre_simbolo);
+ //    nombre_prefijo = addPrefijo(nombre_ambito, nombre_simbolo);
+	nombre_prefijo = nombre_simbolo;
 	/*Buscar en el ambito actual, tabla principal*/
 	if(ht_isin(node->principal, nombre_prefijo)){
 		*s = ht_search(node->principal, nombre_prefijo);
 		strcpy(nombre_ambito_encontrado, nombre_ambito);
-		free(nombre_prefijo);
+		// free(nombre_prefijo);
 		// return aplicarAccesos(simbolos, nombre_clase, nombre_clase, *s);
 		return OK;
 	}
 
-	s = NULL;
-	nombre_ambito_encontrado = NULL;
-	free(nombre_prefijo);
+	// s = NULL;
+	// nombre_ambito_encontrado = NULL;
+	// free(nombre_prefijo);
+	tok = strtok(nombre_prefijo, "_\n");
+	tok = strtok(NULL, "_\n");
+	printf("\nTOK:  %s\n\n\n", tok);
 
-	return ERROR;
+	return buscarIdEnJerarquiaDesdeClase(simbolos, tok, nombre_clase, s, nombre_ambito_encontrado);
 
 }
 
@@ -1340,7 +1346,7 @@ int buscarParaDeclararIdLocalEnMetodo(simbolos_p simbolos,
 	// nombre_prefijo = addPrefijo(ht_get_name(node->local), nombre_id);
 	// nombre_prefijo = nombre_id;
 	*s = ht_search(node->local, nombre_prefijo);
-	// free(nombre_prefijo);
+	free(nombre_prefijo);
 	if(*s == NULL){
 		return ERROR;
 	}
