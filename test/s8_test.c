@@ -9,8 +9,8 @@
 
 #define NOCUALIFICADO 1
 #define INSTANCIA 2
-#define CLASE 3
-#define BUSCAR_PARA_CLASE 4
+#define CLASE 4
+#define BUSCAR_PARA_CLASE 3
 #define BUSCAR_PARA_INSTANCIA 5
 
 void check_simbol(simbolos_p simbol, char* simbolo, char* clase_desde, char* nombre_cualifica, int deberia_estar, int prueba){

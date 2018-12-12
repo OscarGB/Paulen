@@ -24,7 +24,7 @@ int process_line(FILE * f){
 	if(strcmp(tok, "inicia_tsc") == 0){
 		tok = strtok(NULL, " \t\n");
 		simbolos = createSimbolos(tok);
-		printf("%s\n", to_print);
+		printf("inicial_tsc\n");
 	}
 	else if(strcmp(tok, "abrir_clase") == 0){
 		tok = strtok(NULL, " \t\n");
@@ -56,7 +56,10 @@ int process_line(FILE * f){
 		eliminaSimbolos(simbolos);
 		printf("%s\n", to_print);
 	}
-
+	else if(strcmp(tok, "cerrar_ambito_tsa_main") == 0){
+		cerrarLocal(simbolos);
+		printf("%s\n", to_print);
+	}
 	else if(strcmp(tok, "insertar_tsa_main") == 0){
 		printf("%s\n", to_print);
 		printf("\n=================== main =================\n\n");
@@ -108,9 +111,19 @@ int process_line(FILE * f){
 		tipo_acceso = atoi(tok1);
 		tok1 = strtok(NULL, " \t\n");
 		tipo_miembro = atoi(tok1);
+		nuevoSimboloEnClase(simbolos,nombre,tok,categoria,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,tipo_acceso,tipo_miembro,0,0,0,0,0,0,NULL);
 		iniciaLocalEnClase(simbolos,tok,nombre,categoria,tipo_acceso,tipo_miembro,0);
 	}
-
+	else if(strcmp(tok, "abrir_ambito_tsa_main") == 0){
+		printf("%s\n", to_print);
+		tok = strtok(NULL, " \t\n");
+		printf("\n=================== %s =================\n\n", tok);
+		printf("FALTA LLENAR ESTE TROZO\n\n");
+		tok1 = strtok(NULL, " \t\n");
+		tipo_basico = atoi(tok1);
+		nuevoSimboloEnMain(simbolos,tok,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NULL);
+		iniciaLocal(simbolos,tok);
+	}
 	else if(strcmp(tok, "buscar") == 0){
 		tok = strtok(NULL, " \t\n");
 		if(strcmp(tok, "declarar_main") == 0){
@@ -120,7 +133,7 @@ int process_line(FILE * f){
 				printf("No encontrado: se puede declarar\n");
 			}
 			else{
-				printf("Existe id: no se puede declarar\n");
+				printf("Encontrado en %s: no se puede declarar\n", ambito);
 			}
 		}
 		else if(strcmp(tok, "declarar_miembro_instancia") == 0){

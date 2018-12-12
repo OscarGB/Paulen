@@ -237,9 +237,9 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 	int flag = 0, i = 0;
 	node_p node = searchNode(simbolos->graph, nombre_clase);
 
-	if(tipo == FUNCION || tipo == MS || tipo == MNS) {
-		simbolo_a_insertar = crearNombreFuncion(simbolo_a_insertar, numero_parametros, tipo_args);
-	}
+	// if(tipo == FUNCION || tipo == MS || tipo == MNS) {
+	// 	simbolo_a_insertar = crearNombreFuncion(simbolo_a_insertar, numero_parametros, tipo_args);
+	// }
 	if(!node->local){
 		switch(tipo){
 			case MS:
@@ -267,13 +267,16 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 				break;
 		}
 	}
-
 	/*Metemos los parametros de la funcion en el nombre del simbolo
 	ATENCION: sobreescribimos simbolo_a_insertar*/
 
 	nombre_ambito = getAmbito(node);
 
-	nombre_prefijo = addPrefijo(nombre_ambito, simbolo_a_insertar);
+	// nombre_prefijo = addPrefijo(nombre_ambito, simbolo_a_insertar);
+	nombre_prefijo = simbolo_a_insertar;
+	if(node->local){
+		nombre_prefijo = addPrefijo(nombre_clase, nombre_prefijo);
+	}
 	simbolo_p s = createSimbolo(nombre_prefijo,
 								simbolo_a_insertar,
 								clase,
@@ -311,10 +314,13 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 	else{
 		ht_insert(node->principal, nombre_prefijo, s);
 	}
-	free(nombre_prefijo);
+	if(node->local){
+		free(nombre_prefijo);
+	}
+	// free(nombre_prefijo);
 	// if(tipo == MNS) free(simbolo_a_insertar);
-	if(tipo == FUNCION || tipo == MS || tipo == MNS)
-		free(simbolo_a_insertar);
+	// if(tipo == FUNCION || tipo == MS || tipo == MNS)
+	// 	free(simbolo_a_insertar);
 }
 
 /*Inserta un simbolo en el main
@@ -342,9 +348,9 @@ void nuevoSimboloEnMain(simbolos_p simbolos, char* simbolo_a_insertar,
 
 	/*Metemos los parametros de la funcion en el nombre del simbolo
 	ATENCION: sobreescribimos simbolo_a_insertar*/
-	if(tipo == FUNCION) {
-		simbolo_a_insertar = crearNombreFuncion(simbolo_a_insertar, numero_parametros, tipo_args);
-	}
+	// if(tipo == FUNCION) {
+	// 	simbolo_a_insertar = crearNombreFuncion(simbolo_a_insertar, numero_parametros, tipo_args);
+	// }
 
 	if(simbolos->main_local) {
 		nombre_ambito = ht_get_name(simbolos->main_local);
@@ -353,8 +359,11 @@ void nuevoSimboloEnMain(simbolos_p simbolos, char* simbolo_a_insertar,
 		nombre_ambito = main_name;
 	}
 
-	nombre_prefijo = addPrefijo(nombre_ambito, simbolo_a_insertar);
-
+	// nombre_prefijo = addPrefijo(nombre_ambito, simbolo_a_insertar);
+	nombre_prefijo = simbolo_a_insertar;
+	if(simbolos->main_local){
+		nombre_prefijo = addPrefijo("main", nombre_prefijo);
+	}
 	simbolo_p s = createSimbolo(nombre_prefijo,
 								simbolo_a_insertar,
 								clase,
@@ -390,9 +399,12 @@ void nuevoSimboloEnMain(simbolos_p simbolos, char* simbolo_a_insertar,
 	else{
 		ht_insert(simbolos->main_principal, nombre_prefijo, s);
 	}
-	free(nombre_prefijo);
-	if(tipo == FUNCION)
-		free(simbolo_a_insertar);
+	if(simbolos->main_local){
+		free(nombre_prefijo);
+	}
+	// free(nombre_prefijo);
+	// if(tipo == FUNCION)
+	// 	free(simbolo_a_insertar);
 }
 
 /*Comprueba si un simbolo esta en una clase*/
@@ -1030,10 +1042,13 @@ int aplicarAccesos(simbolos_p simbolos, char * clase_actual,
 			return OK; // Si expuesto siempre OK
 		}
 		else if(s->tipo_acceso == SECRET){
+			if(strcmp(clase_actual, clase_variable_encontrada) == 0){
+				return OK; // En la propia clase
+			}
 			node_p node = searchNode(simbolos->graph, clase_actual);
 			int i = 0;
 			while(node->padres[i] != NULL){
-                if(strcmp(clase_actual, node->padres[i]) == 0){
+                if(strcmp(clase_variable_encontrada, node->padres[i]) == 0){
                 	return OK;
                 }
                 i++;
@@ -1212,6 +1227,7 @@ int buscarIdNoCualificado(  simbolos_p simbolos,
 			free(nombre_prefijo);
 		}
 		nombre_prefijo = addPrefijo(main_name, nombre_simbolo);
+		
 		/*Tabla principal de main*/
 		if(ht_isin(simbolos->main_principal, nombre_prefijo)){
 			*s = ht_search(simbolos->main_principal, nombre_prefijo);
@@ -1281,12 +1297,12 @@ int buscarParaDeclararIdTablaSimbolosAmbitos(simbolos_p simbolos,
                                     char* id_ambito){
 
 	char * nombre_prefijo = NULL;
-
+	nombre_prefijo = id;
 	if(simbolos->main_local){
 		*s = NULL;
-		nombre_prefijo = addPrefijo(ht_get_name(simbolos->main_local), id);
+		// nombre_prefijo = addPrefijo(ht_get_name(simbolos->main_local), id);
 		*s = ht_search(simbolos->main_local, nombre_prefijo);
-		free(nombre_prefijo);
+		// free(nombre_prefijo);
 		if(*s == NULL){
 			return ERROR;
 		}
@@ -1295,9 +1311,9 @@ int buscarParaDeclararIdTablaSimbolosAmbitos(simbolos_p simbolos,
 	}
 	else{
 		*s = NULL;
-		nombre_prefijo = addPrefijo("main", id);
+		// nombre_prefijo = addPrefijo("main", id);
 		*s = ht_search(simbolos->main_principal, nombre_prefijo);
-		free(nombre_prefijo);
+		// free(nombre_prefijo);
 		if(*s == NULL){
 			return ERROR;
 		}

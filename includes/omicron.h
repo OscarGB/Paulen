@@ -46,7 +46,7 @@
 /* PARA CLASES */
 
 #define ERR -1
-#define OK 0
+#define OK 1
 
 typedef struct{
     char lexema[MAX_LONG_ID+1];
