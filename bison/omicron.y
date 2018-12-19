@@ -57,12 +57,12 @@ void gc_printf_vectores(FILE *salida, int etiqueta, int tamanio, int tipo);
 void gc_printf(FILE *salida, int es_direccion_op1, int tipo);
 void gc_ident_asiglocal(FILE *salida, int es_direccion, int categoria, int nPar, int pos);
 void gc_asigexp_ident(FILE *salida, int es_direccion_op1, char *lexema);
-void ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta);
-void ifthen_inicio(FILE * salida, int exp_es_variable, int etiqueta);
-void ifthen_fin(FILE* salida, int etiqueta);
-void ifthenelse_fin_then(FILE* salida, int etiqueta);
-void ifthenelse_fin( FILE * salida, int etiqueta);
-void ifthenelse_fin( FILE * salida, int etiqueta);
+void gc_ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta);
+void gc_ifthen_inicio(FILE * salida, int exp_es_variable, int etiqueta);
+void gc_ifthen_fin(FILE* salida, int etiqueta);
+void gc_ifthenelse_fin_then(FILE* salida, int etiqueta);
+void gc_ifthenelse_fin( FILE * salida, int etiqueta);
+void gc_ifthenelse_fin( FILE * salida, int etiqueta);
 void asignarDestinoPila(FILE* salida, int es_variable, char * eax, char * ebx);
 void gc_scanf_funcion(FILE *salida, int num_param_actual, int posicion_parametro, int categoria, int tipo);
 void gc_lectura(FILE * salida, char * nombre, int tipo);
@@ -203,7 +203,7 @@ programa: inicioTabla TOK_MAIN '{' declaraciones escritura_TS funciones escritur
 escritura_TS: {
 			escribir_subseccion_data(salida);
 			escribir_cabecera_bss(salida);
-			simbolos_main = ht_get_values(simbolos->main_principal);
+			simbolos_main = (simbolo_p *)ht_get_values(simbolos->main_principal);
 			for(int i=0;simbolos_main[i]!=NULL;i++){
 				nombre_actual_simbolo = simbolos_main[i]->nombre;
 				escribe_variables(salida, nombre_actual_simbolo, 1);
@@ -1365,60 +1365,38 @@ void gc_printf(FILE *salida, int es_direccion_op1, int tipo){
 	return;
 }
 
-void ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta){
-	fprintf(salida,"; Comprobamos la condicion: if (%d) para ver que es algo asimilable a una variable", etiqueta);
-    fprintf(salida, "pop eax\n");
-    if (exp_es_variable)
-        fprintf(salida, "mov eax, [eax]\n");
-
-    fprintf(salida, "cmp eax, 0\n");
-    fprintf(salida, "; En caso de que no se cumpla la condicion nos vamos al else\n");
-    fprintf(salida,"je __else_%d\n", etiqueta);
-	fprintf(salida, ";Nos metemos en el caso del then (%i) ya que se cumple la condicion", etiqueta);
+void gc_ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta){
+	ifthenelse_inicio(salida, exp_es_variable, etiqueta);
+	return;
 }
 
 
-void ifthen_inicio(FILE * salida, int exp_es_variable, int etiqueta){
-	fprintf(salida,"; Comprobamos la condicion: if (%d) para ver que es algo asimilable a una variable", etiqueta);
-    fprintf(salida, "pop eax\n");
-    if (exp_es_variable)
-        fprintf(salida, "mov eax, [eax]\n");
-
-    fprintf(salida, "cmp eax, 0\n");
-    fprintf(salida, "; En caso de que no se cumpla la condicion nos vamos al final del ifthen\n");
-    fprintf(salida, "je __endifthen_%d\n", etiqueta);
-	fprintf(salida, "; En caso de que se cumpla nos metemos en el caso del then (%i) ya que se cumple la condicion", etiqueta);
+void gc_ifthen_inicio(FILE * salida, int exp_es_variable, int etiqueta){
+	ifthen_inicio(salida, exp_es_variable, etiqueta);
+	return;
 }
 
 
-void ifthen_fin(FILE* salida, int etiqueta){
-    fprintf(salida, "; Estamos en la parte del final del then (%d) del ifthen", etiqueta);
-    fprintf(salida, "__endifthen_%d:", etiqueta);
+void gc_ifthen_fin(FILE* salida, int etiqueta){
+    ifthen_fin(salida, etiqueta);
+    return;
 }
 
 
-void ifthenelse_fin_then(FILE* salida, int etiqueta){
-    fprintf(salida, "; Estamos en la parte del final del then (%d) del ifthen_else", etiqueta);
-    fprintf(salida, "jmp __endifthen_else_%d", etiqueta);
+void gc_ifthenelse_fin_then(FILE* salida, int etiqueta){
+    ifthenelse_fin_then(salida, etiqueta);
+    return;
 }
 
-void ifthenelse_fin( FILE * salida, int etiqueta){
-	fprintf(salida, "; Estamos en la parte del final del else (%d) del ifthen_else", etiqueta);
-	fprintf(salida, "__endifthen_else_%d:\n", etiqueta);
+void gc_ifthenelse_fin( FILE * salida, int etiqueta){
+	ifthenelse_fin(salida, etiqueta);
+	return;
 }
 
 
-void asignarDestinoPila(FILE* salida, int es_variable, char * eax, char * ebx){
-	/*Hay algo mas que hacer pero no se el que*/
-	/*fprintf(salida, "\n\t; Asignacion de a pila a %s\n", nombre);*/
-	fprintf(salida, "\tpop dword eax\n");
-	if(es_variable){
-		fprintf(salida, "\tmov eax,dword [eax]\n");
-	}
-	else{
-		/*printf(salida, "\tmov dword [_%s], eax\n", nombre);*/
-	}
-	/*fprintf(salida, "; Apilando %s de variable local %d", (es_variable) ? "direccion": "valor", posicion_variable);*/
+void gc_asignarDestinoPila(FILE* salida, int es_variable, char * eax, char * ebx){
+	asignarDestinoEnPila(salida, es_variable);
+	return;
 }
 
 void gc_scanf_funcion(FILE *salida, int num_param_actual, int posicion_parametro, int categoria, int tipo){
