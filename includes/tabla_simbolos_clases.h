@@ -31,6 +31,9 @@ typedef struct _simbolos
 
 }simbolos_t, *simbolos_p;
 
+/*Concatena el simbolo al nombre del ambito, con una _ en medio*/
+char * addPrefijo(char * nombre_ambito, char * simbolo);
+
 /*Crea la estructura y reserva toda la memoria necesaria
 iniciarTablasSimbolosClases()*/
 simbolos_p createSimbolos(char* name);
