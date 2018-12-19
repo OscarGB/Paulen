@@ -89,8 +89,8 @@ void** getSimbolosObjetoEnClase(simbolos_p simbolos, char* nombre_clase, int amb
 
 /*Cierra una clase*/
 void cerrarClase(simbolos_p simbolos,
-				char* name, 
-				int n_atributos_clase, 
+				char* name,
+				int n_atributos_clase,
 				int n_atributos_instancia,
 				int num_metodos_sobreescribibles,
 				int num_metodos_no_sobreescribibles){
@@ -190,7 +190,7 @@ char * addPrefijo(char * nombre_ambito, char * simbolo) {
 	char * underscore = "_";
 
 	/*Reservamos memoria para el nombre del simbolo: clase_nombreSimbolo*/
-	nombre_prefijo = (char *)malloc(sizeof(char) * (strlen(nombre_ambito) + 1 + strlen(simbolo) + 1)); 
+	nombre_prefijo = (char *)malloc(sizeof(char) * (strlen(nombre_ambito) + 1 + strlen(simbolo) + 1));
 	strcpy(nombre_prefijo, nombre_ambito);
 	strcat(nombre_prefijo, "_");
 	strcat(nombre_prefijo, simbolo);
@@ -215,7 +215,7 @@ char * crearNombreFuncion(char* simbolo_a_insertar, int num_parametros, int * ti
 }
 
 /*Inserta un simbolo en una clase concreta*/
-void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,  
+void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 	char* nombre_clase, 			int clase,
 	int tipo,                        int estructura,
 	int direcciones,                    int numero_parametros,
@@ -225,7 +225,7 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 	int columnas,                    int capacidad,
 	int numero_atributos_clase,            int numero_atributos_instancia,
 	int numero_metodos_sobreescribibles,    int numero_metodos_no_sobreescribibles,
-	int tipo_acceso,                  int tipo_miembro, 
+	int tipo_acceso,                  int tipo_miembro,
 	int posicion_atributo_instancia,        int posicion_metodo_sobreescribible,
 	int num_acumulado_atributos_instancia,    int num_acumulado_metodos_sobreescritura,
 	int posicion_acumulada_atributos_instancia,
@@ -252,9 +252,9 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 				if(!flag){
 					simbolos->metodos->nombres = (char**)realloc(simbolos->metodos->nombres, sizeof(char*)*(simbolos->metodos->num + 1));
 					simbolos->metodos->nombres[simbolos->metodos->num] = strdup(simbolo_a_insertar);
-					simbolos->metodos->num++; 
+					simbolos->metodos->num++;
 					node->num_ms++;
-				}	
+				}
 				break;
 			case MNS:
 				node->num_mns++;
@@ -297,7 +297,7 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 								numero_metodos_sobreescribibles,
 								numero_metodos_no_sobreescribibles,
 								tipo_acceso,
-								tipo_miembro, 
+								tipo_miembro,
 								posicion_atributo_instancia,
 								posicion_metodo_sobreescribible,
 								num_acumulado_atributos_instancia,
@@ -325,7 +325,7 @@ void nuevoSimboloEnClase(simbolos_p simbolos, char* simbolo_a_insertar,
 
 /*Inserta un simbolo en el main
 insertarTablaSimbolosAmbitos()*/
-void nuevoSimboloEnMain(simbolos_p simbolos, char* simbolo_a_insertar,  
+void nuevoSimboloEnMain(simbolos_p simbolos, char* simbolo_a_insertar,
 	int clase,
 	int tipo,                        int estructura,
 	int direcciones,                    int numero_parametros,
@@ -335,7 +335,7 @@ void nuevoSimboloEnMain(simbolos_p simbolos, char* simbolo_a_insertar,
 	int columnas,                    int capacidad,
 	int numero_atributos_clase,            int numero_atributos_instancia,
 	int numero_metodos_sobreescribibles,    int numero_metodos_no_sobreescribibles,
-	int tipo_acceso,                  int tipo_miembro, 
+	int tipo_acceso,                  int tipo_miembro,
 	int posicion_atributo_instancia,        int posicion_metodo_sobreescribible,
 	int num_acumulado_atributos_instancia,    int num_acumulado_metodos_sobreescritura,
 	int posicion_acumulada_atributos_instancia,
@@ -384,7 +384,7 @@ void nuevoSimboloEnMain(simbolos_p simbolos, char* simbolo_a_insertar,
 								numero_metodos_sobreescribibles,
 								numero_metodos_no_sobreescribibles,
 								tipo_acceso,
-								tipo_miembro, 
+								tipo_miembro,
 								posicion_atributo_instancia,
 								posicion_metodo_sobreescribible,
 								num_acumulado_atributos_instancia,
@@ -441,7 +441,7 @@ void cerrarLocal(simbolos_p simbolos){
 /*Crea la tabla local de una clase
 tablaSimbolosClasesAbrirAmbitoEnClase()*/
 void iniciaLocalEnClase(simbolos_p simbolos,
-						char* nombre_clase, 
+						char* nombre_clase,
 						char* nombre_ambito,
 						int categoria_ambito,
 						int acceso_metodo,
@@ -501,7 +501,7 @@ void printLinearGraph(FILE * file, graph_p graph){
 
 	}
 
-	/*Relaciones*/	
+	/*Relaciones*/
 	current = graph->nodes_list->head;
 	next = current->next;
 
@@ -647,7 +647,7 @@ void printTestNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos){
 
 		fprintf(file, "\n;ATRIBUTOS DE CLASE\n\n");
 		simbolos_clase = current->node->ac;
-		
+
 		for(i = 0; i < current->node->num_ac; i++){
 			fprintf(file, "\t\t%s\n", simbolos_clase[i]);
 		}
@@ -757,8 +757,8 @@ void printGlobalHeaderNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos
 	next = current->next;
 	while(current) {
 		node_name = current->node->name;
-		
-		fprintf(file, "_%s, ", node_name);	
+
+		fprintf(file, "_%s, ", node_name);
 
 		current = next;
 		if(current)
@@ -860,7 +860,7 @@ void printSegmentBssNASM(FILE * file, graph_p graph, simbolos_p tabla_simbolos){
 		current = next;
 		if(current)
 			next = current->next;
-	}	
+	}
 
 	fprintf(file, "\t\t__esp resd %d\n", numclases);
 
@@ -991,7 +991,7 @@ void cerrarTablaSimbolosClases(simbolos_p simbolos){
 }
 
 /*Comprueba los accesos de un simbolo concreto*/
-int aplicarAccesos(simbolos_p simbolos, char * clase_actual, 
+int aplicarAccesos(simbolos_p simbolos, char * clase_actual,
 					char * clase_variable_encontrada, simbolo_p s){
 	// Caso MAIN
 	if(strcmp(clase_actual, "main") == 0){
@@ -1030,9 +1030,9 @@ int aplicarAccesos(simbolos_p simbolos, char * clase_actual,
 }
 
 /*Busca un simbolo en la jerarquia de clases*/
-int buscarIdEnJerarquiaDesdeClase( simbolos_p simbolos, 
+int buscarIdEnJerarquiaDesdeClase( simbolos_p simbolos,
 									char * simbolo_a_buscar,
-                          			char * nombre_clase, 
+                          			char * nombre_clase,
   									simbolo_p *s,
   									char * nombre_ambito_encontrado){
 	char * nombre_prefijo = NULL;
@@ -1183,18 +1183,21 @@ int buscarParaDeclararMiembroInstancia(	simbolos_p simbolos,
 /*Busca un id no cualificado*/
 int buscarIdNoCualificado(  simbolos_p simbolos,
                      		char * nombre_simbolo, char * clase_actual,
-                    		simbolo_p * s, 
+                    		simbolo_p * s,
 							char * nombre_ambito_encontrado){
 	char * nombre_ambito = NULL;
 	char * main_name = "main";
 	char * nombre_prefijo = NULL;
+	char * nombre_prefijo2 = NULL;
 
 	/*Busca el simbolo en main (si estamos en main)*/
 	if(strcmp(clase_actual, main_name) == 0){
 		/*Tabla local de main*/
 		if(simbolos->main_local != NULL){
 			nombre_ambito = ht_get_name(simbolos->main_local);
-			nombre_prefijo = addPrefijo(nombre_ambito, nombre_simbolo);
+			nombre_prefijo2 = addPrefijo(nombre_ambito, nombre_simbolo);
+			nombre_prefijo = addPrefijo("main", nombre_prefijo2);
+			free(nombre_prefijo2);
 			if(ht_isin(simbolos->main_local, nombre_prefijo)){
 				*s = ht_search(simbolos->main_local, nombre_prefijo);
 				strcpy(nombre_ambito_encontrado, nombre_ambito);
@@ -1204,7 +1207,7 @@ int buscarIdNoCualificado(  simbolos_p simbolos,
 			free(nombre_prefijo);
 		}
 		nombre_prefijo = addPrefijo(main_name, nombre_simbolo);
-		
+
 		/*Tabla principal de main*/
 		if(ht_isin(simbolos->main_principal, nombre_prefijo)){
 			*s = ht_search(simbolos->main_principal, nombre_prefijo);
@@ -1265,15 +1268,15 @@ int buscarIdCualificadoInstancia(simbolos_p simbolos,
 		if(buscarIdEnJerarquiaDesdeClase(simbolos, nombre_id, nombre_clase_cualifica, s, nombre_ambito_encontrado)){
 			return aplicarAccesos(simbolos, nombre_clase_desde, nombre_ambito_encontrado, *s);
 		}else{
-			
+
 		}
 	}
 	return ERROR;
 }
 
-int buscarParaDeclararIdTablaSimbolosAmbitos(simbolos_p simbolos, 
-                                    char* id, 
-                                    simbolo_p * s,  
+int buscarParaDeclararIdTablaSimbolosAmbitos(simbolos_p simbolos,
+                                    char* id,
+                                    simbolo_p * s,
                                     char* id_ambito){
 
 	char * nombre_prefijo = NULL;
@@ -1304,10 +1307,10 @@ int buscarParaDeclararIdTablaSimbolosAmbitos(simbolos_p simbolos,
 }
 
 
-int buscarParaDeclararIdLocalEnMetodo(simbolos_p simbolos, 
+int buscarParaDeclararIdLocalEnMetodo(simbolos_p simbolos,
                             char * nombre_clase,
                             char * nombre_id,
-                            simbolo_p * s, 
+                            simbolo_p * s,
                             char * nombre_ambito_encontrado){
 
 	char * nombre_prefijo = NULL;

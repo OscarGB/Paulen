@@ -31,10 +31,13 @@ int num_variables_locales_actual=0;
 int pos_variable_local_actual=0;
 int pos_parametro_actual = 0;
 char* nombre_actual_simbolo=NULL;
-char* nombre_funcion=NULL;
+char* nombre_funcion;
+char nombres_parametros[100][100];
 int  num_parametros_llamada_actual = 0;
 int fn_return = 0;
 int en_explist = 0;
+int tipo_retorno = 0;
+char* nombre_prefijo;
 
 void escribe_cabecera (FILE * salida);
 void escribe_variables (FILE * salida, char* nombre, int tamanio);
@@ -57,12 +60,12 @@ void gc_printf_vectores(FILE *salida, int etiqueta, int tamanio, int tipo);
 void gc_printf(FILE *salida, int es_direccion_op1, int tipo);
 void gc_ident_asiglocal(FILE *salida, int es_direccion, int categoria, int nPar, int pos);
 void gc_asigexp_ident(FILE *salida, int es_direccion_op1, char *lexema);
-void ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta);
-void ifthen_inicio(FILE * salida, int exp_es_variable, int etiqueta);
-void ifthen_fin(FILE* salida, int etiqueta);
-void ifthenelse_fin_then(FILE* salida, int etiqueta);
-void ifthenelse_fin( FILE * salida, int etiqueta);
-void ifthenelse_fin( FILE * salida, int etiqueta);
+void gc_ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta);
+void gc_ifthen_inicio(FILE * salida, int exp_es_variable, int etiqueta);
+void gc_ifthen_fin(FILE* salida, int etiqueta);
+void gc_ifthenelse_fin_then(FILE* salida, int etiqueta);
+void gc_ifthenelse_fin( FILE * salida, int etiqueta);
+void gc_ifthenelse_fin( FILE * salida, int etiqueta);
 void asignarDestinoPila(FILE* salida, int es_variable, char * eax, char * ebx);
 void gc_scanf_funcion(FILE *salida, int num_param_actual, int posicion_parametro, int categoria, int tipo);
 void gc_lectura(FILE * salida, char * nombre, int tipo);
@@ -203,7 +206,7 @@ programa: inicioTabla TOK_MAIN '{' declaraciones escritura_TS funciones escritur
 escritura_TS: {
 			escribir_subseccion_data(salida);
 			escribir_cabecera_bss(salida);
-			simbolos_main = ht_get_values(simbolos->main_principal);
+			simbolos_main = (simbolo_p *)ht_get_values(simbolos->main_principal);
 			for(int i=0;simbolos_main[i]!=NULL;i++){
 				nombre_actual_simbolo = simbolos_main[i]->nombre;
 				escribe_variables(salida, nombre_actual_simbolo, 1);
@@ -387,16 +390,13 @@ fn_name: TOK_FUNCTION modificadores_acceso tipo_retorno TOK_IDENTIFICADOR
 			fprintf(sintactico,";R: funcion: TOK_FUNCTION modificadores_acceso tipo_retorno TOK_IDENTIFICADOR ");
 			if(buscarIdNoCualificado(simbolos, $4.lexema, "main", &s, id_ambito)==ERROR){
 
-				nombre_funcion = malloc(sizeof(char)*100);
 				num_variables_locales_actual = 0;
 				pos_variable_local_actual = 1;
 				num_parametros_actual = 0;
 				pos_parametro_actual = 0;
 				fn_return = 0;
+				tipo_retorno = tipo_actual;
 				strcpy ($$.lexema, $4.lexema);
-				strcpy (nombre_funcion, $4.lexema);
-				fprintf(stdout, "%s", nombre_funcion);
-				fflush(stdout);
 			}
 			else{
 				printf("****Error semantico en lin %d: Declaracion duplicada.\n", linea);
@@ -405,31 +405,44 @@ fn_name: TOK_FUNCTION modificadores_acceso tipo_retorno TOK_IDENTIFICADOR
 		}
 		;
 
-fn_complete_name: fn_name '(' parametros_funcion ')'
-		{
+fn_complete_name: fn_name '(' parametros_funcion ')'{
 			fprintf(sintactico, "'(' parametros_funcion ')' ");
+			nombre_funcion = crearNombreFuncion($1.lexema, num_parametros_actual, tipos_parametros);
+			nombre_prefijo = addPrefijo("main", nombre_funcion);
+			fprintf(stdout, "%s\n", nombre_prefijo);
+			fflush(stdout);
 
-			nombre_funcion = crearNombreFuncion(nombre_funcion, num_parametros_actual, tipos_parametros);
+			nuevoSimboloEnMain(simbolos, nombre_prefijo,0,FUNCION,0,0,num_parametros_actual,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,tipos_parametros);
+
 			iniciaLocal(simbolos, nombre_funcion);
-			/*Habra que insertar en la tabla local de igual forma que con nuevoSimboloMain*/
+			free(nombre_prefijo);
+			for(int i =0; i<num_parametros_actual; i++){
+				nombre_prefijo = addPrefijo(nombre_funcion, nombres_parametros[i]);
+				printf("metiendo simbolo %s %d %d\n", nombre_prefijo, clase_actual, tipos_parametros[i]);
+				nuevoSimboloEnMain(simbolos, nombre_prefijo, clase_actual, tipos_parametros[i],0,0,0,0,0,i,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NULL);
+				free(nombre_prefijo);
+			}
 
-
+			fprintf(stdout, "%s\n", nombre_funcion);
+			fflush(stdout);
 			if(simbolos->main_local == NULL){
 				fprintf(sintactico, "Error al inicializar la tabla\n");
 				return -1;
 			}
-			nuevoSimboloEnMain(simbolos, nombre_funcion, 0,FUNCION,0,0,num_parametros_actual,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,tipos_parametros);
 			if(buscarIdNoCualificado(simbolos, nombre_funcion, "main", &s, id_ambito)){
 				s->numero_parametros = num_parametros_actual;
 				s->numero_variables_locales = num_variables_locales_actual;
 			}
-			strcpy($$.lexema, $1.lexema);
+			strcpy($$.lexema, nombre_funcion);
+			fprintf(stdout, "%s\n", nombre_funcion);
+			fflush(stdout);
 		}
 		;
 
-fn_declaration: fn_complete_name '{' declaraciones_funcion
-		{
+fn_declaration: fn_complete_name '{' declaraciones_funcion {
 			fprintf(sintactico, "'{' declaraciones_funcion ");
+			fprintf(stdout, "%s\n", $1.lexema);
+			fflush(stdout);
 			gc_inicio_cuerpo_funcion (salida, $1.lexema, num_variables_locales_actual);
 		}
 		;
@@ -575,12 +588,23 @@ bloque: condicional
 asignacion: TOK_IDENTIFICADOR '=' exp
 		{
 			if (simbolos->main_local != NULL){
-				if(buscarIdNoCualificado(simbolos, $1.lexema, "local", &s, id_ambito)==ERROR){
-					if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
-						printf("****Error semántico en lin %d: Acceso a variable no declarada (%s)\n", linea, $1.lexema);
-						return -1;
-					}
+
+				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
+
+									printf(" PETA EN %s\n", $1.lexema);
+
+									for (int i = 0; i < 2; i ++){
+										printf("%d: %s\n",i , getSimbolos(simbolos, LOCAL)[i]);
+									}
+
+
+
+
+
+					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s)\n", linea, $1.lexema);
+					return -1;
 				}
+
 				if (s->tipo != $3.tipo){
 					printf("****Error semántico en lin %d: Asignacion incompatible.\n", linea);
 					return -1;
@@ -800,11 +824,13 @@ idf_llamada_funcion: TOK_IDENTIFICADOR
 retorno_funcion: TOK_RETURN exp
 		{
 			fprintf(sintactico,";R: retorno_funcion: TOK_RETURN exp\n");
-			if (buscarIdNoCualificado(simbolos, nombre_funcion, "local", &s, id_ambito)==0){
+			if (buscarIdNoCualificado(simbolos, nombre_funcion, "main", &s, id_ambito)==ERROR){
 				printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, nombre_funcion);
 				return -1;
 			}
-			if ($2.tipo != s->tipo){
+			if ($2.tipo != tipo_retorno){
+				printf("tipo exp %d\n", $2.tipo);
+					printf("nombre %s tipo  %d\n",s->id, s->tipo);
 				printf("****Error semántico en lin %d: Asignacion incompatible.\n", linea);
 				return -1;
 			}
@@ -923,6 +949,7 @@ exp: exp '+' exp
 		{
 			if(simbolos->main_local == NULL){
 				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
+
 					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $1.lexema);
 					return -1;
 				}
@@ -1178,32 +1205,26 @@ constante_entera: TOK_CONSTANTE_ENTERA
 
 idpf : TOK_IDENTIFICADOR
 		{
-			if(simbolos->main_local == NULL){
-				printf("****Error semántico en lin %d: El ambito local no esta abierto.\n", linea);
-				return -1;
-			}
-			if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
-				printf("****Error semántico en lin %d:  Acceso a variable no declarada (%s).\n", linea, $1.lexema);
-				return -1;
-			}else{
-			    clase_actual = ESCALAR;
-			    nuevoSimboloEnMain(simbolos, s->id, clase_actual, tipo_actual,0,0,0,0,0,pos_parametro_actual,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NULL);
-					tipos_parametros[pos_parametro_actual] = tipo_actual;
-			    pos_parametro_actual++;
-			    num_parametros_actual++;
-			}
+			clase_actual = ESCALAR;
+			strcpy(nombres_parametros[pos_parametro_actual], $1.lexema);
+			tipos_parametros[pos_parametro_actual] = tipo_actual;
+			pos_parametro_actual++;
+		  num_parametros_actual++;
 		};
 
 identificador: TOK_IDENTIFICADOR
 		{/*REPASAR PORQUE SOLO PUEDEN SER VARIABLES PERO COMO ELLOS LO HAN IMPLEMENTADO NO PODEMOS METER CATEGORIA VARIABLE*/
 			if(simbolos->main_local != NULL){
-				if(buscarIdNoCualificado(simbolos, $1.lexema, "local", &s, id_ambito)==ERROR){
+			nombre_actual_simbolo = addPrefijo(ht_get_name(simbolos->main_local), $1.lexema);
+				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
 					if(tipo_actual == ESCALAR){
-						nuevoSimboloEnMain(simbolos, s->id, clase_actual,tipo_actual,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
+						nuevoSimboloEnMain(simbolos, nombre_actual_simbolo, clase_actual,tipo_actual,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 						pos_variable_local_actual++;
 						num_variables_locales_actual++;
+						free(nombre_actual_simbolo);
 					}else{
 						printf("****Error semántico en lin %d: Variable local de tipo no escalar.\n", linea);
+						free(nombre_actual_simbolo);
 						return -1;
 					}
 				}
@@ -1366,60 +1387,38 @@ void gc_printf(FILE *salida, int es_direccion_op1, int tipo){
 	return;
 }
 
-void ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta){
-	fprintf(salida,"; Comprobamos la condicion: if (%d) para ver que es algo asimilable a una variable", etiqueta);
-    fprintf(salida, "pop eax\n");
-    if (exp_es_variable)
-        fprintf(salida, "mov eax, [eax]\n");
-
-    fprintf(salida, "cmp eax, 0\n");
-    fprintf(salida, "; En caso de que no se cumpla la condicion nos vamos al else\n");
-    fprintf(salida,"je __else_%d\n", etiqueta);
-	fprintf(salida, ";Nos metemos en el caso del then (%i) ya que se cumple la condicion", etiqueta);
+void gc_ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta){
+	ifthenelse_inicio(salida, exp_es_variable, etiqueta);
+	return;
 }
 
 
-void ifthen_inicio(FILE * salida, int exp_es_variable, int etiqueta){
-	fprintf(salida,"; Comprobamos la condicion: if (%d) para ver que es algo asimilable a una variable", etiqueta);
-    fprintf(salida, "pop eax\n");
-    if (exp_es_variable)
-        fprintf(salida, "mov eax, [eax]\n");
-
-    fprintf(salida, "cmp eax, 0\n");
-    fprintf(salida, "; En caso de que no se cumpla la condicion nos vamos al final del ifthen\n");
-    fprintf(salida, "je __endifthen_%d\n", etiqueta);
-	fprintf(salida, "; En caso de que se cumpla nos metemos en el caso del then (%i) ya que se cumple la condicion", etiqueta);
+void gc_ifthen_inicio(FILE * salida, int exp_es_variable, int etiqueta){
+	ifthen_inicio(salida, exp_es_variable, etiqueta);
+	return;
 }
 
 
-void ifthen_fin(FILE* salida, int etiqueta){
-    fprintf(salida, "; Estamos en la parte del final del then (%d) del ifthen", etiqueta);
-    fprintf(salida, "__endifthen_%d:", etiqueta);
+void gc_ifthen_fin(FILE* salida, int etiqueta){
+    ifthen_fin(salida, etiqueta);
+    return;
 }
 
 
-void ifthenelse_fin_then(FILE* salida, int etiqueta){
-    fprintf(salida, "; Estamos en la parte del final del then (%d) del ifthen_else", etiqueta);
-    fprintf(salida, "jmp __endifthen_else_%d", etiqueta);
+void gc_ifthenelse_fin_then(FILE* salida, int etiqueta){
+    ifthenelse_fin_then(salida, etiqueta);
+    return;
 }
 
-void ifthenelse_fin( FILE * salida, int etiqueta){
-	fprintf(salida, "; Estamos en la parte del final del else (%d) del ifthen_else", etiqueta);
-	fprintf(salida, "__endifthen_else_%d:\n", etiqueta);
+void gc_ifthenelse_fin( FILE * salida, int etiqueta){
+	ifthenelse_fin(salida, etiqueta);
+	return;
 }
 
 
-void asignarDestinoPila(FILE* salida, int es_variable, char * eax, char * ebx){
-	/*Hay algo mas que hacer pero no se el que*/
-	/*fprintf(salida, "\n\t; Asignacion de a pila a %s\n", nombre);*/
-	fprintf(salida, "\tpop dword eax\n");
-	if(es_variable){
-		fprintf(salida, "\tmov eax,dword [eax]\n");
-	}
-	else{
-		/*printf(salida, "\tmov dword [_%s], eax\n", nombre);*/
-	}
-	/*fprintf(salida, "; Apilando %s de variable local %d", (es_variable) ? "direccion": "valor", posicion_variable);*/
+void gc_asignarDestinoPila(FILE* salida, int es_variable, char * eax, char * ebx){
+	asignarDestinoEnPila(salida, es_variable);
+	return;
 }
 
 void gc_scanf_funcion(FILE *salida, int num_param_actual, int posicion_parametro, int categoria, int tipo){
