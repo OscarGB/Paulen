@@ -34,6 +34,10 @@ typedef struct _simbolos
 /*Concatena el simbolo al nombre del ambito, con una _ en medio*/
 char * addPrefijo(char * nombre_ambito, char * simbolo);
 
+/*Crea el nombre de una funcion intercalando los parametros con @.
+El resultado debe concatenarse al resto del nombre (ambito + simbolo)
+Se reserva memoria*/
+char * crearNombreFuncion(char* simbolo_a_insertar, int num_parametros, int * tipo_args);
 /*Crea la estructura y reserva toda la memoria necesaria
 iniciarTablasSimbolosClases()*/
 simbolos_p createSimbolos(char* name);

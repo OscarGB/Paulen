@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "generacion.h"
-
+#include "tabla_simbolos_clases.h"
 
 /* OBSERVACIÓN GENERAL A TODAS LAS FUNCIONES:
 Todas ellas escriben el código NASM a un FILE* proporcionado como primer argumento.
@@ -497,4 +497,53 @@ void escribir_elemento_vector(FILE * fpasm,char * nombre_vector, int tam_max, in
   fprintf(fpasm, "mov dword edx, _%s\n", nombre_vector);
   fprintf(fpasm, "lea eax, [edx + eax * 4]\n");
   fprintf(fpasm, "push dword eax\n");
+}
+
+void instance_of(FILE *file, char * nombre_clase, int num_ai){
+  fprintf(file, "\t\tpush %d\n", (num_ai+1)*4);
+  fprintf(file, "\t\tcall malloc\n\t\tadd esp, 4\n\t\tpush eax\n");
+  fprintf(file, "\t\tmov dword [eax], _%s\n", nombre_clase);
+}
+
+void asignarDestinoEnPila(FILE* file, int es_variable) {
+  /*
+    pop eax
+    pop ebx
+    if es_variable = 0:
+      mov [ebx], eax
+    else:
+      mov eax, [eax]
+      mov [ebx], eax
+  */
+  fprintf(file, "\t\tpop eax\n\t\tpop ebx\n");
+  if(es_variable == 0){
+    fprintf(file, "\t\tmov [ebx], eax\n");
+  }
+  else {
+    fprintf(file, "\t\tmov eax, [eax]\n\t\tmov [ebx], [eax]\n");
+  }
+}
+
+void discardPila (FILE * fd_asm){
+  fprintf(fd_asm, "\t\tcall free\n\t\tadd esp, 4\n");
+}
+
+char * claseATabla(char * nombre_fuente_clase){
+  return addPrefijo("", nombre_fuente_clase);
+}
+
+void llamarMetodoSobreescribibleCualificadoInstanciaPila(FILE * fd_asm, char * nombre_metodo){
+  fprintf(fd_asm, "\t\tpop eax\n");
+  fprintf(fd_asm, "\t\tmov eax, [eax]\n");
+  fprintf(fd_asm, "\t\tmov dword ebx, [_offset_%s]\n", nombre_metodo);
+  fprintf(fd_asm, "\t\tlea eax, [eax+ebx]\n");
+  fprintf(fd_asm, "\t\tmov eax, [eax]\n");
+  fprintf(fd_asm, "\t\tcall eax\n");
+}
+
+void accederAtributoInstanciaDePila(FILE * fd_asm, char * nombre_atributo){
+  fprintf(fd_asm, "\t\tpop eax\n");
+  fprintf(fd_asm, "\t\tmov dword ebx, [_offset_%s]\n", nombre_atributo);
+  fprintf(fd_asm, "\t\tlea eax, [eax+ebx]\n");
+  fprintf(fd_asm, "\t\tpush eax\n");
 }
