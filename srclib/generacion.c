@@ -418,3 +418,83 @@ void escribir(FILE* fpasm, int es_variable, int tipo){
   fprintf(fpasm, "call print_endofline\n");
   fprintf(fpasm, "add esp, 4\n\n");/*Limpiamos la pìla*/
 }
+
+void llamarFuncion(FILE * fpasm, char * nombre_funcion, int num_argumentos){
+  fprintf(fpasm, "call _%s\n", nombre_funcion);
+  fprintf(fpasm, "add esp, 4*%d\n", num_argumentos);
+  fprintf(fpasm, "push dword eax\n");
+}
+
+void declararFuncion(FILE * fpasm, char * nombre_funcion, int num_var_loc){
+  fprintf(fpasm, "_%s:\n", nombre_funcion);
+	fprintf(fpasm, "\tpush ebp\n");
+	fprintf(fpasm, "\tmov ebp, esp\n");
+	fprintf(fpasm, "\tsub esp, 4*%d\n", num_var_loc);
+}
+
+void retornarFuncion(FILE * fpasm, int es_variable){
+  fprintf(fpasm, "pop dword eax\n");
+	if (es_variable==1){
+   		fprintf(fpasm,"mov eax, [eax]\n");
+	}
+	fprintf(fpasm, "mov dword esp, ebp\n");
+	fprintf(fpasm, "pop dword ebp\n");
+	fprintf(fpasm, "ret\n");
+}
+
+void escribirParametro(FILE* fpasm, int pos_parametro, int num_total_parametros){
+  fprintf(fpasm, "lea eax, [ebp+4+4*%d]\n", num_total_parametros - pos_parametro);
+  fprintf(fpasm, "push dword eax\n");
+}
+
+void escribirVariableLocal(FILE* fpasm, int posicion_variable_local){
+  fprintf(fpasm, "lea eax, [ebp-4*%d]\n", posicion_variable_local);
+  fprintf(fpasm, "push dword eax\n");
+}
+
+void operandoEnPilaAArgumento(FILE * fpasm, int es_variable){
+  fprintf(fpasm, "pop dword eax\n");
+  if(es_variable==1){
+    fprintf(fpasm,"mov eax, [eax]\n");
+  }
+  fprintf(fpasm, "push dword eax\n");
+}
+
+void limpiarPila(FILE * fpasm, int num_argumentos){
+  fprintf(fpasm, "add esp, 4*%d\n", num_argumentos);
+}
+
+void while_inicio(FILE * fpasm, int etiqueta){
+  fprintf(fpasm, "inicio_while%d:\n", etiqueta);
+}
+
+void while_exp_pila (FILE * fpasm, int exp_es_variable, int etiqueta){
+  fprintf(fpasm,"pop eax\n");
+  if(exp_es_variable == 1){
+    fprintf(fpasm, "mov eax, [eax]\n");
+  }
+  fprintf(fpasm, "cmp eax, 0\n");
+  fprintf(fpasm, "je near fin_while%d\n", etiqueta);
+}
+
+void while_fin( FILE * fpasm, int etiqueta){
+  fprintf(fpasm, "jmp near inicio_while%d\n", etiqueta);
+  fprintf(fpasm, "fin_while%d:\n", etiqueta);
+}
+
+void escribir_elemento_vector(FILE * fpasm,char * nombre_vector, int tam_max, int exp_es_direccion){
+  fprintf(fpasm, "; carga el valor del indice en eax\n");
+  fprintf(fpasm, "pop dword eax \n");
+  if (exp_es_direccion == 1){
+    fprintf(fpasm, "mov dword eax , [eax]\n");
+  }
+  fprintf(fpasm, "; Si el indice es menor que 0, error en tiempo de ejecucion\n");
+  fprintf(fpasm, "cmp eax,0\n");
+  fprintf(fpasm, "jl near error_1\n");
+  fprintf(fpasm, "; Si el indice es mayor de lo permitido, error en tiempo de ejecucion\n");
+  fprintf(fpasm, "cmp eax, %d\n", tam_max-1);
+  fprintf(fpasm, "jg near error_1\n");
+  fprintf(fpasm, "mov dword edx, _%s\n", nombre_vector);
+  fprintf(fpasm, "lea eax, [edx + eax * 4]\n");
+  fprintf(fpasm, "push dword eax\n");
+}
