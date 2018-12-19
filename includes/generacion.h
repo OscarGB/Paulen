@@ -9,6 +9,7 @@
 #define BOOLEANO 	3
 
 #define BUFSIZE 50
+#define MAX_ETIQUETAS 100
 
 /* OBSERVACIÓN GENERAL A TODAS LAS FUNCIONES:
    Todas ellas escriben el código NASM a un FILE* proporcionado como primer argumento.
@@ -129,4 +130,19 @@ void while_exp_pila (FILE * fpasm, int exp_es_variable, int etiqueta);
 void while_fin( FILE * fpasm, int etiqueta);
 
 void escribir_elemento_vector(FILE * fpasm,char * nombre_vector, int tam_max, int exp_es_direccion);
+
+
+/*------------------------------OBJETOS---------------------*/
+void instance_of(FILE *file, char * nombre_clase, int num_ai);
+
+void asignarDestinoEnPila(FILE* file, int es_variable);
+
+void discardPila (FILE * fd_asm);
+
+char * claseATabla(char * nombre_fuente_clase);
+
+void llamarMetodoSobreescribibleCualificadoInstanciaPila(FILE * fd_asm, char * nombre_metodo); 
+
+void accederAtributoInstanciaDePila(FILE * fd_asm, char * nombre_atributo);
+
 #endif
