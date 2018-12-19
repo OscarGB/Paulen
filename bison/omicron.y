@@ -31,7 +31,7 @@ int num_variables_locales_actual=0;
 int pos_variable_local_actual=0;
 int pos_parametro_actual = 0;
 char* nombre_actual_simbolo=NULL;
-char nombre_funcion[100];
+char* nombre_funcion=NULL;
 int  num_parametros_llamada_actual = 0;
 int fn_return = 0;
 int en_explist = 0;
@@ -387,16 +387,6 @@ fn_name: TOK_FUNCTION modificadores_acceso tipo_retorno TOK_IDENTIFICADOR
 			fprintf(sintactico,";R: funcion: TOK_FUNCTION modificadores_acceso tipo_retorno TOK_IDENTIFICADOR ");
 			if(buscarIdNoCualificado(simbolos, $4.lexema, "main", &s, id_ambito)==ERROR){
 
-
-				iniciaLocal(simbolos, $4.lexema);
-				/*Habra que insertar en la tabla local de igual forma que con nuevoSimboloMain*/
-
-
-				if(simbolos->main_local == NULL){
-					fprintf(sintactico, "Error al inicializar la tabla\n");
-					return -1;
-				}
-
 				num_variables_locales_actual = 0;
 				pos_variable_local_actual = 1;
 				num_parametros_actual = 0;
@@ -417,6 +407,16 @@ fn_name: TOK_FUNCTION modificadores_acceso tipo_retorno TOK_IDENTIFICADOR
 fn_complete_name: fn_name '(' parametros_funcion ')'
 		{
 			fprintf(sintactico, "'(' parametros_funcion ')' ");
+
+			nombre_funcion = crearNombreFuncion(nombre_funcion, num_parametros_actual, tipos_parametros);
+			iniciaLocal(simbolos, nombre_funcion);
+			/*Habra que insertar en la tabla local de igual forma que con nuevoSimboloMain*/
+
+
+			if(simbolos->main_local == NULL){
+				fprintf(sintactico, "Error al inicializar la tabla\n");
+				return -1;
+			}
 			nuevoSimboloEnMain(simbolos, nombre_funcion, 0,FUNCION,0,0,num_parametros_actual,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,tipos_parametros);
 			if(buscarIdNoCualificado(simbolos, nombre_funcion, "main", &s, id_ambito)){
 				s->numero_parametros = num_parametros_actual;
