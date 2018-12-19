@@ -77,7 +77,7 @@ void escribir_fin(FILE* fpasm){
   fprintf(fpasm, "\n\t;FINAL DEL PROGRAMA\n");
   fprintf(fpasm, "\tjmp near _fin\n");
   fprintf(fpasm, "\t__error_division:\n");
-  fprintf(fpasm, "\t\tpush Mensaje1\n");
+  fprintf(fpasm, "\t\tpush mensaje_1\n");
   fprintf(fpasm, "\t\tjmp near __salida_mensaje_error\n");
   fprintf(fpasm, "\t__salida_mensaje_error:\n");
   fprintf(fpasm, "\t\tcall print_string\n");
@@ -490,10 +490,10 @@ void escribir_elemento_vector(FILE * fpasm,char * nombre_vector, int tam_max, in
   }
   fprintf(fpasm, "; Si el indice es menor que 0, error en tiempo de ejecucion\n");
   fprintf(fpasm, "cmp eax,0\n");
-  fprintf(fpasm, "jl near error_1\n");
+  fprintf(fpasm, "jl near mensaje_1\n");
   fprintf(fpasm, "; Si el indice es mayor de lo permitido, error en tiempo de ejecucion\n");
   fprintf(fpasm, "cmp eax, %d\n", tam_max-1);
-  fprintf(fpasm, "jg near error_1\n");
+  fprintf(fpasm, "jg near mensaje_1\n");
   fprintf(fpasm, "mov dword edx, _%s\n", nombre_vector);
   fprintf(fpasm, "lea eax, [edx + eax * 4]\n");
   fprintf(fpasm, "push dword eax\n");
@@ -502,11 +502,11 @@ void escribir_elemento_vector(FILE * fpasm,char * nombre_vector, int tam_max, in
 void instance_of(FILE *file, char * nombre_clase, int num_ai){
   fprintf(file, "\t\tpush %d\n", (num_ai+1)*4);
   fprintf(file, "\t\tcall malloc\n\t\tadd esp, 4\n\t\tpush eax\n");
-  fprintf(file, "\t\tmov dword [eax], _%s\n", nombre_clase);
+  fprintf(file, "\t\tmov dword [eax], _ms%s\n", nombre_clase);
 }
 
 void ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta){
-  fprintf(salida,"; Comprobamos la condicion: if (%d) para ver que es algo asimilable a una variable", etiqueta);
+  fprintf(salida,"; Comprobamos la condicion: if (%d) para ver que es algo asimilable a una variable\n", etiqueta);
     fprintf(salida, "pop eax\n");
     if (exp_es_variable)
         fprintf(salida, "mov eax, [eax]\n");
@@ -514,12 +514,12 @@ void ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta){
     fprintf(salida, "cmp eax, 0\n");
     fprintf(salida, "; En caso de que no se cumpla la condicion nos vamos al else\n");
     fprintf(salida,"je __else_%d\n", etiqueta);
-  fprintf(salida, ";Nos metemos en el caso del then (%i) ya que se cumple la condicion", etiqueta);
+  fprintf(salida, ";Nos metemos en el caso del then (%i) ya que se cumple la condicion\n", etiqueta);
 }
 
 
 void ifthen_inicio(FILE * salida, int exp_es_variable, int etiqueta){
-  fprintf(salida,"; Comprobamos la condicion: if (%d) para ver que es algo asimilable a una variable", etiqueta);
+  fprintf(salida,"; Comprobamos la condicion: if (%d) para ver que es algo asimilable a una variable\n", etiqueta);
     fprintf(salida, "pop eax\n");
     if (exp_es_variable)
         fprintf(salida, "mov eax, [eax]\n");
@@ -527,23 +527,24 @@ void ifthen_inicio(FILE * salida, int exp_es_variable, int etiqueta){
     fprintf(salida, "cmp eax, 0\n");
     fprintf(salida, "; En caso de que no se cumpla la condicion nos vamos al final del ifthen\n");
     fprintf(salida, "je __endifthen_%d\n", etiqueta);
-  fprintf(salida, "; En caso de que se cumpla nos metemos en el caso del then (%i) ya que se cumple la condicion", etiqueta);
+  fprintf(salida, "; En caso de que se cumpla nos metemos en el caso del then (%i) ya que se cumple la condicion\n", etiqueta);
 }
 
 
 void ifthen_fin(FILE* salida, int etiqueta){
-    fprintf(salida, "; Estamos en la parte del final del then (%d) del ifthen", etiqueta);
-    fprintf(salida, "__endifthen_%d:", etiqueta);
+    fprintf(salida, "; Estamos en la parte del final del then (%d) del ifthen\n", etiqueta);
+    fprintf(salida, "__endifthen_%d:\n", etiqueta);
 }
 
 
 void ifthenelse_fin_then(FILE* salida, int etiqueta){
-    fprintf(salida, "; Estamos en la parte del final del then (%d) del ifthen_else", etiqueta);
-    fprintf(salida, "jmp __endifthen_else_%d", etiqueta);
+    fprintf(salida, "; Estamos en la parte del final del then (%d) del ifthen_else\n", etiqueta);
+    fprintf(salida, "jmp __endifthen_else_%d\n", etiqueta);
+    fprintf(salida, "__else_%d:\n", etiqueta);
 }
 
 void ifthenelse_fin( FILE * salida, int etiqueta){
-  fprintf(salida, "; Estamos en la parte del final del else (%d) del ifthen_else", etiqueta);
+  fprintf(salida, "; Estamos en la parte del final del else (%d) del ifthen_else\n", etiqueta);
   fprintf(salida, "__endifthen_else_%d:\n", etiqueta);
 }
 
@@ -559,10 +560,10 @@ void asignarDestinoEnPila(FILE* file, int es_variable) {
   */
   fprintf(file, "\t\tpop eax\n\t\tpop ebx\n");
   if(es_variable == 0){
-    fprintf(file, "\t\tmov [ebx], eax\n");
+    fprintf(file, "\t\tmov [eax], ebx\n");
   }
   else {
-    fprintf(file, "\t\tmov eax, [eax]\n\t\tmov [ebx], [eax]\n");
+    fprintf(file, "\t\tmov ebx, [ebx]\n\t\tmov [eax], ebx\n");
   }
 }
 
