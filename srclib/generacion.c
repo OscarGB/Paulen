@@ -505,6 +505,48 @@ void instance_of(FILE *file, char * nombre_clase, int num_ai){
   fprintf(file, "\t\tmov dword [eax], _%s\n", nombre_clase);
 }
 
+void ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta){
+  fprintf(salida,"; Comprobamos la condicion: if (%d) para ver que es algo asimilable a una variable", etiqueta);
+    fprintf(salida, "pop eax\n");
+    if (exp_es_variable)
+        fprintf(salida, "mov eax, [eax]\n");
+
+    fprintf(salida, "cmp eax, 0\n");
+    fprintf(salida, "; En caso de que no se cumpla la condicion nos vamos al else\n");
+    fprintf(salida,"je __else_%d\n", etiqueta);
+  fprintf(salida, ";Nos metemos en el caso del then (%i) ya que se cumple la condicion", etiqueta);
+}
+
+
+void ifthen_inicio(FILE * salida, int exp_es_variable, int etiqueta){
+  fprintf(salida,"; Comprobamos la condicion: if (%d) para ver que es algo asimilable a una variable", etiqueta);
+    fprintf(salida, "pop eax\n");
+    if (exp_es_variable)
+        fprintf(salida, "mov eax, [eax]\n");
+
+    fprintf(salida, "cmp eax, 0\n");
+    fprintf(salida, "; En caso de que no se cumpla la condicion nos vamos al final del ifthen\n");
+    fprintf(salida, "je __endifthen_%d\n", etiqueta);
+  fprintf(salida, "; En caso de que se cumpla nos metemos en el caso del then (%i) ya que se cumple la condicion", etiqueta);
+}
+
+
+void ifthen_fin(FILE* salida, int etiqueta){
+    fprintf(salida, "; Estamos en la parte del final del then (%d) del ifthen", etiqueta);
+    fprintf(salida, "__endifthen_%d:", etiqueta);
+}
+
+
+void ifthenelse_fin_then(FILE* salida, int etiqueta){
+    fprintf(salida, "; Estamos en la parte del final del then (%d) del ifthen_else", etiqueta);
+    fprintf(salida, "jmp __endifthen_else_%d", etiqueta);
+}
+
+void ifthenelse_fin( FILE * salida, int etiqueta){
+  fprintf(salida, "; Estamos en la parte del final del else (%d) del ifthen_else", etiqueta);
+  fprintf(salida, "__endifthen_else_%d:\n", etiqueta);
+}
+
 void asignarDestinoEnPila(FILE* file, int es_variable) {
   /*
     pop eax
