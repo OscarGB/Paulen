@@ -52,7 +52,7 @@ typedef struct{
     char lexema[MAX_LONG_ID+1];
     int valor_entero;
     int tipo;
-    int direcciones;
+    int es_direccion;
     int etiqueta;
 }tipo_atributos;
 

@@ -206,6 +206,7 @@ escritura_TS: {
 			simbolos_main = ht_get_values(simbolos->main_principal);
 			for(int i=0;simbolos_main[i]!=NULL;i++){
 				nombre_actual_simbolo = simbolos_main[i]->nombre;
+				addPrefijo("main", nombre_actual_simbolo);
 				escribe_variables(salida, nombre_actual_simbolo, 1);
 			}
 			escribe_cabecera(salida);
