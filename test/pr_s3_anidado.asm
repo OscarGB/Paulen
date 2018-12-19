@@ -4,9 +4,9 @@ mensaje_2 db "Division por cero", 0
 
 segment .bss
 __esp resd 1
-_x2 resd 1
-_y1 resd 1
-_x1 resd 1
+_main_x2 resd 1
+_main_y1 resd 1
+_main_x1 resd 1
 
 segment .text
 global main
@@ -17,21 +17,21 @@ main:
 mov dword [__esp], esp
 
 	; Lectura
-	push dword _x1
+	push dword _main_x1
 	call scan_int
 	add esp, 4
 
 	; Lectura
-	push dword _x2
+	push dword _main_x2
 	call scan_int
 	add esp, 4
 
 	; Lectura
-	push dword _y1
+	push dword _main_y1
 	call scan_boolean
 	add esp, 4
-push dword _x1
-push dword _x2
+push dword _main_x1
+push dword _main_x2
 
 	; Comparacion de igualdad
 	pop dword ebx
@@ -47,7 +47,7 @@ push dword _x2
 pop eax
 cmp eax, 0
 je near fin_then1
-push dword _y1
+push dword _main_y1
 pop eax
 mov eax, [eax]
 cmp eax, 0
@@ -71,7 +71,7 @@ add esp, 4
 fin_ifelse2:
 jmp near fin_ifelse1
 fin_then1:
-push dword _y1
+push dword _main_y1
 pop eax
 mov eax, [eax]
 cmp eax, 0

@@ -31,7 +31,7 @@ int num_variables_locales_actual=0;
 int pos_variable_local_actual=0;
 int pos_parametro_actual = 0;
 char* nombre_actual_simbolo=NULL;
-char* nombre_funcion=NULL;
+char nombre_funcion[100];
 int  num_parametros_llamada_actual = 0;
 int fn_return = 0;
 int en_explist = 0;
@@ -206,8 +206,8 @@ escritura_TS: {
 			simbolos_main = ht_get_values(simbolos->main_principal);
 			for(int i=0;simbolos_main[i]!=NULL;i++){
 				nombre_actual_simbolo = simbolos_main[i]->nombre;
-				addPrefijo("main", nombre_actual_simbolo);
 				escribe_variables(salida, nombre_actual_simbolo, 1);
+				free(nombre_actual_simbolo);
 			}
 			escribe_cabecera(salida);
 		}
@@ -385,15 +385,18 @@ funciones: funcion funciones
 fn_name: TOK_FUNCTION modificadores_acceso tipo_retorno TOK_IDENTIFICADOR
 		{
 			fprintf(sintactico,";R: funcion: TOK_FUNCTION modificadores_acceso tipo_retorno TOK_IDENTIFICADOR ");
-			if(buscarIdNoCualificado(simbolos, $4.lexema, "main", &s, id_ambito)){
+			if(buscarIdNoCualificado(simbolos, $4.lexema, "main", &s, id_ambito)==ERROR){
+
 
 				iniciaLocal(simbolos, $4.lexema);
 				/*Habra que insertar en la tabla local de igual forma que con nuevoSimboloMain*/
 
+
 				if(simbolos->main_local == NULL){
-					fprintf(salida, "Error al inicializar la tabla\n");
+					fprintf(sintactico, "Error al inicializar la tabla\n");
 					return -1;
 				}
+
 				num_variables_locales_actual = 0;
 				pos_variable_local_actual = 1;
 				num_parametros_actual = 0;
@@ -401,6 +404,8 @@ fn_name: TOK_FUNCTION modificadores_acceso tipo_retorno TOK_IDENTIFICADOR
 				fn_return = 0;
 				strcpy ($$.lexema, $4.lexema);
 				strcpy (nombre_funcion, $4.lexema);
+				fprintf(stdout, "%s", nombre_funcion);
+				fflush(stdout);
 			}
 			else{
 				printf("****Error semantico en lin %d: Declaracion duplicada.\n", linea);
@@ -413,9 +418,10 @@ fn_complete_name: fn_name '(' parametros_funcion ')'
 		{
 			fprintf(sintactico, "'(' parametros_funcion ')' ");
 			nuevoSimboloEnMain(simbolos, nombre_funcion, 0,FUNCION,0,0,num_parametros_actual,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,tipos_parametros);
-			buscarIdNoCualificado(simbolos, nombre_funcion, "main", &s, id_ambito);
-			s->numero_parametros = num_parametros_actual;
-			s->numero_variables_locales = num_variables_locales_actual;
+			if(buscarIdNoCualificado(simbolos, nombre_funcion, "main", &s, id_ambito)){
+				s->numero_parametros = num_parametros_actual;
+				s->numero_variables_locales = num_variables_locales_actual;
+			}
 			strcpy($$.lexema, $1.lexema);
 		}
 		;
@@ -568,10 +574,8 @@ bloque: condicional
 asignacion: TOK_IDENTIFICADOR '=' exp
 		{
 			if (simbolos->main_local != NULL){
-				buscarIdNoCualificado(simbolos, $1.lexema, "local", &s, id_ambito);
-				if(s == NULL){
-					buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito);
-					if(s == NULL){
+				if(buscarIdNoCualificado(simbolos, $1.lexema, "local", &s, id_ambito)==ERROR){
+					if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
 						printf("****Error semántico en lin %d: Acceso a variable no declarada (%s)\n", linea, $1.lexema);
 						return -1;
 					}
@@ -589,7 +593,7 @@ asignacion: TOK_IDENTIFICADOR '=' exp
 			}
 			else{
 				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)){
-					gc_asigexp_ident(salida, $3.es_direccion, $1.lexema);
+					gc_asigexp_ident(salida, $3.es_direccion, s->id);
 				}
 				else{
 					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s)\n", linea, $1.lexema);
@@ -628,13 +632,11 @@ elemento_vector: TOK_IDENTIFICADOR '[' exp ']'
 		{
 			fprintf(sintactico,";R: elemento_vector: TOK_IDENTIFICADOR '[' exp ']'\n");
 			if(simbolos->main_local !=NULL){
-				buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito);
-				if (s==NULL){
+				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
 					printf("****Error semantico en lin %d: Acceso a variable no declarada\n", linea);
 				}
 			}else{
-				buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito);
-				if (s==NULL){
+				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
 					printf("****Error semantico en lin %d: Acceso a variable no declarada\n", linea);
 				}
 			}
@@ -650,7 +652,7 @@ elemento_vector: TOK_IDENTIFICADOR '[' exp ']'
 
 			$$.es_direccion = 1;
 			$$.tipo = s->tipo;
-			gc_indexacion_vectores(salida, $3.es_direccion, $1.lexema, s->tamanio);
+			gc_indexacion_vectores(salida, $3.es_direccion, s->id, s->tamanio);
 		}
 		;
 
@@ -726,8 +728,7 @@ while : TOK_WHILE '('{
 lectura: TOK_SCANF TOK_IDENTIFICADOR
 		{
 			if(simbolos->main_local != NULL){
-				buscarIdNoCualificado(simbolos, $2.lexema, "main", &s, id_ambito);
-				if(s==NULL){
+				if(buscarIdNoCualificado(simbolos, $2.lexema, "main", &s, id_ambito)==ERROR){
 					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $2.lexema);
 					return -1;
 				}
@@ -742,9 +743,7 @@ lectura: TOK_SCANF TOK_IDENTIFICADOR
 					gc_scanf_funcion(salida, num_variables_locales_actual, s->posicion_variable_local, s->clase, s->tipo);
 				}
 			}else{
-				buscarIdNoCualificado(simbolos, $2.lexema, "main", &s, id_ambito);
-				if(s==NULL){
-					printf("HOLA\n");
+				if(buscarIdNoCualificado(simbolos, $2.lexema, "main", &s, id_ambito)==ERROR){
 					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $2.lexema);
 					return -1;
 				}
@@ -756,7 +755,7 @@ lectura: TOK_SCANF TOK_IDENTIFICADOR
 					printf("****Error semántico en lin %d: Variable local de tipo no escalar.\n", linea);
 					return -1;
 				}
-				gc_lectura(salida, $2.lexema, s->tipo);
+				gc_lectura(salida, s->id, s->tipo);
 			}
 			fprintf(sintactico,";R: lectura: TOK_SCANF TOK_IDENTIFICADOR\n");
 		}
@@ -778,8 +777,7 @@ escritura: TOK_PRINTF exp
 idf_llamada_funcion: TOK_IDENTIFICADOR
 		{
 			/*Buscamos identificador en la tabla de simbolos*/
-			buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito);;
-			if (s == NULL){
+			if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
 				printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $1.lexema);
 				return -1;
 			}
@@ -923,19 +921,17 @@ exp: exp '+' exp
 		TOK_IDENTIFICADOR
 		{
 			if(simbolos->main_local == NULL){
-				buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito);
-				if (s == NULL){
+				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
 					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $1.lexema);
 					return -1;
 				}
 				if(en_explist == 0){
-					fprintf (salida, "push dword _%s\n", $1.lexema);
+					fprintf (salida, "push dword _%s\n", s->id);
 				}else{
-					fprintf (salida, "push dword [_%s]\n", $1.lexema);
+					fprintf (salida, "push dword [_%s]\n", s->id);
 				}
 			}else{
-				buscarIdNoCualificado(simbolos, $1.lexema, "local", &s, id_ambito);
-				if (s == NULL){
+				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
 					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $1.lexema);
 					return -1;
 				}
@@ -981,14 +977,12 @@ exp: exp '+' exp
 		{
 			fprintf(sintactico,";R: exp: TOK_IDENTIFICADOR '(' lista_expresiones ')'\n");
 			if (simbolos->main_local == NULL){
-				buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito);
-				if (s == NULL){
+				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
 					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $1.lexema);
 					return -1;
 				}
 			} else{
-				buscarIdNoCualificado(simbolos, $1.lexema, "local", &s, id_ambito);
-				if (s == NULL){
+				if(buscarIdNoCualificado(simbolos, $1.lexema, "local", &s, id_ambito)==ERROR){
 					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $1.lexema);
 					return -1;
 				}
@@ -1001,7 +995,7 @@ exp: exp '+' exp
 			en_explist = 0;
 			$$.tipo = s->tipo;
 			$$.es_direccion = 0;
-			gc_llamarfuncion(salida, $1.lexema, num_parametros_actual);
+			gc_llamarfuncion(salida, s->id, num_parametros_actual);
 		}
 		|
 		identificador_clase '.' TOK_IDENTIFICADOR '(' lista_expresiones ')'
@@ -1187,13 +1181,13 @@ idpf : TOK_IDENTIFICADOR
 				printf("****Error semántico en lin %d: El ambito local no esta abierto.\n", linea);
 				return -1;
 			}
-			if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)){
+			if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
 				printf("****Error semántico en lin %d:  Acceso a variable no declarada (%s).\n", linea, $1.lexema);
 				return -1;
 			}else{
 			    clase_actual = ESCALAR;
-			    nuevoSimboloEnMain(simbolos, $1.lexema, clase_actual, tipo_actual,0,0,0,0,0,pos_parametro_actual,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NULL);
-				tipos_parametros[pos_parametro_actual] = tipo_actual;
+			    nuevoSimboloEnMain(simbolos, s->id, clase_actual, tipo_actual,0,0,0,0,0,pos_parametro_actual,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NULL);
+					tipos_parametros[pos_parametro_actual] = tipo_actual;
 			    pos_parametro_actual++;
 			    num_parametros_actual++;
 			}
@@ -1202,10 +1196,9 @@ idpf : TOK_IDENTIFICADOR
 identificador: TOK_IDENTIFICADOR
 		{/*REPASAR PORQUE SOLO PUEDEN SER VARIABLES PERO COMO ELLOS LO HAN IMPLEMENTADO NO PODEMOS METER CATEGORIA VARIABLE*/
 			if(simbolos->main_local != NULL){
-				buscarIdNoCualificado(simbolos, $1.lexema, "local", &s, id_ambito);
-				if(s == NULL){
+				if(buscarIdNoCualificado(simbolos, $1.lexema, "local", &s, id_ambito)==ERROR){
 					if(tipo_actual == ESCALAR){
-						nuevoSimboloEnMain(simbolos, $1.lexema, clase_actual,tipo_actual,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
+						nuevoSimboloEnMain(simbolos, s->id, clase_actual,tipo_actual,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 						pos_variable_local_actual++;
 						num_variables_locales_actual++;
 					}else{
@@ -1215,14 +1208,16 @@ identificador: TOK_IDENTIFICADOR
 				}
 			} else {
 				nombre_actual_simbolo = $1.lexema;
-				if(buscarParaDeclararIdTablaSimbolosAmbitos(simbolos, $1.lexema, &s, id_ambito)){
+				nombre_actual_simbolo = addPrefijo("main", nombre_actual_simbolo);
+				if(buscarParaDeclararIdTablaSimbolosAmbitos(simbolos, nombre_actual_simbolo, &s, id_ambito)){
 					fprintf(salida, "Error al declarar el elemento, ya esta declarado\n");
 				}
 				else{
 					$1.tipo = tipo_actual;
-					nuevoSimboloEnMain(simbolos, $1.lexema, clase_actual,tipo_actual,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
+					nuevoSimboloEnMain(simbolos, nombre_actual_simbolo, clase_actual,tipo_actual,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 				}
 				fprintf(sintactico,";R: identificador: TOK_IDENTIFICADOR\n");
+				free(nombre_actual_simbolo);
 			}
 		}
 		;
