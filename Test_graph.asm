@@ -1,4 +1,4 @@
-	global _mc1, _mb1, _ma1, _no_defined_method, _mnsb1, _set_offsets, _create_ms_table, _offset_ma1, _offset_mb1, _offset_mc1, _offset_bib1, _offset_aia1, _offset_aia2, _CC, _BB, _AA, _bbb1, _bbb2, _bbb3, _a1, _sa1, 
+	global _mc1, _mb1, _ma1, _no_defined_method, _mnsb1, _set_offsets, _create_ms_table, _offset_ma1, _offset_mb1, _offset_mc1, _offset_bib1, _offset_aia1, _offset_aia2, _CC, _BB, _AA, _bbb1, _bbb2, _bbb3, _a1, _sa1,
 
 segment .data
 		msg_error_indice_vector     db "Indice de vector fuera de rango", 0
