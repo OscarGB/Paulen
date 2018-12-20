@@ -70,3 +70,16 @@ sentencias '}'
 ;D: printf
 ;D: doble
 ;D: (
+;D: z
+;D: )
+;R: resto_lista_expresiones: 
+;R: lista_expresiones: exp resto_lista_expresiones
+;R: exp: TOK_IDENTIFICADOR '(' lista_expresiones ')'
+;D: ;
+;R: escritura: TOK_PRINTF exp
+;R: sentencia_simple: escritura
+;R: sentencia: sentencia_simple ';'
+;D: }
+;R: sentencias: sentencia
+;R: sentencias: sentencia sentencias
+;R: programa: TOK_MAIN '{' declaraciones funciones sentencias '}'
