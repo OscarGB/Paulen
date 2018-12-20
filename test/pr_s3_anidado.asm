@@ -54,19 +54,19 @@ cmp eax, 0
 je near fin_then2
 	push dword 110
 
-; Escritura
-call print_int
-call print_endofline
-add esp, 4
+	; Escritura
+	call print_int
+	call print_endofline
+	add esp, 4
 
 jmp near fin_ifelse2
 fin_then2:
 	push dword 111
 
-; Escritura
-call print_int
-call print_endofline
-add esp, 4
+	; Escritura
+	call print_int
+	call print_endofline
+	add esp, 4
 
 fin_ifelse2:
 jmp near fin_ifelse1
@@ -78,19 +78,19 @@ cmp eax, 0
 je near fin_then3
 	push dword 10
 
-; Escritura
-call print_int
-call print_endofline
-add esp, 4
+	; Escritura
+	call print_int
+	call print_endofline
+	add esp, 4
 
 jmp near fin_ifelse3
 fin_then3:
 	push dword 11
 
-; Escritura
-call print_int
-call print_endofline
-add esp, 4
+	; Escritura
+	call print_int
+	call print_endofline
+	add esp, 4
 
 fin_ifelse3:
 fin_ifelse1:

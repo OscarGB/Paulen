@@ -347,6 +347,7 @@ tipo: TOK_INT
 		|
 		TOK_BOOLEAN
 		{
+
 			tipo_actual = BOOLEAN;
 			fprintf(sintactico,";R: tipo: TOK_BOOLEAN\n");
 		}
@@ -390,7 +391,9 @@ fn_name: TOK_FUNCTION modificadores_acceso tipo_retorno TOK_IDENTIFICADOR
 		{
 			fprintf(sintactico,";R: funcion: TOK_FUNCTION modificadores_acceso tipo_retorno TOK_IDENTIFICADOR ");
 			if(buscarIdNoCualificado(simbolos, $4.lexema, "main", &s, id_ambito)==ERROR){
-
+				for(int i=0; i<=num_parametros_actual;i++){
+					tipos_parametros[i]=0;
+				}
 				num_variables_locales_actual = 0;
 				pos_variable_local_actual = 1;
 				num_parametros_actual = 0;
@@ -411,22 +414,16 @@ fn_complete_name: fn_name '(' parametros_funcion ')'{
 			fprintf(sintactico, "'(' parametros_funcion ')' ");
 			nombre_funcion = crearNombreFuncion($1.lexema, num_parametros_actual, tipos_parametros);
 			nombre_prefijo = addPrefijo("main", nombre_funcion);
-			fprintf(stdout, "%s\n", nombre_prefijo);
-			fflush(stdout);
-
 			nuevoSimboloEnMain(simbolos, nombre_prefijo,0,FUNCION,0,0,num_parametros_actual,0,0,0,0,0,0,0,0,$1.tipo,0,0,0,EXPOSED,0,0,0,0,0,0,0,tipos_parametros);
 
 			iniciaLocal(simbolos, nombre_funcion);
 			free(nombre_prefijo);
 			for(int i =0; i<num_parametros_actual; i++){
 				nombre_prefijo = addPrefijo(nombre_funcion, nombres_parametros[i]);
-				printf("metiendo simbolo %s %d %d\n", nombre_prefijo, clase_actual, tipos_parametros[i]);
 				nuevoSimboloEnMain(simbolos, nombre_prefijo, PARAMETRO, tipos_parametros[i],0,0,0,0,0,i,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NULL);
 				free(nombre_prefijo);
 			}
 
-			fprintf(stdout, "%s\n", nombre_funcion);
-			fflush(stdout);
 			if(simbolos->main_local == NULL){
 				fprintf(sintactico, "Error al inicializar la tabla\n");
 				return -1;
@@ -436,17 +433,12 @@ fn_complete_name: fn_name '(' parametros_funcion ')'{
 				s->numero_variables_locales = num_variables_locales_actual;
 			}
 			$$.tipo = $1.tipo;
-			printf("TIPO EN FN_COMPLETE:%d\n", $1.tipo);
 			strcpy($$.lexema, nombre_funcion);
-			fprintf(stdout, "%s\n", nombre_funcion);
-			fflush(stdout);
 		}
 		;
 
 fn_declaration: fn_complete_name '{' declaraciones_funcion {
 			fprintf(sintactico, "'{' declaraciones_funcion ");
-			fprintf(stdout, "NOMBRE:%s\n", $1.lexema);
-			fflush(stdout);
 			nombre_prefijo = addPrefijo("main", $1.lexema);
 			gc_inicio_cuerpo_funcion (salida, nombre_prefijo, num_variables_locales_actual);
 			$$.tipo = $1.tipo;
@@ -459,10 +451,6 @@ funcion: fn_declaration sentencias '}'
 			fprintf(sintactico, "sentencias '}'\n");
 			cerrarLocal(simbolos);
 			simbolos->main_local=NULL;
-			if (fn_return == 0){
-				printf("****Error semántico en lin %d: Funcion <%s> sin sentencia de retorno.\n", linea, $1.lexema);
-				return -1;
-			}
 			$$.tipo = $1.tipo;
 		}
 		;
@@ -597,17 +585,6 @@ asignacion: TOK_IDENTIFICADOR '=' exp
 			if (simbolos->main_local != NULL){
 
 				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
-
-									printf(" PETA EN %s\n", $1.lexema);
-
-									for (int i = 0; i < 2; i ++){
-										printf("%d: %s\n",i , getSimbolos(simbolos, LOCAL)[i]);
-									}
-
-
-
-
-
 					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s)\n", linea, $1.lexema);
 					return -1;
 				}
@@ -688,44 +665,38 @@ elemento_vector: TOK_IDENTIFICADOR '[' exp ']'
 		}
 		;
 
-condicional: if_exp '(' exp ')' '{' sentencias '}'
+condicional: if_exp sentencias '}'
 		{
-			fprintf(salida, "fin_ifelse%d:\n", $1.etiqueta);
 			fprintf(sintactico,";R: condicional: if_exp '(' exp ')' '{' sentencias '}'\n");
+			gc_ifthen_fin(salida, $1.etiqueta);
 		}
 		|
 		if_exp_sentencias TOK_ELSE '{' sentencias '}'
 		{
-			fprintf(salida, "fin_ifelse%d:\n", $1.etiqueta);
 			fprintf(sintactico,";R: condicional: if_exp_sentencias TOK_ELSE '{' sentencias '}'\n");
+			gc_ifthenelse_fin(salida, $1.etiqueta);
 		}
 		;
 
 if_exp_sentencias: if_exp sentencias '}'
 		{
-			$$.etiqueta = $1.etiqueta;
-			fprintf(salida, "jmp near fin_ifelse%d\n", $1.etiqueta);
-			fprintf(salida, "fin_then%d:\n", $1.etiqueta);
 			fprintf(sintactico,";R: if_exp_sentencias: if_exp sentencias '}'\n");
+			$$.etiqueta = $1.etiqueta;
+			gc_ifthenelse_fin_then(salida, $1.etiqueta);
 		}
 		;
 
 if_exp: TOK_IF '(' exp ')' '{'
 		{
+			fprintf(sintactico,";R: if_exp: TOK_IF '(' exp ')' '{'\n");
 			if ($3.tipo != BOOLEAN){
 				printf("****Error semántico en lin %d: Comparacion con operandos boolean.\n", linea);
 				return -1;
 			}
 
 			$$.etiqueta = etiqueta++;
-			fprintf(salida, "pop eax\n");
-
-			if($3.es_direccion == 1){
-				fprintf(salida, "mov eax, [eax]\n");
-			}
-			fprintf(salida, "cmp eax, 0\n");
-			fprintf(salida, "je near fin_then%d\n", $$.etiqueta);
-			fprintf(sintactico,";R: if_exp: TOK_IF '(' exp ')' '{'\n");
+			gc_ifthenelse_inicio(salida, $3.es_direccion, $$.etiqueta);
+			
 		}
 		;
 
@@ -764,10 +735,7 @@ lectura: TOK_SCANF TOK_IDENTIFICADOR
 					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $2.lexema);
 					return -1;
 				}
-				if(s->clase != ESCALAR){
-					printf("****Error semántico en lin %d: Variable local de tipo no escalar.\n", linea);
-					return -1;
-				}
+				
 				if(s->clase == PARAMETRO){
 					gc_scanf_funcion(salida, num_parametros_actual, s->posicion_parametro, s->clase, s->tipo);
 				}
@@ -800,12 +768,7 @@ lectura: TOK_SCANF TOK_IDENTIFICADOR
 
 escritura: TOK_PRINTF exp
 		{
-			printf("Tipo:%d\n", $2.tipo);
-			printf("Tipo_retorno:%d\n", tipo_retorno);
-
-			
-				gc_printf(salida, $2.es_direccion, $2.tipo);
-
+			gc_printf(salida, $2.es_direccion, $2.tipo);
 			fprintf(sintactico,";R: escritura: TOK_PRINTF exp\n");
 		}
 		;
@@ -813,28 +776,8 @@ escritura: TOK_PRINTF exp
 
 idf_llamada_funcion: TOK_IDENTIFICADOR
 		{
-			nombre_funcion = crearNombreFuncion($1.lexema, num_parametros_actual, tipos_parametros);
-			if(buscarIdNoCualificado(simbolos, nombre_funcion, "main", &s, id_ambito)==ERROR){
-				printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $1.lexema);
-				return -1;
-			}
-			/*Comprobamos que es de categoria funcion*/
-			if (s->tipo != FUNCION){
-				printf("****Error semántico en lin %d: Identificador no es de categoriaegoria funcion\n", linea);
-				return -1;
-			}
-
-			/*Comprobamos que en_explist no valga 1*/
-			if (en_explist == 1){
-				printf("****Error semántico en lin %d: No esta permitido el uso de llamadas a funciones como parametros de otras funciones.\n", linea);
-				return -1;
-			}
-			num_parametros_llamada_actual = 0;
 			en_explist = 1;
-			strcpy($$.lexema,nombre_funcion);
-			printf("OLE:%d\n", s->TIPO_RETORNO);
-			$$.tipo = s->TIPO_RETORNO;
-			printf("OLE:%d\n", $$.tipo);
+			strcpy($$.lexema,$1.lexema);
 		};
 
 retorno_funcion: TOK_RETURN exp
@@ -963,18 +906,16 @@ exp: exp '+' exp
 		{
 			if(simbolos->main_local == NULL){
 				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
-				printf("HOLA GUAPI");
 					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $1.lexema);
 					return -1;
 				}
 				if(en_explist == 0){
-					fprintf (salida, "push dword _%s\n", s->id);
+					fprintf (salida, "\t\tpush dword _%s\n", s->id);
 				}else{
-					fprintf (salida, "push dword [_%s]\n", s->id);
+					fprintf (salida, "\t\tpush dword [_%s]\n", s->id);
 				}
 			}else{
 				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
-
 					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $1.lexema);
 					return -1;
 				}
@@ -1018,32 +959,37 @@ exp: exp '+' exp
 		|
 		idf_llamada_funcion '(' lista_expresiones ')'
 		{
-
 			fprintf(sintactico,";R: exp: TOK_IDENTIFICADOR '(' lista_expresiones ')'\n");
-			if (simbolos->main_local == NULL){
-				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
-				printf("HOLA GUAPI");
-
-					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $1.lexema);
-					return -1;
-				}
-			} else{
-				if(buscarIdNoCualificado(simbolos, $1.lexema, "local", &s, id_ambito)==ERROR){
-
-					printf("****Error semántico en lin %d: Acceso a variable no declarada (%s).\n", linea, $1.lexema);
-					return -1;
-				}
+	
+			nombre_funcion = crearNombreFuncion($1.lexema, num_parametros_llamada_actual, tipos_parametros);
+			nombre_prefijo= addPrefijo("main", nombre_funcion);
+			printf("%s\n", nombre_prefijo);
+			if(buscarIdNoCualificado(simbolos, nombre_funcion, "main", &s, id_ambito)==ERROR){
+				printf("****Error semántico en lin %d: Acceso a funcion no declarada (%s).\n", linea, $1.lexema);
+				return -1;
 			}
+			if (s->tipo != FUNCION){
+				printf("****Error semántico en lin %d: Identificador no es de categoriaegoria funcion\n", linea);
+				return -1;
+			}
+
+			if (en_explist == 1){
+				printf("****Error semántico en lin %d: No esta permitido el uso de llamadas a funciones como parametros de otras funciones.\n", linea);
+				return -1;
+			}
+
 			/*Comprobamos que el numero de parametros es correcto*/
 			if (s->numero_parametros != num_parametros_llamada_actual){
 				printf("****Error semántico en lin %d: Numero incorrecto de parametros en llamada a funcion.\n", linea);
 				return -1;
 			}
-			en_explist = 0;
+
 			$$.tipo = s->TIPO_RETORNO;
 			$$.es_direccion = 0;
-			printf("%s\n", s->id);
-			gc_llamarfuncion(salida, s->id, num_parametros_actual);
+			gc_llamarfuncion(salida, s->id, s->numero_parametros);
+			num_parametros_actual=0;
+			num_parametros_llamada_actual = 0;
+
 		}
 		|
 		identificador_clase '.' TOK_IDENTIFICADOR '(' lista_expresiones ')'
@@ -1072,6 +1018,7 @@ identificador_clase: TOK_IDENTIFICADOR
 lista_expresiones: exp resto_lista_expresiones
 		{
 			fprintf(sintactico,";R: lista_expresiones: exp resto_lista_expresiones\n");
+			en_explist = 0;
 			num_parametros_llamada_actual++;
 		}
 		|
@@ -1189,35 +1136,26 @@ constante: constante_logica
 
 constante_logica: TOK_TRUE
 		{
-			/* análisis semántico */
 			$$.tipo = BOOLEAN;
 			$$.es_direccion = 0;
-			/* generación de código */
-			/*fprintf(salida, "; numero_linea %d\n", numero_linea);*/
-			fprintf(salida, "\tpush dword 1\n");
+			fprintf(salida, "\t\tpush dword 1\n");
 			fprintf(sintactico,";R: constante_logica: TOK_TRUE\n");
 		}
 		|
 		TOK_FALSE
 		{
-			/* análisis semántico */
 			$$.tipo = BOOLEAN;
 			$$.es_direccion = 0;
-			/* generación de código */
-			/*fprintf(salida, "; numero_linea %d\n", numero_linea);*/
-			fprintf(salida, "\tpush dword 0\n");
+			fprintf(salida, "\t\tpush dword 0\n");
 			fprintf(sintactico,";R: constante_logica: TOK_FALSE\n");
 		}
 		;
 
 constante_entera: TOK_CONSTANTE_ENTERA
 		{
-			/* análisis semántico */
 			$$.tipo = INT;
 			$$.es_direccion = 0;
-			/* generación de código */
-			/*fprintf(salida, "; numero_linea %d\n", numero_linea);*/
-			fprintf(salida, "\tpush dword %d\n", $1.valor_entero);
+			fprintf(salida, "\t\tpush dword %d\n", $1.valor_entero);
 			fprintf(sintactico,";R: constante_entera: TOK_CONSTANTE_ENTERA\n");
 		}
 		;
@@ -1229,7 +1167,7 @@ idpf : TOK_IDENTIFICADOR
 			strcpy(nombres_parametros[pos_parametro_actual], $1.lexema);
 			tipos_parametros[pos_parametro_actual] = tipo_actual;
 			pos_parametro_actual++;
-		  num_parametros_actual++;
+		  	num_parametros_actual++;
 		};
 
 identificador: TOK_IDENTIFICADOR
@@ -1443,19 +1381,19 @@ void gc_asignarDestinoPila(FILE* salida, int es_variable, char * eax, char * ebx
 
 void gc_scanf_funcion(FILE *salida, int num_param_actual, int posicion_parametro, int categoria, int tipo){
 	if (categoria == PARAMETRO){
-		fprintf(salida,"lea eax, [ebp+4+4*(%d)]\n",num_param_actual - posicion_parametro);
-		fprintf(salida,"push dword eax\n");
+		fprintf(salida,"\t\tlea eax, [ebp+4+4*(%d)]\n",num_param_actual - posicion_parametro);
+		fprintf(salida,"\t\tpush dword eax\n");
 	}else {
-		fprintf(salida,"lea eax, [ebp-4*%d]\n",posicion_parametro);
-		fprintf(salida,"push dword eax\n");
+		fprintf(salida,"\t\tlea eax, [ebp-4*%d]\n",posicion_parametro);
+		fprintf(salida,"\t\tpush dword eax\n");
 	}
 
 	if(tipo==INT){
-		fprintf(salida,"call scan_int\n");
+		fprintf(salida,"\t\tcall scan_int\n");
 	}else{
-		fprintf(salida,"call scan_boolean\n");
+		fprintf(salida,"\t\tcall scan_boolean\n");
 	}
-	fprintf(salida,"add esp,4\n");
+	fprintf(salida,"\t\tadd esp,4\n");
 }
 
 void gc_lectura(FILE * salida, char * nombre, int tipo){
@@ -1481,27 +1419,27 @@ void gc_escribirVariableLocal(FILE *salida,int posicion_variable_local){
 
 
 void gc_identificador_asignacion_local(FILE *salida, int es_direccion, int categoria, int numero_param, int posicion){
-	fprintf(salida,"pop dword eax\n");
+	fprintf(salida,"\t\tpop dword eax\n");
 	if (es_direccion == 1)
-		fprintf(salida,"mov dword eax, [eax]\n");
+		fprintf(salida,"\t\tmov dword eax, [eax]\n");
 	if (categoria == PARAMETRO){
-		fprintf(salida,"mov dword [ebp+4+4*%d], eax\n", numero_param-posicion);
+		fprintf(salida,"\t\tmov dword [ebp+4+4*%d], eax\n", numero_param-posicion);
 	}else{
-		fprintf(salida,"mov dword [ebp-4*%d], eax\n", posicion);
+		fprintf(salida,"\t\tmov dword [ebp-4*%d], eax\n", posicion);
 	}
 	return;
 }
 
 void gc_asignar_exp_a_elementovector(FILE *salida, int es_direccion_op1, char *lexema){
-	fprintf(salida, "; Cargar en eax la parte derecha de la asignacion\n");
-	fprintf(salida,"pop dword eax\n");
+	fprintf(salida, "\t\t; Cargar en eax la parte derecha de la asignacion\n");
+	fprintf(salida,"\t\tpop dword eax\n");
 	if (es_direccion_op1==1){
-		fprintf(salida,"mov dword eax, [eax]\n");
+		fprintf(salida,"\t\tmov dword eax, [eax]\n");
 	}
-	fprintf(salida, "; Cargar en edx la parte izquierda de la asignacion\n");
-	fprintf(salida,"pop dword edx\n");
-	fprintf(salida, "; Hacer la asignacion efectiva\n");
-	fprintf(salida,"mov dword [edx], eax\n");
+	fprintf(salida, "\t\t; Cargar en edx la parte izquierda de la asignacion\n");
+	fprintf(salida,"\t\tpop dword edx\n");
+	fprintf(salida, "\t\t; Hacer la asignacion efectiva\n");
+	fprintf(salida,"\t\tmov dword [edx], eax\n");
 	return;
 }
 
