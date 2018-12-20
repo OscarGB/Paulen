@@ -46,7 +46,7 @@ add esp, 4*1
 push dword eax
 
 ; Escritura
-call print_int
+call print_boolean
 call print_endofline
 add esp, 4
 

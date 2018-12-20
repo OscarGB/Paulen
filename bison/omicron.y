@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define TIPO_RETORNO numero_atributos_clase
 
 extern int linea;
 extern int columna;
@@ -413,7 +414,7 @@ fn_complete_name: fn_name '(' parametros_funcion ')'{
 			fprintf(stdout, "%s\n", nombre_prefijo);
 			fflush(stdout);
 
-			nuevoSimboloEnMain(simbolos, nombre_prefijo,0,FUNCION,0,0,num_parametros_actual,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,tipos_parametros);
+			nuevoSimboloEnMain(simbolos, nombre_prefijo,0,FUNCION,0,0,num_parametros_actual,0,0,0,0,0,0,0,0,$1.tipo,0,0,0,EXPOSED,0,0,0,0,0,0,0,tipos_parametros);
 
 			iniciaLocal(simbolos, nombre_funcion);
 			free(nombre_prefijo);
@@ -800,8 +801,13 @@ lectura: TOK_SCANF TOK_IDENTIFICADOR
 escritura: TOK_PRINTF exp
 		{
 			printf("Tipo:%d\n", $2.tipo);
+			printf("Tipo_retorno:%d\n", tipo_retorno);
 
-			gc_printf(salida, $2.es_direccion, tipo_retorno);
+			if(tipo_retorno!=0){
+				gc_printf(salida, $2.es_direccion, tipo_retorno);
+			}else{
+				gc_printf(salida, $2.es_direccion, $2.tipo);
+			}
 			fprintf(sintactico,";R: escritura: TOK_PRINTF exp\n");
 		}
 		;
@@ -828,6 +834,7 @@ idf_llamada_funcion: TOK_IDENTIFICADOR
 			num_parametros_llamada_actual = 0;
 			en_explist = 1;
 			strcpy($$.lexema,nombre_funcion);
+			$$.tipo = s->TIPO_RETORNO;
 		};
 
 retorno_funcion: TOK_RETURN exp
