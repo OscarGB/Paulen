@@ -251,9 +251,13 @@ _CmsA2:
 	mov ebp, esp
 ; this.aiC2 = 2222;
 ; this está en [ebp+8]
-	lea ebx, [ebp+8]    ; ebx &this 
-	mov ebx, [ebx]    ; ebx tiene this
-	mov ebx, [ebx]    ; ebx tiene [this] comienzo del bloque de memoria al que apunta this
+	lea ebx, [ebp]    ; ebx &this 
+;	mov ebx, [ebx]    ; ebx tiene this
+;	mov ebx, [ebx]    ; ebx tiene [this] comienzo del bloque de memoria al que apunta this
+push dword mensaje_prueba
+call print_string
+call print_endofline
+add esp,4
 	mov dword ecx, [_offset_aiC2]   ; ecx tiene el offset
 	lea ebx, [ebx+ ecx]  ; ebx tiene [c]+offset
 	mov dword [ebx ], 2222  ; añadimos 100 a su instancia [[c]+offset]

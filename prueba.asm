@@ -10,7 +10,7 @@ _c2 resd 1
 _d1 resd 1
 _m resd 1
 _Vobjs resd 1
-_vector_int resd 1
+_vector_int resd 4
 _c3 resd 1
 
 segment .text
@@ -82,9 +82,6 @@ push dword eax
 
 ; Escritura
 pop eax
-
-
-
 push dword [eax]
 call print_int
 call print_endofline
@@ -750,6 +747,10 @@ push dword eax
 		lea eax, [eax+ebx]
 		mov eax, [eax]
 		call eax
+push dword mensaje_prueba
+call print_string
+call print_endofline
+add esp,4		
 
 	; Guarda el operando m en la pila
 	push dword _m
@@ -780,7 +781,6 @@ fin_while6:
 		pop eax
 		pop ebx
 		mov [eax], ebx
-
 inicio_while7:
 
 	; Guarda el operando m en la pila
@@ -854,7 +854,6 @@ push dword eax
 		mov [eax], ebx
 jmp near inicio_while7
 fin_while7:
-
 
 	; Guarda el operando c2 en la pila
 	push dword _c2
