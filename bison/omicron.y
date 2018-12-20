@@ -803,11 +803,9 @@ escritura: TOK_PRINTF exp
 			printf("Tipo:%d\n", $2.tipo);
 			printf("Tipo_retorno:%d\n", tipo_retorno);
 
-			if(tipo_retorno!=0){
-				gc_printf(salida, $2.es_direccion, tipo_retorno);
-			}else{
+			
 				gc_printf(salida, $2.es_direccion, $2.tipo);
-			}
+
 			fprintf(sintactico,";R: escritura: TOK_PRINTF exp\n");
 		}
 		;
@@ -834,7 +832,9 @@ idf_llamada_funcion: TOK_IDENTIFICADOR
 			num_parametros_llamada_actual = 0;
 			en_explist = 1;
 			strcpy($$.lexema,nombre_funcion);
+			printf("OLE:%d\n", s->TIPO_RETORNO);
 			$$.tipo = s->TIPO_RETORNO;
+			printf("OLE:%d\n", $$.tipo);
 		};
 
 retorno_funcion: TOK_RETURN exp
@@ -1040,7 +1040,7 @@ exp: exp '+' exp
 				return -1;
 			}
 			en_explist = 0;
-			$$.tipo = s->tipo;
+			$$.tipo = s->TIPO_RETORNO;
 			$$.es_direccion = 0;
 			printf("%s\n", s->id);
 			gc_llamarfuncion(salida, s->id, num_parametros_actual);
