@@ -165,3 +165,8 @@ help:
 	@echo "cleanbison: Borra todo lo generado por bison"
 	@echo "cleanall: Borra todo, ejecutables, librerias, bison y flex."
 	@echo "help: Muestra esta ayuda"
+
+asm:
+	nasm -g -o ts.o -f elf32 ts.asm
+	nasm -g -o prueba.o -f elf32 prueba.asm
+	gcc -o prueba -m32 prueba.o ts.o executables/olib.o
