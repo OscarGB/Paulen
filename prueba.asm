@@ -1,7 +1,6 @@
 segment .data
 mensaje_1 db "Indice fuera de rango", 0
 mensaje_2 db "Division por cero", 0
-mensaje_prueba db "Me caguen tu padre", 0
 
 segment .bss
 __esp resd 1
@@ -10,7 +9,7 @@ _c2 resd 1
 _d1 resd 1
 _m resd 1
 _Vobjs resd 1
-_vector_int resd 4
+_vector_int resd 1
 _c3 resd 1
 
 segment .text
@@ -747,10 +746,6 @@ push dword eax
 		lea eax, [eax+ebx]
 		mov eax, [eax]
 		call eax
-push dword mensaje_prueba
-call print_string
-call print_endofline
-add esp,4		
 
 	; Guarda el operando m en la pila
 	push dword _m
