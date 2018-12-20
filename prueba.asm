@@ -82,6 +82,9 @@ push dword eax
 
 ; Escritura
 pop eax
+
+
+
 push dword [eax]
 call print_int
 call print_endofline
@@ -146,8 +149,8 @@ mov dword [__esp], esp
 		push 28
 		call malloc
 		add esp, 4
-		mov dword [eax], _msC
 		push eax
+		mov dword [eax], _msC
 
 	; Guarda el operando c1 en la pila
 	push dword _c1
@@ -185,39 +188,12 @@ add esp, 4
 
 	; Guarda el operando c1 en la pila
 	push dword _c1
-
-call print_int
-call print_endofline ;134525304
 		pop eax
-
-		mov eax, [eax]	
-push dword eax
-call print_int
-call print_endofline
-pop eax	
-
-push dword eax
-call print_int
-call print_endofline
-pop eax
-		mov dword ebx, [_offset_msA1]
-push dword ebx
-call print_int
-call print_endofline
-pop ebx
-
-		lea eax, [eax+ebx]
-
-push dword eax
-call print_int
-call print_endofline
-add esp, 4	
-
 		mov eax, [eax]
-push dword eax
-call print_int
-call print_endofline
-add esp, 4
+		mov eax, [eax]
+		mov dword ebx, [_offset_msA1]
+		lea eax, [eax+ebx]
+		mov eax, [eax]
 		call eax
 
 	; Guarda el operando c1 en la pila
@@ -235,6 +211,8 @@ push dword eax
 
 	; Guarda el operando c1 en la pila
 	push dword _c1
+		pop eax
+		push dword [eax]
 		call free
 		add esp, 4
 
@@ -745,6 +723,7 @@ lea eax, [edx + eax * 4]
 push dword eax
 		pop eax
 		mov eax, [eax]
+		mov eax, [eax]
 		mov dword ebx, [_offset_msA1]
 		lea eax, [eax+ebx]
 		mov eax, [eax]
@@ -765,6 +744,7 @@ mov dword edx, _Vobjs
 lea eax, [edx + eax * 4]
 push dword eax
 		pop eax
+		mov eax, [eax]
 		mov eax, [eax]
 		mov dword ebx, [_offset_msA2]
 		lea eax, [eax+ebx]
@@ -800,6 +780,7 @@ fin_while6:
 		pop eax
 		pop ebx
 		mov [eax], ebx
+
 inicio_while7:
 
 	; Guarda el operando m en la pila
@@ -848,6 +829,8 @@ jg near mensaje_1
 mov dword edx, _Vobjs
 lea eax, [edx + eax * 4]
 push dword eax
+		pop eax
+		push dword [eax]
 		call free
 		add esp, 4
 
@@ -871,6 +854,7 @@ push dword eax
 		mov [eax], ebx
 jmp near inicio_while7
 fin_while7:
+
 
 	; Guarda el operando c2 en la pila
 	push dword _c2
@@ -965,11 +949,15 @@ add esp, 4
 
 	; Guarda el operando c3 en la pila
 	push dword _c3
+		pop eax
+		push dword [eax]
 		call free
 		add esp, 4
 
 	; Guarda el operando c2 en la pila
 	push dword _c2
+		pop eax
+		push dword [eax]
 		call free
 		add esp, 4
 
@@ -979,11 +967,15 @@ add esp, 4
 		mov dword ebx, [_offset_aiD2]
 		lea eax, [eax+ebx]
 		push eax
+		pop eax
+		push dword [eax]
 		call free
 		add esp, 4
 
 	; Guarda el operando d1 en la pila
 	push dword _d1
+		pop eax
+		push dword [eax]
 		call free
 		add esp, 4
 

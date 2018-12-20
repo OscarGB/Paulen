@@ -568,6 +568,7 @@ void asignarDestinoEnPila(FILE* file, int es_variable) {
 }
 
 void discardPila (FILE * fd_asm){
+  fprintf(fd_asm, "\t\tpop eax\n\t\tpush dword [eax]\n");
   fprintf(fd_asm, "\t\tcall free\n\t\tadd esp, 4\n");
 }
 
@@ -577,6 +578,7 @@ char * claseATabla(char * nombre_fuente_clase){
 
 void llamarMetodoSobreescribibleCualificadoInstanciaPila(FILE * fd_asm, char * nombre_metodo){
   fprintf(fd_asm, "\t\tpop eax\n");
+  fprintf(fd_asm, "\t\tmov eax, [eax]\n");
   fprintf(fd_asm, "\t\tmov eax, [eax]\n");
   fprintf(fd_asm, "\t\tmov dword ebx, [_offset_%s]\n", nombre_metodo);
   fprintf(fd_asm, "\t\tlea eax, [eax+ebx]\n");

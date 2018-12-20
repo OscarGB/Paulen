@@ -239,10 +239,6 @@ _BmsA1:
 ; En Class C se sobreescirbe A1
 ; A1() { print 10 }
 _CmsA1:
-	push dword mensaje_prueba
-	call print_string
-	call print_endofline
-	add esp, 4
 	push dword 10
 	call print_int
 	add esp,4
@@ -317,16 +313,7 @@ _create_ms_table:
 	mov dword [_msB+8], _msB1
 	mov dword [_msB+12], _msB2		
 ; C SOBRE ESCRIBE msA1
-	mov dword [_msC], _CmsA1
-	push _CmsA1
-call print_int
-call print_endofline
-add esp,4	
-
-push _msC
-call print_int
-call print_endofline
-add esp,4		
+	mov dword [_msC], _CmsA1		
 ; C SOBRE ESCRIBE msA2
 	mov dword [_msC+4], _CmsA2		
 ; C NO HEREDA DE B
