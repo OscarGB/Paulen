@@ -91,6 +91,7 @@
 segment .data
 	msg_error_indice_vector     db "Indice de vector fuera de rango", 0
 	msg_asignacion     db "Asignacion", 0
+	mensaje_prueba db "Me caguen tu padre", 0
 	msg_f2     db "Llamada a f2", 0
 	__auxfloat dd 0.0
 	__auxint dd 0.0
@@ -238,6 +239,10 @@ _BmsA1:
 ; En Class C se sobreescirbe A1
 ; A1() { print 10 }
 _CmsA1:
+	push dword mensaje_prueba
+	call print_string
+	call print_endofline
+	add esp, 4
 	push dword 10
 	call print_int
 	add esp,4
@@ -312,7 +317,16 @@ _create_ms_table:
 	mov dword [_msB+8], _msB1
 	mov dword [_msB+12], _msB2		
 ; C SOBRE ESCRIBE msA1
-	mov dword [_msC], _CmsA1		
+	mov dword [_msC], _CmsA1
+	push _CmsA1
+call print_int
+call print_endofline
+add esp,4	
+
+push _msC
+call print_int
+call print_endofline
+add esp,4		
 ; C SOBRE ESCRIBE msA2
 	mov dword [_msC+4], _CmsA2		
 ; C NO HEREDA DE B

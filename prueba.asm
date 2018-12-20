@@ -1,6 +1,7 @@
 segment .data
 mensaje_1 db "Indice fuera de rango", 0
 mensaje_2 db "Division por cero", 0
+mensaje_prueba db "Me caguen tu padre", 0
 
 segment .bss
 __esp resd 1
@@ -145,8 +146,8 @@ mov dword [__esp], esp
 		push 28
 		call malloc
 		add esp, 4
-		push eax
 		mov dword [eax], _msC
+		push eax
 
 	; Guarda el operando c1 en la pila
 	push dword _c1
@@ -184,11 +185,39 @@ add esp, 4
 
 	; Guarda el operando c1 en la pila
 	push dword _c1
+
+call print_int
+call print_endofline ;134525304
 		pop eax
-		mov eax, [eax]
+
+		mov eax, [eax]	
+push dword eax
+call print_int
+call print_endofline
+pop eax	
+
+push dword eax
+call print_int
+call print_endofline
+pop eax
 		mov dword ebx, [_offset_msA1]
+push dword ebx
+call print_int
+call print_endofline
+pop ebx
+
 		lea eax, [eax+ebx]
+
+push dword eax
+call print_int
+call print_endofline
+add esp, 4	
+
 		mov eax, [eax]
+push dword eax
+call print_int
+call print_endofline
+add esp, 4
 		call eax
 
 	; Guarda el operando c1 en la pila
