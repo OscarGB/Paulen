@@ -1,6 +1,7 @@
 segment .data
 mensaje_1 db "Indice fuera de rango", 0
 mensaje_2 db "Division por cero", 0
+mensaje_prueba db "Me caguen tu padre", 0
 
 segment .bss
 __esp resd 1
@@ -81,6 +82,9 @@ push dword eax
 
 ; Escritura
 pop eax
+
+
+
 push dword [eax]
 call print_int
 call print_endofline
@@ -186,6 +190,7 @@ add esp, 4
 	push dword _c1
 		pop eax
 		mov eax, [eax]
+		mov eax, [eax]
 		mov dword ebx, [_offset_msA1]
 		lea eax, [eax+ebx]
 		mov eax, [eax]
@@ -206,6 +211,8 @@ push dword eax
 
 	; Guarda el operando c1 en la pila
 	push dword _c1
+		pop eax
+		push dword [eax]
 		call free
 		add esp, 4
 
@@ -716,6 +723,7 @@ lea eax, [edx + eax * 4]
 push dword eax
 		pop eax
 		mov eax, [eax]
+		mov eax, [eax]
 		mov dword ebx, [_offset_msA1]
 		lea eax, [eax+ebx]
 		mov eax, [eax]
@@ -736,6 +744,7 @@ mov dword edx, _Vobjs
 lea eax, [edx + eax * 4]
 push dword eax
 		pop eax
+		mov eax, [eax]
 		mov eax, [eax]
 		mov dword ebx, [_offset_msA2]
 		lea eax, [eax+ebx]
@@ -771,6 +780,7 @@ fin_while6:
 		pop eax
 		pop ebx
 		mov [eax], ebx
+
 inicio_while7:
 
 	; Guarda el operando m en la pila
@@ -819,6 +829,8 @@ jg near mensaje_1
 mov dword edx, _Vobjs
 lea eax, [edx + eax * 4]
 push dword eax
+		pop eax
+		push dword [eax]
 		call free
 		add esp, 4
 
@@ -842,6 +854,7 @@ push dword eax
 		mov [eax], ebx
 jmp near inicio_while7
 fin_while7:
+
 
 	; Guarda el operando c2 en la pila
 	push dword _c2
@@ -936,11 +949,15 @@ add esp, 4
 
 	; Guarda el operando c3 en la pila
 	push dword _c3
+		pop eax
+		push dword [eax]
 		call free
 		add esp, 4
 
 	; Guarda el operando c2 en la pila
 	push dword _c2
+		pop eax
+		push dword [eax]
 		call free
 		add esp, 4
 
@@ -950,11 +967,15 @@ add esp, 4
 		mov dword ebx, [_offset_aiD2]
 		lea eax, [eax+ebx]
 		push eax
+		pop eax
+		push dword [eax]
 		call free
 		add esp, 4
 
 	; Guarda el operando d1 en la pila
 	push dword _d1
+		pop eax
+		push dword [eax]
 		call free
 		add esp, 4
 
