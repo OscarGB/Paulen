@@ -48,7 +48,7 @@ main{
 	printf x+y; //3
 	printf x-y; //1
 	printf x*y; //2
-	printf x/y; //1
+	printf x/y; //2
 	printf -x; //-2
 	printf x+y*z; //5
 	printf (x+y)*z; //9
@@ -98,6 +98,7 @@ main{
 
 	res = cuadrado(i) * 2;
 	printf res;
+	
 
 	x = 4;
 	x = A1[res/A1[4]/(4*x)]; //x = A1[2] = 2

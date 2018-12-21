@@ -3,25 +3,6 @@
 main
 {
     int x, y;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     boolean x;
     x = 0;
 }
-
-
-
-
-

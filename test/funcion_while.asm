@@ -19,7 +19,7 @@ mov dword [__esp], esp
 		call scan_int
 		add esp, 4
 		inicio_while1:
-push dword _main_x1
+		push dword _main_x1
 		push dword 4
 
 		; Comparacion de menor o igual
@@ -37,7 +37,7 @@ push dword _main_x1
 		cmp eax, 0
 		je near fin_while1
 		push dword 2
-push dword _main_x1
+		push dword _main_x1
 
 		; Multiplicacion
 		pop dword ebx
@@ -50,7 +50,7 @@ push dword _main_x1
 		call print_endofline
 		add esp, 4
 
-push dword _main_x1
+		push dword _main_x1
 		push dword 1
 
 		; Suma
@@ -59,11 +59,11 @@ push dword _main_x1
 		mov dword eax, [eax]
 		add eax, ebx
 		push dword eax
-; Cargamos en el registro eax la parte derecha de la asignacion
-pop dword eax
-; Efectuamos la asignacion
-mov dword [_main_x1], eax
-push dword _main_x1
+
+		; Asignacion de pila a main_x1
+		pop dword eax
+		mov dword [_main_x1], eax
+		push dword _main_x1
 		push dword 5
 
 		; Comparacion de igualdad
@@ -79,9 +79,9 @@ push dword _main_x1
 		; Comprobamos la condicion: if (2) para ver que es algo asimilable a una variable
 		pop eax
 		cmp eax, 0
-		; En caso de que no se cumpla la condicion nos vamos al else
-		je __else_2
-		;Nos metemos en el caso del then (2) ya que se cumple la condicion
+		; En caso de que no se cumpla la condicion nos vamos al final del ifthen
+		je __end_if_2
+		; En caso de que se cumpla nos metemos en el caso del then (2) ya que se cumple la condicion
 		push dword 1
 
 		; Escritura
@@ -90,8 +90,8 @@ push dword _main_x1
 		add esp, 4
 
 		; Estamos en la parte del final del then (2) del ifthen_else
-		jmp __endifthen_else_2
-		__else_2:
+		jmp __end_ifthen_2
+		__end_if_2:
 		push dword 0
 
 		; Escritura
@@ -100,21 +100,21 @@ push dword _main_x1
 		add esp, 4
 
 		; Estamos en la parte del final del else (2) del ifthen_else
-		__endifthen_else_2:
+		__end_ifthen_2:
 		jmp near inicio_while1
 		fin_while1:
-jmp near fin
 
-error_1: push dword mensaje_1
-	  call print_string
-	  add esp, 4
-	  jmp near fin
-
-error_2: push dword mensaje_2
-         call print_string
-         add esp, 4
-         jmp near fin
-
-fin:
-mov dword esp, [__esp]
-ret
+		;FINAL DEL PROGRAMA
+		jmp near _fin
+__error_division:
+		push mensaje_2
+		jmp near __salida_mensaje_error
+__error_rango:
+		push mensaje_1
+		jmp near __salida_mensaje_error
+__salida_mensaje_error:
+		call print_string
+		call print_endofline
+		_fin:
+		mov dword esp, [__esp]
+		ret

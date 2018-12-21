@@ -116,9 +116,7 @@ void asignar(FILE* fpasm, char* nombre, int es_variable){
   if(es_variable){
     fprintf(fpasm, "\t\tmov dword eax, [eax]\n");
   }
-  else{
-    fprintf(fpasm, "\t\tmov dword [_%s], eax\n", nombre);
-  }
+  fprintf(fpasm, "\t\tmov dword [_%s], eax\n", nombre);
 }
 
 
@@ -540,7 +538,7 @@ void ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta){
 
     fprintf(salida, "\t\tcmp eax, 0\n");
     fprintf(salida, "\t\t; En caso de que no se cumpla la condicion nos vamos al else\n");
-    fprintf(salida,"\t\tje __else_%d\n", etiqueta);
+    fprintf(salida,"\t\tje __end_if_%d\n", etiqueta);
   fprintf(salida, "\t\t;Nos metemos en el caso del then (%i) ya que se cumple la condicion\n", etiqueta);
 }
 
@@ -553,26 +551,26 @@ void ifthen_inicio(FILE * salida, int exp_es_variable, int etiqueta){
 
     fprintf(salida, "\t\tcmp eax, 0\n");
     fprintf(salida, "\t\t; En caso de que no se cumpla la condicion nos vamos al final del ifthen\n");
-    fprintf(salida, "\t\tje __endifthen_%d\n", etiqueta);
+    fprintf(salida, "\t\tje __end_if_%d\n", etiqueta);
   fprintf(salida, "\t\t; En caso de que se cumpla nos metemos en el caso del then (%i) ya que se cumple la condicion\n", etiqueta);
 }
 
 
 void ifthen_fin(FILE* salida, int etiqueta){
     fprintf(salida, "\t\t; Estamos en la parte del final del then (%d) del ifthen\n", etiqueta);
-    fprintf(salida, "\t\t__endifthen_%d:\n", etiqueta);
+    fprintf(salida, "\t\t__end_if_%d:\n", etiqueta);
 }
 
 
 void ifthenelse_fin_then(FILE* salida, int etiqueta){
     fprintf(salida, "\t\t; Estamos en la parte del final del then (%d) del ifthen_else\n", etiqueta);
-    fprintf(salida, "\t\tjmp __endifthen_else_%d\n", etiqueta);
-    fprintf(salida, "\t\t__else_%d:\n", etiqueta);
+    fprintf(salida, "\t\tjmp __end_ifthen_%d\n", etiqueta);
+    fprintf(salida, "\t\t__end_if_%d:\n", etiqueta);
 }
 
 void ifthenelse_fin( FILE * salida, int etiqueta){
   fprintf(salida, "\t\t; Estamos en la parte del final del else (%d) del ifthen_else\n", etiqueta);
-  fprintf(salida, "\t\t__endifthen_else_%d:\n", etiqueta);
+  fprintf(salida, "\t\t__end_ifthen_%d:\n", etiqueta);
 }
 
 void discardPila (FILE * fd_asm){

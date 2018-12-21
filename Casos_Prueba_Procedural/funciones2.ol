@@ -10,19 +10,19 @@ main
     function int fibonacci (int num1)
     {
         // Declaraciones
-	int res1, res2;
+		int res1, res2;
 	
         if ((num1 == 0))
         {
           return 0;
-	}  
-	if ((num1 == 1)) 
-	{
-	  return 1;
-	}
-	res1 = fibonacci (num1 - 1);
-	res2 = fibonacci (num1 - 2);
-	return res1 + res2;
+		}  	
+		if ((num1 == 1)) 
+		{
+	  	return 1;
+		}
+		res1 = fibonacci (num1 - 1);
+		res2 = fibonacci (num1 - 2);
+		return res1+res2;
     }
 
 // Sentencias

@@ -16,96 +16,111 @@ extern print_int, print_boolean, print_string, print_blank, print_endofline, sca
 main:
 mov dword [__esp], esp
 
-	; Lectura
-	push dword _main_x1
-	call scan_int
-	add esp, 4
+		; Lectura
+		push dword _main_x1
+		call scan_int
+		add esp, 4
 
-	; Lectura
-	push dword _main_x2
-	call scan_int
-	add esp, 4
+		; Lectura
+		push dword _main_x2
+		call scan_int
+		add esp, 4
 
-	; Lectura
-	push dword _main_y1
-	call scan_boolean
-	add esp, 4
-push dword _main_x1
-push dword _main_x2
+		; Lectura
+		push dword _main_y1
+		call scan_boolean
+		add esp, 4
+		push dword _main_x1
+		push dword _main_x2
 
-	; Comparacion de igualdad
-	pop dword ebx
-	pop dword eax
-	mov dword eax, [eax]
-	cmp eax, [ebx]
-	je __igual_0
-	push dword 0
-	jmp __fin_igual_0
-	__igual_0:
+		; Comparacion de igualdad
+		pop dword ebx
+		pop dword eax
+		mov dword eax, [eax]
+		cmp eax, [ebx]
+		je __igual_0
+		push dword 0
+		jmp __fin_igual_0
+		__igual_0:
 		push dword 1
-	__fin_igual_0:
-pop eax
-cmp eax, 0
-je near fin_then1
-push dword _main_y1
-pop eax
-mov eax, [eax]
-cmp eax, 0
-je near fin_then2
-	push dword 110
+		__fin_igual_0:
+		; Comprobamos la condicion: if (1) para ver que es algo asimilable a una variable
+		pop eax
+		cmp eax, 0
+		; En caso de que no se cumpla la condicion nos vamos al else
+		je __end_if_1
+		;Nos metemos en el caso del then (1) ya que se cumple la condicion
+		push dword _main_y1
+		; Comprobamos la condicion: if (2) para ver que es algo asimilable a una variable
+		pop eax
+		mov eax, [eax]
+		cmp eax, 0
+		; En caso de que no se cumpla la condicion nos vamos al else
+		je __end_if_2
+		;Nos metemos en el caso del then (2) ya que se cumple la condicion
+		push dword 110
 
-	; Escritura
-	call print_int
-	call print_endofline
-	add esp, 4
+		; Escritura
+		call print_int
+		call print_endofline
+		add esp, 4
 
-jmp near fin_ifelse2
-fin_then2:
-	push dword 111
+		; Estamos en la parte del final del then (2) del ifthen_else
+		jmp __end_if_2
+		__else_2:
+		push dword 111
 
-	; Escritura
-	call print_int
-	call print_endofline
-	add esp, 4
+		; Escritura
+		call print_int
+		call print_endofline
+		add esp, 4
 
-fin_ifelse2:
-jmp near fin_ifelse1
-fin_then1:
-push dword _main_y1
-pop eax
-mov eax, [eax]
-cmp eax, 0
-je near fin_then3
-	push dword 10
+		; Estamos en la parte del final del else (2) del ifthen_else
+		__end_if_2:
+		; Estamos en la parte del final del then (1) del ifthen_else
+		jmp __end_if_1
+		__else_1:
+		push dword _main_y1
+		; Comprobamos la condicion: if (3) para ver que es algo asimilable a una variable
+		pop eax
+		mov eax, [eax]
+		cmp eax, 0
+		; En caso de que no se cumpla la condicion nos vamos al else
+		je __end_if_3
+		;Nos metemos en el caso del then (3) ya que se cumple la condicion
+		push dword 10
 
-	; Escritura
-	call print_int
-	call print_endofline
-	add esp, 4
+		; Escritura
+		call print_int
+		call print_endofline
+		add esp, 4
 
-jmp near fin_ifelse3
-fin_then3:
-	push dword 11
+		; Estamos en la parte del final del then (3) del ifthen_else
+		jmp __end_if_3
+		__else_3:
+		push dword 11
 
-	; Escritura
-	call print_int
-	call print_endofline
-	add esp, 4
+		; Escritura
+		call print_int
+		call print_endofline
+		add esp, 4
 
-fin_ifelse3:
-fin_ifelse1:
-jmp near fin
+		; Estamos en la parte del final del else (3) del ifthen_else
+		__end_if_3:
+		; Estamos en la parte del final del else (1) del ifthen_else
+		__end_if_1:
 
-error_1: push dword mensaje_1
-	  call print_string
-	  add esp, 4
-	  jmp near fin
-
-error_2: push dword mensaje_2
-         call print_string
-         add esp, 4
-         jmp near fin
-
-fin:
-mov dword esp, [__esp]
-ret
+		;FINAL DEL PROGRAMA
+		jmp near _fin
+__error_division:
+		push mensaje_2
+		jmp near __salida_mensaje_error
+__error_rango:
+		push mensaje_1
+		jmp near __salida_mensaje_error
+__salida_mensaje_error:
+		call print_string
+		call print_endofline
+		_fin:
+		mov dword esp, [__esp]
+		ret
