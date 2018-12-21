@@ -1227,18 +1227,19 @@ void escribe_variables (FILE * salida, char* nombre, int tamanio){
 }
 
 void imprimir_error(FILE * salida){
-	fprintf(salida, "jmp near fin\n\n");
-	fprintf(salida, "error_1: push dword mensaje_1\n");
-	fprintf(salida, "	  call print_string\n");
-	fprintf(salida, "	  add esp, 4\n");
-	fprintf(salida, "	  jmp near fin\n\n");
-	fprintf(salida, "error_2: push dword mensaje_2\n");
-	fprintf(salida, "         call print_string\n");
-	fprintf(salida, "         add esp, 4\n");
-	fprintf(salida, "         jmp near fin\n\n");
-	fprintf(salida, "fin:\n");
-	fprintf(salida, "mov dword esp, [__esp]\n");
-	fprintf(salida, "ret\n");
+	escribir_fin(salida);
+	// fprintf(salida, "jmp near fin\n\n");
+	// fprintf(salida, "error_1: push dword mensaje_1\n");
+	// fprintf(salida, "	  call print_string\n");
+	// fprintf(salida, "	  add esp, 4\n");
+	// fprintf(salida, "	  jmp near fin\n\n");
+	// fprintf(salida, "error_2: push dword mensaje_2\n");
+	// fprintf(salida, "         call print_string\n");
+	// fprintf(salida, "         add esp, 4\n");
+	// fprintf(salida, "         jmp near fin\n\n");
+	// fprintf(salida, "fin:\n");
+	// fprintf(salida, "mov dword esp, [__esp]\n");
+	// fprintf(salida, "ret\n");
 	return;
 }
 
@@ -1313,20 +1314,21 @@ void gc_mayor(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiq
 }
 
 void gc_vectores_indice(FILE *salida, int es_direccion_op1, char *lexema, int tam_vector){
-	fprintf(salida, "; Cargamos en el registro eax el valor del indice\n");
-	fprintf(salida, "pop dword eax \n");
-	if (es_direccion_op1 == 1){
-		fprintf(salida, "mov dword eax , [eax]\n");
-	}
-	fprintf(salida, "; Si el indice es menor que 0 se produce un error\n");
-	fprintf(salida, "cmp eax,0\n");
-	fprintf(salida, "jl near error_1\n");
-	fprintf(salida, "; Si el indice es mayor de lo estipulado se comete un error\n");
-	fprintf(salida, "cmp eax, %d\n", tam_vector-1);
-	fprintf(salida, "jg near error_1\n");
-	fprintf(salida, "mov dword edx, _%s\n", lexema);
-	fprintf(salida, "lea eax, [edx + eax * 4]\n");
-	fprintf(salida, "push dword eax\n");
+	escribir_elemento_vector(salida,lexema, tam_vector, es_direccion_op1);
+	// fprintf(salida, "; Cargamos en el registro eax el valor del indice\n");
+	// fprintf(salida, "pop dword eax \n");
+	// if (es_direccion_op1 == 1){
+	// 	fprintf(salida, "mov dword eax , [eax]\n");
+	// }
+	// fprintf(salida, "; Si el indice es menor que 0 se produce un error\n");
+	// fprintf(salida, "cmp eax,0\n");
+	// fprintf(salida, "jl near error_1\n");
+	// fprintf(salida, "; Si el indice es mayor de lo estipulado se comete un error\n");
+	// fprintf(salida, "cmp eax, %d\n", tam_vector-1);
+	// fprintf(salida, "jg near error_1\n");
+	// fprintf(salida, "mov dword edx, _%s\n", lexema);
+	// fprintf(salida, "lea eax, [edx + eax * 4]\n");
+	// fprintf(salida, "push dword eax\n");
 	return;
 }
 
@@ -1445,7 +1447,7 @@ void gc_identificador_asignacion_local(FILE *salida, int es_direccion, int categ
 }
 
 void gc_asignar_exp_a_elementovector(FILE *salida, int es_direccion_op1){
-	void asignar_valor_vector(salida, es_direccion_op1);
+	asignar_valor_vector(salida, es_direccion_op1);
 	return;
 }
 
