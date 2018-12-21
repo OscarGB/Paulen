@@ -61,7 +61,6 @@ void gc_mayor(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiq
 void gc_vectores_indice(FILE *salida, int es_direccion_op1, char *lexema, int tam_vector);
 void gc_printf_vectores(FILE *salida, int etiqueta, int tamanio, int tipo);
 void gc_printf(FILE *salida, int es_direccion_op1, int tipo);
-void gc_ident_asiglocal(FILE *salida, int es_direccion, int categoria, int nPar, int pos);
 void gc_asigexp_ident(FILE *salida, int es_direccion_op1, char *lexema);
 void gc_ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta);
 void gc_ifthen_inicio(FILE * salida, int exp_es_variable, int etiqueta);
@@ -366,6 +365,9 @@ clase_vector: TOK_ARRAY tipo '[' TOK_CONSTANTE_ENTERA ']'
 		{
 			fprintf(sintactico,";R: clase_vector: array tipo '[' TOK_CONSTANTE_ENTERA ']'\n");
 			tamanio_vector_actual = $4.valor_entero;
+
+			printf("%d\n", tamanio_vector_actual);
+			printf("%d\n", tipo_actual);
 			if ((tamanio_vector_actual < 1) || (tamanio_vector_actual> MAX_TAM_VECTOR)){
 				printf("****Error semantico en lin %d: El tamanio del vector excede del maximo o es menor que 1.\n", linea);
 				return -1;
@@ -671,6 +673,8 @@ elemento_vector: TOK_IDENTIFICADOR '[' exp ']'
 				return -1;
 			}
 
+			printf("%d\n", tamanio_vector_actual);
+			printf("tabla:%d\n", s->tamanio);
 			gc_escribir_elemento_vector(salida, $3.es_direccion, s->id, s->tamanio);
 			$$.es_direccion = 1;
 			$$.tipo = s->tipo;
@@ -1201,6 +1205,7 @@ identificador: TOK_IDENTIFICADOR
 					}
 				}
 			} else {
+				printf("IDENTIFICADOR:%d\n", tamanio_vector_actual);
 				nombre_actual_simbolo = $1.lexema;
 				nombre_actual_simbolo = addPrefijo("main", nombre_actual_simbolo);
 				if(buscarParaDeclararIdTablaSimbolosAmbitos(simbolos, nombre_actual_simbolo, &s, id_ambito)){
@@ -1208,7 +1213,7 @@ identificador: TOK_IDENTIFICADOR
 				}
 				else{
 					$1.tipo = tipo_actual;
-					nuevoSimboloEnMain(simbolos, nombre_actual_simbolo, clase_actual,tipo_actual,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
+					nuevoSimboloEnMain(simbolos, nombre_actual_simbolo, clase_actual,tipo_actual,0,1,0,0,0,0,0,tamanio_vector_actual,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
 				}
 				fprintf(sintactico,";R: identificador: TOK_IDENTIFICADOR\n");
 				free(nombre_actual_simbolo);
@@ -1330,17 +1335,6 @@ void gc_vectores_indice(FILE *salida, int es_direccion_op1, char *lexema, int ta
 	return;
 }
 
-void gc_ident_asiglocal(FILE *salida, int es_direccion, int categoria, int nPar, int pos){
-	fprintf(salida,"pop dword eax\n");
-	if (es_direccion == 1)
-		fprintf(salida,"mov dword eax, [eax]\n");
-	if (categoria == PARAMETRO){
-		fprintf(salida,"mov dword [ebp+4+4*%d], eax\n", nPar-pos);
-	}else{
-		fprintf(salida,"mov dword [ebp-4*%d], eax\n", pos);
-	}
-	return;
-}
 
 void gc_asigexp_ident(FILE *salida, int es_direccion_op1, char *lexema){
 	fprintf(salida, "; Cargamos en el registro eax la parte derecha de la asignacion\n");

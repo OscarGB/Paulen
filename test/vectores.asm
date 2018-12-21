@@ -21,7 +21,7 @@ mov dword [__esp], esp
 		cmp eax,0
 		jl near mensaje_1
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
-		cmp eax, -1
+		cmp eax, 7
 		jg near mensaje_1
 		mov dword edx, _main_A1
 		lea eax, [edx + eax * 4]
@@ -34,7 +34,7 @@ mov dword [__esp], esp
 		cmp eax,0
 		jl near mensaje_1
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
-		cmp eax, -1
+		cmp eax, 7
 		jg near mensaje_1
 		mov dword edx, _main_A2
 		lea eax, [edx + eax * 4]
@@ -47,7 +47,7 @@ mov dword [__esp], esp
 		cmp eax,0
 		jl near mensaje_1
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
-		cmp eax, -1
+		cmp eax, 7
 		jg near mensaje_1
 		mov dword edx, _main_A1
 		lea eax, [edx + eax * 4]
