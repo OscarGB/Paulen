@@ -29,6 +29,8 @@ _main_factorial@o2:
 		add esp, 4
 		push eax
 		mov dword [eax], _msC
+
+debug1:
 lea eax, [ebp-4*2]
 push dword eax
 		pop eax
@@ -136,6 +138,7 @@ pop dword eax
 mov eax, [eax]
 mov dword esp, ebp
 pop dword ebp
+debug2:
 ret
 
 ; PROCEDIMIENTO PRINCIPAL
@@ -197,9 +200,11 @@ add esp, 4
 pop dword eax
 mov eax, [eax]
 push dword eax
+para_cosas:
 call _main_factorial@o2
 add esp, 4*1
 push dword eax
+debug3:
 
 	; Asignacion de a pila a c2
 	pop dword eax
@@ -213,15 +218,18 @@ push dword eax
 		add esp, 4
 
 	; Guarda el operando c2 en la pila
-	push dword _c2
+	push dword [_c2]
 		pop eax
-		mov dword ebx, [_offset_aiC2]
+debug4:
+		mov dword ebx, 24
 		lea eax, [eax+ebx]
 		push eax
 
+
 ; Escritura
 pop eax
-push dword [eax]
+
+push dword [0x804c44c]
 call print_int
 call print_endofline
 add esp, 4
