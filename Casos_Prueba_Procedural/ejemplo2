@@ -1,0 +1,7 @@
+main
+{
+	int x1, x2;
+	x1 = 8;
+	x2 = 4;
+	printf 3*x1+x2;
+}
