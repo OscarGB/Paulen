@@ -111,10 +111,10 @@ El último argumento es el que indica si lo que hay en la cima de la pila es una
 */
 
 void asignar(FILE* fpasm, char* nombre, int es_variable){
-  fprintf(fpasm, "\n\t\t; Asignacion de a pila a %s\n", nombre);
+  fprintf(fpasm, "\n\t\t; Asignacion de pila a %s\n", nombre);
   fprintf(fpasm, "\t\tpop dword eax\n");
   if(es_variable){
-    fprintf(fpasm, "\t\tmov eax,dword [eax]\n");
+    fprintf(fpasm, "\t\tmov dword eax, [eax]\n");
   }
   else{
     fprintf(fpasm, "\t\tmov dword [_%s], eax\n", nombre);

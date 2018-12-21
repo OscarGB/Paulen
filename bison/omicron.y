@@ -1320,32 +1320,19 @@ void gc_mayor(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiq
 
 void gc_vectores_indice(FILE *salida, int es_direccion_op1, char *lexema, int tam_vector){
 	escribir_elemento_vector(salida,lexema, tam_vector, es_direccion_op1);
-	// fprintf(salida, "; Cargamos en el registro eax el valor del indice\n");
-	// fprintf(salida, "pop dword eax \n");
-	// if (es_direccion_op1 == 1){
-	// 	fprintf(salida, "mov dword eax , [eax]\n");
-	// }
-	// fprintf(salida, "; Si el indice es menor que 0 se produce un error\n");
-	// fprintf(salida, "cmp eax,0\n");
-	// fprintf(salida, "jl near error_1\n");
-	// fprintf(salida, "; Si el indice es mayor de lo estipulado se comete un error\n");
-	// fprintf(salida, "cmp eax, %d\n", tam_vector-1);
-	// fprintf(salida, "jg near error_1\n");
-	// fprintf(salida, "mov dword edx, _%s\n", lexema);
-	// fprintf(salida, "lea eax, [edx + eax * 4]\n");
-	// fprintf(salida, "push dword eax\n");
 	return;
 }
 
 
 void gc_asigexp_ident(FILE *salida, int es_direccion_op1, char *lexema){
-	fprintf(salida, "; Cargamos en el registro eax la parte derecha de la asignacion\n");
-	fprintf(salida, "pop dword eax\n");
-	if (es_direccion_op1==1){
-		fprintf(salida,"mov dword eax, [eax]\n");
-	}
-	fprintf(salida, "; Efectuamos la asignacion\n");
-	fprintf(salida,"mov dword [_%s], eax\n", lexema);
+	asignar(salida, lexema, es_direccion_op1);
+	// fprintf(salida, "; Cargamos en el registro eax la parte derecha de la asignacion\n");
+	// fprintf(salida, "pop dword eax\n");
+	// if (es_direccion_op1==1){
+	// 	fprintf(salida,"mov dword eax, [eax]\n");
+	// }
+	// fprintf(salida, "; Efectuamos la asignacion\n");
+	// fprintf(salida,"mov dword [_%s], eax\n", lexema);
 	return;
 }
 
@@ -1391,11 +1378,13 @@ void gc_asignarDestinoPila(FILE* salida, int es_variable, char * eax, char * ebx
 
 void gc_scanf_funcion(FILE *salida, int num_param_actual, int posicion_parametro, int categoria, int tipo){
 	if (categoria == PARAMETRO){
-		fprintf(salida,"\t\tlea eax, [ebp+4+4*(%d)]\n",num_param_actual - posicion_parametro);
-		fprintf(salida,"\t\tpush dword eax\n");
+		escribirParametro(salida, posicion_parametro, num_param_actual);
+		// fprintf(salida,"\t\tlea eax, [ebp+4+4*(%d)]\n",num_param_actual - posicion_parametro);
+		// fprintf(salida,"\t\tpush dword eax\n");
 	}else {
-		fprintf(salida,"\t\tlea eax, [ebp-4*%d]\n",posicion_parametro);
-		fprintf(salida,"\t\tpush dword eax\n");
+		escribirVariableLocal(salida, posicion_parametro);
+		// fprintf(salida,"\t\tlea eax, [ebp-4*%d]\n",posicion_parametro);
+		// fprintf(salida,"\t\tpush dword eax\n");
 	}
 
 	if(tipo==INT){
