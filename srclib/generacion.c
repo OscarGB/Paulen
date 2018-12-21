@@ -500,6 +500,7 @@ void escribir_elemento_vector(FILE * fpasm,char * nombre_vector, int tam_max, in
 }
 
 void instance_of(FILE *file, char * nombre_clase, int num_ai){
+  fprintf(file, "\t\t; Instanciamos un objeto de clase %s\n", nombre_clase);
   fprintf(file, "\t\tpush %d\n", (num_ai+1)*4);
   fprintf(file, "\t\tcall malloc\n\t\tadd esp, 4\n\t\tpush eax\n");
   fprintf(file, "\t\tmov dword [eax], _ms%s\n", nombre_clase);
@@ -549,6 +550,7 @@ void ifthenelse_fin( FILE * salida, int etiqueta){
 }
 
 void asignarDestinoEnPila(FILE* file, int es_variable) {
+  fprintf(file, "\t\t; Asignamos a la parte superior de la pila\n");
   /*
     pop eax
     pop ebx
@@ -568,6 +570,7 @@ void asignarDestinoEnPila(FILE* file, int es_variable) {
 }
 
 void discardPila (FILE * fd_asm){
+  fprintf(fd_asm, "\t\t; Liberamos la posicion de memoria de arriba de la pila\n");
   fprintf(fd_asm, "\t\tpop eax\n\t\tpush dword [eax]\n");
   fprintf(fd_asm, "\t\tcall free\n\t\tadd esp, 4\n");
 }
@@ -577,6 +580,7 @@ char * claseATabla(char * nombre_fuente_clase){
 }
 
 void llamarMetodoSobreescribibleCualificadoInstanciaPila(FILE * fd_asm, char * nombre_metodo){
+  fprintf(fd_asm, "\t\t; Accedemos al metodo %s\n", nombre_metodo);
   fprintf(fd_asm, "\t\tpop eax\n");
   fprintf(fd_asm, "\t\tmov eax, [eax]\n");
   fprintf(fd_asm, "\t\tmov eax, [eax]\n");
@@ -587,7 +591,9 @@ void llamarMetodoSobreescribibleCualificadoInstanciaPila(FILE * fd_asm, char * n
 }
 
 void accederAtributoInstanciaDePila(FILE * fd_asm, char * nombre_atributo){
+  fprintf(fd_asm, "\t\t; Accedemos al atributo %s\n", nombre_atributo);
   fprintf(fd_asm, "\t\tpop eax\n");
+  fprintf(fd_asm, "\t\tmov eax, [eax]\n");
   fprintf(fd_asm, "\t\tmov dword ebx, [_offset_%s]\n", nombre_atributo);
   fprintf(fd_asm, "\t\tlea eax, [eax+ebx]\n");
   fprintf(fd_asm, "\t\tpush eax\n");
