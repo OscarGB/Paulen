@@ -1235,18 +1235,6 @@ void escribe_variables (FILE * salida, char* nombre, int tamanio){
 
 void imprimir_error(FILE * salida){
 	escribir_fin(salida);
-	// fprintf(salida, "jmp near fin\n\n");
-	// fprintf(salida, "error_1: push dword mensaje_1\n");
-	// fprintf(salida, "	  call print_string\n");
-	// fprintf(salida, "	  add esp, 4\n");
-	// fprintf(salida, "	  jmp near fin\n\n");
-	// fprintf(salida, "error_2: push dword mensaje_2\n");
-	// fprintf(salida, "         call print_string\n");
-	// fprintf(salida, "         add esp, 4\n");
-	// fprintf(salida, "         jmp near fin\n\n");
-	// fprintf(salida, "fin:\n");
-	// fprintf(salida, "mov dword esp, [__esp]\n");
-	// fprintf(salida, "ret\n");
 	return;
 }
 
@@ -1328,13 +1316,6 @@ void gc_vectores_indice(FILE *salida, int es_direccion_op1, char *lexema, int ta
 
 void gc_asigexp_ident(FILE *salida, int es_direccion_op1, char *lexema){
 	asignar(salida, lexema, es_direccion_op1);
-	// fprintf(salida, "; Cargamos en el registro eax la parte derecha de la asignacion\n");
-	// fprintf(salida, "pop dword eax\n");
-	// if (es_direccion_op1==1){
-	// 	fprintf(salida,"mov dword eax, [eax]\n");
-	// }
-	// fprintf(salida, "; Efectuamos la asignacion\n");
-	// fprintf(salida,"mov dword [_%s], eax\n", lexema);
 	return;
 }
 
@@ -1381,12 +1362,8 @@ void gc_asignarDestinoPila(FILE* salida, int es_variable, char * eax, char * ebx
 void gc_scanf_funcion(FILE *salida, int num_param_actual, int posicion_parametro, int categoria, int tipo){
 	if (categoria == PARAMETRO){
 		escribirParametro(salida, posicion_parametro, num_param_actual);
-		// fprintf(salida,"\t\tlea eax, [ebp+4+4*(%d)]\n",num_param_actual - posicion_parametro);
-		// fprintf(salida,"\t\tpush dword eax\n");
 	}else {
 		escribirVariableLocal(salida, posicion_parametro);
-		// fprintf(salida,"\t\tlea eax, [ebp-4*%d]\n",posicion_parametro);
-		// fprintf(salida,"\t\tpush dword eax\n");
 	}
 
 	if(tipo==INT){
