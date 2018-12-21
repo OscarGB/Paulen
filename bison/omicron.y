@@ -7,6 +7,7 @@
 #include <string.h>
 
 #define TIPO_RETORNO numero_atributos_clase
+#define MAX_TAM_VECTOR 256
 
 extern int linea;
 extern int columna;
@@ -38,6 +39,7 @@ int  num_parametros_llamada_actual = 0;
 int fn_return = 0;
 int en_explist = 0;
 int tipo_retorno = 0;
+int tamanio_vector_actual =0;
 char* nombre_prefijo;
 
 void escribe_cabecera (FILE * salida);
@@ -73,11 +75,11 @@ void gc_lectura(FILE * salida, char * nombre, int tipo);
 void gc_inicio_cuerpo_funcion (FILE *salida, char * lexema, int num_variable_locales);
 void gc_final_cuerpo_funcion (FILE *salida, int esdireccion);
 void gc_identificador_asignacion_local(FILE *salida, int es_direccion, int categoria, int numero_param, int posicion);
-void gc_asignar_exp_a_elementovector(FILE *salida, int es_direccion_op1, char *lexema);
+void gc_asignar_exp_a_elementovector(FILE *salida, int es_direccion_op1);
 void gc_llamarfuncion (FILE *salida, char * lexema, int num_parametros);
 void gc_escribirParametro(FILE *salida, int posicion_parametro, int num_parametros_actual);
 void gc_escribirVariableLocal(FILE *salida,int posicion_variable_local);
-void gc_indexacion_vectores(FILE *salida, int es_direccion_op1, char *lexema, int tam_vector);
+void gc_escribir_elemento_vector(FILE *salida, int es_direccion_op1, char *lexema, int tam_vector);
 void gc_while_fin(FILE * salida,int etiqueta);
 void gc_while_inicio(FILE * salida,int  etiqueta);
 void gc_while_exp_pila (FILE * salida, int exp_es_variable, int etiqueta);
@@ -250,6 +252,7 @@ declaraciones: declaracion
 
 declaracion: modificadores_acceso clase identificadores ';'
 		{
+			tamanio_vector_actual =0;
 			fprintf(sintactico,";R: declaracion: modificadores_acceso clase identificadores ';'\n");
 		}
 		|
@@ -362,6 +365,11 @@ clase_objeto: '{' TOK_IDENTIFICADOR '}'
 clase_vector: TOK_ARRAY tipo '[' TOK_CONSTANTE_ENTERA ']'
 		{
 			fprintf(sintactico,";R: clase_vector: array tipo '[' TOK_CONSTANTE_ENTERA ']'\n");
+			tamanio_vector_actual = $4.valor_entero;
+			if ((tamanio_vector_actual < 1) || (tamanio_vector_actual> MAX_TAM_VECTOR)){
+				printf("****Error semantico en lin %d: El tamanio del vector excede del maximo o es menor que 1.\n", linea);
+				return -1;
+			}
 		}
 		;
 
@@ -618,7 +626,9 @@ asignacion: TOK_IDENTIFICADOR '=' exp
 				printf("****Error semántico en lin %d: Asignacion incompatible\n", linea);
 				return -1;
 			}
-			gc_asignar_exp_a_elementovector(salida, $3.es_direccion, $1.lexema);
+			gc_asignar_exp_a_elementovector(salida, $3.es_direccion);
+			$$.tipo=$1.tipo;
+			$$.es_direccion = 0;
 		}
 		|
 		elemento_vector '=' TOK_INSTANCE_OF TOK_IDENTIFICADOR '(' lista_expresiones ')'
@@ -639,6 +649,11 @@ asignacion: TOK_IDENTIFICADOR '=' exp
 
 elemento_vector: TOK_IDENTIFICADOR '[' exp ']'
 		{
+			if($3.tipo != INT){
+				printf("****Error semántico en lin %d: El indice en una operacion de indexacion tiene que ser de tipo entero.\n", linea);
+				return -1;
+			}
+
 			fprintf(sintactico,";R: elemento_vector: TOK_IDENTIFICADOR '[' exp ']'\n");
 			if(simbolos->main_local !=NULL){
 				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
@@ -650,18 +665,17 @@ elemento_vector: TOK_IDENTIFICADOR '[' exp ']'
 				}
 			}
 
-			if($3.tipo != INT){
-				printf("****Error semántico en lin %d: El indice en una operacion de indexacion tiene que ser de tipo entero.\n", linea);
-				return -1;
-			}
+			
 			if (s->clase != VECTOR){
 				printf("****Error semántico en lin %d: Intento de indexacion de una variable que no es de tipo vector.\n", linea);
 				return -1;
 			}
 
+			gc_escribir_elemento_vector(salida, $3.es_direccion, s->id, s->tamanio);
 			$$.es_direccion = 1;
 			$$.tipo = s->tipo;
-			gc_indexacion_vectores(salida, $3.es_direccion, s->id, s->tamanio);
+			printf("%s\n", $1.lexema);
+			
 		}
 		;
 
@@ -1430,16 +1444,8 @@ void gc_identificador_asignacion_local(FILE *salida, int es_direccion, int categ
 	return;
 }
 
-void gc_asignar_exp_a_elementovector(FILE *salida, int es_direccion_op1, char *lexema){
-	fprintf(salida, "\t\t; Cargar en eax la parte derecha de la asignacion\n");
-	fprintf(salida,"\t\tpop dword eax\n");
-	if (es_direccion_op1==1){
-		fprintf(salida,"\t\tmov dword eax, [eax]\n");
-	}
-	fprintf(salida, "\t\t; Cargar en edx la parte izquierda de la asignacion\n");
-	fprintf(salida,"\t\tpop dword edx\n");
-	fprintf(salida, "\t\t; Hacer la asignacion efectiva\n");
-	fprintf(salida,"\t\tmov dword [edx], eax\n");
+void gc_asignar_exp_a_elementovector(FILE *salida, int es_direccion_op1){
+	void asignar_valor_vector(salida, es_direccion_op1);
 	return;
 }
 
@@ -1448,7 +1454,7 @@ void gc_llamarfuncion (FILE *salida, char * lexema, int num_parametros){
 }
 
 
-void gc_indexacion_vectores(FILE *salida, int es_direccion_op1, char *lexema, int tam_vector){
+void gc_escribir_elemento_vector(FILE *salida, int es_direccion_op1, char *lexema, int tam_vector){
 	escribir_elemento_vector(salida,lexema, tam_vector, es_direccion_op1);
 }
 

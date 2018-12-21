@@ -27,12 +27,6 @@ mov dword [__esp], esp
 		lea eax, [edx + eax * 4]
 		push dword eax
 		push dword 2
-		; Cargar en eax la parte derecha de la asignacion
-		pop dword eax
-		; Cargar en edx la parte izquierda de la asignacion
-		pop dword edx
-		; Hacer la asignacion efectiva
-		mov dword [edx], eax
 		push dword 2
 		; carga el valor del indice en eax
 		pop dword eax 
@@ -46,12 +40,6 @@ mov dword [__esp], esp
 		lea eax, [edx + eax * 4]
 		push dword eax
 		push dword 8
-		; Cargar en eax la parte derecha de la asignacion
-		pop dword eax
-		; Cargar en edx la parte izquierda de la asignacion
-		pop dword edx
-		; Hacer la asignacion efectiva
-		mov dword [edx], eax
 		push dword 5
 		; carga el valor del indice en eax
 		pop dword eax 

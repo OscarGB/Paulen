@@ -482,6 +482,17 @@ void while_fin( FILE * fpasm, int etiqueta){
   fprintf(fpasm, "\t\tfin_while%d:\n", etiqueta);
 }
 
+
+void asignarDestinoEnPila(FILE* file, int es_variable) {
+  fprintf(file, "\t\tpop eax\n\t\tpop ebx\n");
+  if(es_variable == 0){
+    fprintf(file, "\t\tmov [eax], ebx\n");
+  }
+  else {
+    fprintf(file, "\t\tmov ebx, [ebx]\n\t\tmov [eax], ebx\n");
+  }
+}
+
 void escribir_elemento_vector(FILE * fpasm,char * nombre_vector, int tam_max, int exp_es_direccion){
   fprintf(fpasm, "\t\t; carga el valor del indice en eax\n");
   fprintf(fpasm, "\t\tpop dword eax \n");
@@ -497,6 +508,18 @@ void escribir_elemento_vector(FILE * fpasm,char * nombre_vector, int tam_max, in
   fprintf(fpasm, "\t\tmov dword edx, _%s\n", nombre_vector);
   fprintf(fpasm, "\t\tlea eax, [edx + eax * 4]\n");
   fprintf(fpasm, "\t\tpush dword eax\n");
+}
+
+void asignar_valor_vector(FILE *fpasm, int exp_es_direccion){
+  fprintf(fpasm, "\t\t; Cargar en eax la parte derecha de la asignacion\n");
+  fprintf(fpasm,"\t\tpop dword eax\n");
+  if (exp_es_direccion==1){
+    fprintf(fpasm,"\t\tmov dword eax, [eax]\n");
+  }
+  fprintf(fpasm, "\t\t; Cargar en edx la parte izquierda de la asignacion\n");
+  fprintf(fpasm,"\t\tpop dword edx\n");
+  fprintf(fpasm, "\t\t; Hacer la asignacion efectiva\n");
+  fprintf(fpasm,"\t\tmov dword [edx], eax\n");
 }
 
 void instance_of(FILE *file, char * nombre_clase, int num_ai){
@@ -548,24 +571,6 @@ void ifthenelse_fin( FILE * salida, int etiqueta){
   fprintf(salida, "\t\t__endifthen_else_%d:\n", etiqueta);
 }
 
-void asignarDestinoEnPila(FILE* file, int es_variable) {
-  /*
-    pop eax
-    pop ebx
-    if es_variable = 0:
-      mov [ebx], eax
-    else:
-      mov eax, [eax]
-      mov [ebx], eax
-  */
-  fprintf(file, "\t\tpop eax\n\t\tpop ebx\n");
-  if(es_variable == 0){
-    fprintf(file, "\t\tmov [eax], ebx\n");
-  }
-  else {
-    fprintf(file, "\t\tmov ebx, [ebx]\n\t\tmov [eax], ebx\n");
-  }
-}
 
 void discardPila (FILE * fd_asm){
   fprintf(fd_asm, "\t\tpop eax\n\t\tpush dword [eax]\n");

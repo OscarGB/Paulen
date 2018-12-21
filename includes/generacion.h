@@ -135,7 +135,7 @@ void ifthenelse_fin_then(FILE* salida, int etiqueta);
 void ifthenelse_fin( FILE * salida, int etiqueta);
 
 void escribir_elemento_vector(FILE * fpasm,char * nombre_vector, int tam_max, int exp_es_direccion);
-
+void asignar_valor_vector(FILE *fpasm, int exp_es_direccion);
 
 /*------------------------------OBJETOS---------------------*/
 void instance_of(FILE *file, char * nombre_clase, int num_ai);
