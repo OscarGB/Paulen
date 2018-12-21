@@ -233,8 +233,13 @@ _main_cuadrado@1:
 _main_factorial@1:
 		push ebp
 		mov ebp, esp
-		sub esp, 4*0
+		sub esp, 4*1
 		lea eax, [ebp+4+4*1]
+		push dword eax
+		pop dword eax
+		mov dword eax, [eax]
+		mov dword [ebp-4*0], eax
+		lea eax, [ebp-4*0]
 		push dword eax
 		push dword 1
 
@@ -262,9 +267,9 @@ _main_factorial@1:
 		; Estamos en la parte del final del then (13) del ifthen_else
 		jmp __end_ifthen_13
 		__end_if_13:
-		lea eax, [ebp+4+4*1]
+		lea eax, [ebp-4*0]
 		push dword eax
-		lea eax, [ebp+4+4*1]
+		lea eax, [ebp-4*0]
 		push dword eax
 		push dword 1
 

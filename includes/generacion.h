@@ -117,6 +117,8 @@ void mayor(FILE* fpasm, int es_variable1, int es_variable2, int etiqueta);
 void leer(FILE* fpasm, char* nombre, int tipo);
 void escribir(FILE* fpasm, int es_variable, int tipo);
 
+/* FUCIONES DE GENERACION DE CODIGO DE FUNCIONES*/
+
 void llamarFuncion(FILE * fpasm, char * nombre_funcion, int num_argumentos);
 void declararFuncion(FILE * fpasm, char * nombre_funcion, int num_var_loc);
 void retornarFuncion(FILE * fpasm, int es_variable);
@@ -125,14 +127,21 @@ void escribirVariableLocal(FILE* fpasm, int posicion_variable_local);
 void operandoEnPilaAArgumento(FILE * fpasm, int es_variable);
 void limpiarPila(FILE * fpasm, int num_argumentos);
 
+/*FUNCIONES DE GESTION DE BUCLES WHILE*/
+
 void while_inicio(FILE * fpasm, int etiqueta);
 void while_exp_pila (FILE * fpasm, int exp_es_variable, int etiqueta);
 void while_fin( FILE * fpasm, int etiqueta);
+
+/* FUNCIONES DE GESTION DE CONDICIONALES IF*/
+
 void ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta);
 void ifthen_inicio(FILE * salida, int exp_es_variable, int etiqueta);
 void ifthen_fin(FILE* salida, int etiqueta);
 void ifthenelse_fin_then(FILE* salida, int etiqueta);
 void ifthenelse_fin( FILE * salida, int etiqueta);
+
+/* FUNCIONES DE GESTION DE VECTORES */
 
 void escribir_elemento_vector(FILE * fpasm,char * nombre_vector, int tam_max, int exp_es_direccion);
 void asignar_valor_vector(FILE *fpasm, int exp_es_direccion);

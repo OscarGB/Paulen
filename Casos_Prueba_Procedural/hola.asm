@@ -4,116 +4,14 @@ mensaje_2 db "Division por cero", 0
 
 segment .bss
 __esp resd 1
+_main_y resd 1
 _main_resultado resd 1
+_main_i resd 1
 _main_x resd 1
 
 segment .text
 global main
 extern print_int, print_boolean, print_string, print_blank, print_endofline, scan_int, scan_boolean
-_main_fibonacci@1:
-		push ebp
-		mov ebp, esp
-		sub esp, 4*2
-		lea eax, [ebp+4+4*1]
-		push dword eax
-		push dword 0
-
-		; Comparacion de igualdad
-		pop dword eax
-		pop dword ebx
-		cmp eax, [ebx]
-		je __igual_0
-		push dword 0
-		jmp __fin_igual_0
-		__igual_0:
-		push dword 1
-		__fin_igual_0:
-		; Comprobamos la condicion: if (1) para ver que es algo asimilable a una variable
-		pop eax
-		cmp eax, 0
-		; En caso de que no se cumpla la condicion nos vamos al final del ifthen
-		je __end_if_1
-		; En caso de que se cumpla nos metemos en el caso del then (1) ya que se cumple la condicion
-		push dword 0
-		pop dword eax
-		mov dword esp, ebp
-		pop dword ebp
-		ret
-		; Estamos en la parte del final del then (1) del ifthen
-		__end_if_1:
-		lea eax, [ebp+4+4*1]
-		push dword eax
-		push dword 1
-
-		; Comparacion de igualdad
-		pop dword eax
-		pop dword ebx
-		cmp eax, [ebx]
-		je __igual_2
-		push dword 0
-		jmp __fin_igual_2
-		__igual_2:
-		push dword 1
-		__fin_igual_2:
-		; Comprobamos la condicion: if (3) para ver que es algo asimilable a una variable
-		pop eax
-		cmp eax, 0
-		; En caso de que no se cumpla la condicion nos vamos al final del ifthen
-		je __end_if_3
-		; En caso de que se cumpla nos metemos en el caso del then (3) ya que se cumple la condicion
-		push dword 1
-		pop dword eax
-		mov dword esp, ebp
-		pop dword ebp
-		ret
-		; Estamos en la parte del final del then (3) del ifthen
-		__end_if_3:
-		lea eax, [ebp+4+4*1]
-		push dword eax
-		push dword 1
-
-		; Resta
-		pop dword ebx
-		pop dword eax
-		mov dword eax, [eax]
-		sub eax, ebx
-		push dword eax
-		call _main_fibonacci@1
-		add esp, 4*1
-		push dword eax
-		pop dword eax
-		mov dword [ebp-4*0], eax
-		lea eax, [ebp+4+4*0]
-		push dword eax
-		push dword 2
-
-		; Resta
-		pop dword ebx
-		pop dword eax
-		mov dword eax, [eax]
-		sub eax, ebx
-		push dword eax
-		call _main_fibonacci@1
-		add esp, 4*1
-		push dword eax
-		pop dword eax
-		mov dword [ebp-4*0], eax
-		lea eax, [ebp-4*0]
-		push dword eax
-		lea eax, [ebp-4*0]
-		push dword eax
-
-		; Suma
-		pop dword ebx
-		pop dword eax
-		mov dword eax, [eax]
-		mov dword ebx, [ebx]
-		add eax, ebx
-		push dword eax
-		pop dword eax
-		mov dword esp, ebp
-		pop dword ebp
-		ret
 
 ; PROCEDIMIENTO PRINCIPAL
 main:
@@ -123,14 +21,69 @@ mov dword [__esp], esp
 		push dword _main_x
 		call scan_int
 		add esp, 4
-		push dword [_main_x]
-		call _main_fibonacci@1
-		add esp, 4*1
+
+		; Lectura
+		push dword _main_y
+		call scan_int
+		add esp, 4
+		push dword 0
+
+		; Asignacion de pila a main_resultado
+		pop dword eax
+		mov dword [_main_resultado], eax
+		push dword 0
+
+		; Asignacion de pila a main_i
+		pop dword eax
+		mov dword [_main_i], eax
+		inicio_while1:
+		push dword _main_i
+		push dword _main_y
+
+		; Comparacion de menor
+		pop dword ebx
+		pop dword eax
+		mov eax, dword [eax]
+		mov ebx, dword [ebx]
+		cmp eax, ebx
+		jl __menor_1
+		push dword 0
+		jmp __fin_menor_1
+		__menor_1:
+		push dword 1
+		__fin_menor_1:
+		pop eax
+		cmp eax, 0
+		je near fin_while1
+		push dword _main_resultado
+		push dword _main_x
+
+		; Suma
+		pop dword ebx
+		pop dword eax
+		mov dword eax, [eax]
+		mov dword ebx, [ebx]
+		add eax, ebx
 		push dword eax
 
 		; Asignacion de pila a main_resultado
 		pop dword eax
 		mov dword [_main_resultado], eax
+		push dword _main_i
+		push dword 1
+
+		; Suma
+		pop dword ebx
+		pop dword eax
+		mov dword eax, [eax]
+		add eax, ebx
+		push dword eax
+
+		; Asignacion de pila a main_i
+		pop dword eax
+		mov dword [_main_i], eax
+		jmp near inicio_while1
+		fin_while1:
 		push dword _main_resultado
 
 		; Escritura

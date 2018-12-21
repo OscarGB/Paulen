@@ -1,18 +1,10 @@
 main
 {
-    boolean a, b, c;
-
+	boolean a,b,c;
 	scanf a;
 	scanf b;
-      scanf c;
-
+	scanf c;
 	printf a || b && c;
-	printf ( a || b) && c;
+	printf (a || b) && c;
 	printf !a && b && !c;
-
 }
-
-
-
-
-

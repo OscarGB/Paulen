@@ -350,11 +350,27 @@ sentencias '}'
 ;R: resto_parametros_funcion: 
 ;R: parametros_funcion: parametro_funcion resto_parametros_funcion
 '(' parametros_funcion ')' ;D: {
-;D: if
-;R: declaraciones_funcion:
-'{' declaraciones_funcion ;D: (
-;D: (
+;D: int
+;R: modificadores_acceso: 
+;R: tipo: TOK_INT
+;R: clase_escalar: tipo
+;R: clase: clase_escalar
+;D: m
+;D: ;
+;R: identificadores: TOK_IDENTIFICADOR
+;R: declaracion: modificadores_acceso clase identificadores ';'
+;D: m
+;R: declaraciones: declaracion
+;R: declaraciones_funcion: declaraciones
+'{' declaraciones_funcion ;D: =
 ;D: n
+;D: ;
+;R: sentencia_simple: asignacion
+;R: sentencia: sentencia_simple ';'
+;D: if
+;D: (
+;D: (
+;D: m
 ;D: ==
 ;D: 1
 ;R: constante_entera: TOK_CONSTANTE_ENTERA
@@ -381,11 +397,11 @@ sentencias '}'
 ;R: if_exp_sentencias: if_exp sentencias '}'
 ;D: {
 ;D: return
-;D: n
+;D: m
 ;D: *
 ;D: factorial
 ;D: (
-;D: n
+;D: m
 ;D: -
 ;D: 1
 ;R: constante_entera: TOK_CONSTANTE_ENTERA
@@ -408,6 +424,7 @@ sentencias '}'
 ;R: sentencia: bloque
 ;D: }
 ;R: sentencias: sentencia
+;R: sentencias: sentencia sentencias
 sentencias '}'
 ;D: scanf
 ;R: funciones: 

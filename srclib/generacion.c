@@ -420,6 +420,8 @@ void escribir(FILE* fpasm, int es_variable, int tipo){
   fprintf(fpasm, "\t\tadd esp, 4\n\n");/*Limpiamos la pìla*/
 }
 
+/* FUCIONES DE GENERACION DE CODIGO DE FUNCIONES*/
+
 void llamarFuncion(FILE * fpasm, char * nombre_funcion, int num_argumentos){
   fprintf(fpasm, "\t\tcall _%s\n", nombre_funcion);
   fprintf(fpasm, "\t\tadd esp, 4*%d\n", num_argumentos);
@@ -465,6 +467,8 @@ void limpiarPila(FILE * fpasm, int num_argumentos){
   fprintf(fpasm, "\t\tadd esp, 4*%d\n", num_argumentos);
 }
 
+/*FUNCIONES DE GESTION DE BUCLES WHILE*/
+
 void while_inicio(FILE * fpasm, int etiqueta){
   fprintf(fpasm, "\t\tinicio_while%d:\n", etiqueta);
 }
@@ -483,52 +487,7 @@ void while_fin( FILE * fpasm, int etiqueta){
   fprintf(fpasm, "\t\tfin_while%d:\n", etiqueta);
 }
 
-
-void asignarDestinoEnPila(FILE* file, int es_variable) {
-  fprintf(file, "\t\tpop eax\n\t\tpop ebx\n");
-  if(es_variable == 0){
-    fprintf(file, "\t\tmov [eax], ebx\n");
-  }
-  else {
-    fprintf(file, "\t\tmov ebx, [ebx]\n\t\tmov [eax], ebx\n");
-  }
-}
-
-void escribir_elemento_vector(FILE * fpasm,char * nombre_vector, int tam_max, int exp_es_direccion){
-  fprintf(fpasm, "\t\t; carga el valor del indice en eax\n");
-  fprintf(fpasm, "\t\tpop dword eax \n");
-  if (exp_es_direccion == 1){
-    fprintf(fpasm, "\t\tmov dword eax , [eax]\n");
-  }
-  fprintf(fpasm, "\t\t; Si el indice es menor que 0, error en tiempo de ejecucion\n");
-  fprintf(fpasm, "\t\tcmp eax,0\n");
-  fprintf(fpasm, "\t\tjl near __error_rango\n");
-  fprintf(fpasm, "\t\t; Si el indice es mayor de lo permitido, error en tiempo de ejecucion\n");
-  fprintf(fpasm, "\t\tcmp eax, %d\n", tam_max-1);
-  fprintf(fpasm, "\t\tjg near __error_rango\n");
-  fprintf(fpasm, "\t\tmov dword edx, _%s\n", nombre_vector);
-  fprintf(fpasm, "\t\tlea eax, [edx + eax * 4]\n");
-  fprintf(fpasm, "\t\tpush dword eax\n");
-}
-
-void asignar_valor_vector(FILE *fpasm, int exp_es_direccion){
-  fprintf(fpasm, "\t\t; Cargar en eax la parte derecha de la asignacion\n");
-  fprintf(fpasm,"\t\tpop dword eax\n");
-  if (exp_es_direccion==1){
-    fprintf(fpasm,"\t\tmov dword eax, [eax]\n");
-  }
-  fprintf(fpasm, "\t\t; Cargar en edx la parte izquierda de la asignacion\n");
-  fprintf(fpasm,"\t\tpop dword edx\n");
-  fprintf(fpasm, "\t\t; Hacer la asignacion efectiva\n");
-  fprintf(fpasm,"\t\tmov dword [edx], eax\n");
-}
-
-void instance_of(FILE *file, char * nombre_clase, int num_ai){
-  fprintf(file, "\t\t; Instanciamos un objeto de clase %s\n", nombre_clase);
-  fprintf(file, "\t\tpush %d\n", (num_ai+1)*4);
-  fprintf(file, "\t\tcall malloc\n\t\tadd esp, 4\n\t\tpush eax\n");
-  fprintf(file, "\t\tmov dword [eax], _ms%s\n", nombre_clase);
-}
+/* FUNCIONES DE GESTION DE CONDICIONALES IF*/
 
 void ifthenelse_inicio(FILE * salida, int exp_es_variable, int etiqueta){
   fprintf(salida,"\t\t; Comprobamos la condicion: if (%d) para ver que es algo asimilable a una variable\n", etiqueta);
@@ -571,6 +530,56 @@ void ifthenelse_fin_then(FILE* salida, int etiqueta){
 void ifthenelse_fin( FILE * salida, int etiqueta){
   fprintf(salida, "\t\t; Estamos en la parte del final del else (%d) del ifthen_else\n", etiqueta);
   fprintf(salida, "\t\t__end_ifthen_%d:\n", etiqueta);
+}
+
+/* FUNCIONES DE GESTION DE VECTORES */
+
+void escribir_elemento_vector(FILE * fpasm,char * nombre_vector, int tam_max, int exp_es_direccion){
+  fprintf(fpasm, "\t\t; carga el valor del indice en eax\n");
+  fprintf(fpasm, "\t\tpop dword eax \n");
+  if (exp_es_direccion == 1){
+    fprintf(fpasm, "\t\tmov dword eax , [eax]\n");
+  }
+  fprintf(fpasm, "\t\t; Si el indice es menor que 0, error en tiempo de ejecucion\n");
+  fprintf(fpasm, "\t\tcmp eax,0\n");
+  fprintf(fpasm, "\t\tjl near __error_rango\n");
+  fprintf(fpasm, "\t\t; Si el indice es mayor de lo permitido, error en tiempo de ejecucion\n");
+  fprintf(fpasm, "\t\tcmp eax, %d\n", tam_max-1);
+  fprintf(fpasm, "\t\tjg near __error_rango\n");
+  fprintf(fpasm, "\t\tmov dword edx, _%s\n", nombre_vector);
+  fprintf(fpasm, "\t\tlea eax, [edx + eax * 4]\n");
+  fprintf(fpasm, "\t\tpush dword eax\n");
+}
+
+void asignar_valor_vector(FILE *fpasm, int exp_es_direccion){
+  fprintf(fpasm, "\t\t; Cargar en eax la parte derecha de la asignacion\n");
+  fprintf(fpasm,"\t\tpop dword eax\n");
+  if (exp_es_direccion==1){
+    fprintf(fpasm,"\t\tmov dword eax, [eax]\n");
+  }
+  fprintf(fpasm, "\t\t; Cargar en edx la parte izquierda de la asignacion\n");
+  fprintf(fpasm,"\t\tpop dword edx\n");
+  fprintf(fpasm, "\t\t; Hacer la asignacion efectiva\n");
+  fprintf(fpasm,"\t\tmov dword [edx], eax\n");
+}
+
+/*------------------------------OBJETOS---------------------*/
+
+void instance_of(FILE *file, char * nombre_clase, int num_ai){
+  fprintf(file, "\t\t; Instanciamos un objeto de clase %s\n", nombre_clase);
+  fprintf(file, "\t\tpush %d\n", (num_ai+1)*4);
+  fprintf(file, "\t\tcall malloc\n\t\tadd esp, 4\n\t\tpush eax\n");
+  fprintf(file, "\t\tmov dword [eax], _ms%s\n", nombre_clase);
+}
+
+void asignarDestinoEnPila(FILE* file, int es_variable) {
+  fprintf(file, "\t\tpop eax\n\t\tpop ebx\n");
+  if(es_variable == 0){
+    fprintf(file, "\t\tmov [eax], ebx\n");
+  }
+  else {
+    fprintf(file, "\t\tmov ebx, [ebx]\n\t\tmov [eax], ebx\n");
+  }
 }
 
 void discardPila (FILE * fd_asm){

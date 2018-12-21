@@ -36,10 +36,12 @@ main{
 		return x*x;
 	}
 	function int factorial(int n){
-		if ((n == 1)){
+		int m;
+		m = n;
+		if ((m == 1)){
 			return 1;
 		}else{
-			return n * factorial(n-1);
+			return m * factorial(m-1);
 		}
 	}
 	scanf x; //2

@@ -8,173 +8,94 @@
 ;D: x
 ;R: identificador: TOK_IDENTIFICADOR
 ;D: ,
+;D: y
+;R: identificador: TOK_IDENTIFICADOR
+;D: ,
+;D: i
+;R: identificador: TOK_IDENTIFICADOR
+;D: ,
 ;D: resultado
 ;R: identificador: TOK_IDENTIFICADOR
 ;D: ;
 ;R: identificadores: TOK_IDENTIFICADOR
 ;R: identificadores: TOK_IDENTIFICADOR ',' identificadores
-;R: declaracion: modificadores_acceso clase identificadores ';'
-;D: function
-;R: declaraciones: declaracion
-;D: int
-;R: modificadores_acceso: 
-;R: tipo: TOK_INT
-;R: tipo_retorno: tipo
-;D: fibonacci
-;R: funcion: TOK_FUNCTION modificadores_acceso tipo_retorno TOK_IDENTIFICADOR ;D: (
-;D: int
-;R: tipo: TOK_INT
-;D: num1
-;R: parametro_funcion: tipo TOK_IDENTIFICADOR
-;D: )
-;R: resto_parametros_funcion: 
-;R: parametros_funcion: parametro_funcion resto_parametros_funcion
-'(' parametros_funcion ')' ;D: {
-;D: int
-;R: modificadores_acceso: 
-;R: tipo: TOK_INT
-;R: clase_escalar: tipo
-;R: clase: clase_escalar
-;D: res1
-;D: ,
-;D: res2
-;D: ;
-;R: identificadores: TOK_IDENTIFICADOR
+;R: identificadores: TOK_IDENTIFICADOR ',' identificadores
 ;R: identificadores: TOK_IDENTIFICADOR ',' identificadores
 ;R: declaracion: modificadores_acceso clase identificadores ';'
-;D: if
-;R: declaraciones: declaracion
-;R: declaraciones_funcion: declaraciones
-'{' declaraciones_funcion ;D: (
-;D: (
-;D: num1
-;D: ==
-;D: 0
-;R: constante_entera: TOK_CONSTANTE_ENTERA
-;R: constante: constante_entera
-;R: exp: constante
-;D: )
-;R: comparacion: exp TOK_IGUAL exp
-;R: exp: '(' comparacion ')'
-;D: )
-;D: {
-;R: if_exp: TOK_IF '(' exp ')' '{'
-;D: return
-;D: 0
-;R: constante_entera: TOK_CONSTANTE_ENTERA
-;R: constante: constante_entera
-;R: exp: constante
-;D: ;
-;R: retorno_funcion: TOK_RETURN exp
-;R: sentencia_simple: retorno_funcion
-;R: sentencia: sentencia_simple ';'
-;D: }
-;R: sentencias: sentencia
-;D: if
-;R: condicional: if_exp '(' exp ')' '{' sentencias '}'
-;R: bloque: condicional
-;R: sentencia: bloque
-;D: (
-;D: (
-;D: num1
-;D: ==
-;D: 1
-;R: constante_entera: TOK_CONSTANTE_ENTERA
-;R: constante: constante_entera
-;R: exp: constante
-;D: )
-;R: comparacion: exp TOK_IGUAL exp
-;R: exp: '(' comparacion ')'
-;D: )
-;D: {
-;R: if_exp: TOK_IF '(' exp ')' '{'
-;D: return
-;D: 1
-;R: constante_entera: TOK_CONSTANTE_ENTERA
-;R: constante: constante_entera
-;R: exp: constante
-;D: ;
-;R: retorno_funcion: TOK_RETURN exp
-;R: sentencia_simple: retorno_funcion
-;R: sentencia: sentencia_simple ';'
-;D: }
-;R: sentencias: sentencia
-;D: res1
-;R: condicional: if_exp '(' exp ')' '{' sentencias '}'
-;R: bloque: condicional
-;R: sentencia: bloque
-;D: =
-;D: fibonacci
-;D: (
-;D: num1
-;D: -
-;D: 1
-;R: constante_entera: TOK_CONSTANTE_ENTERA
-;R: constante: constante_entera
-;R: exp: constante
-;D: )
-;R: exp: exp '-' exp
-;R: resto_lista_expresiones: 
-;R: lista_expresiones: exp resto_lista_expresiones
-;R: exp: TOK_IDENTIFICADOR '(' lista_expresiones ')'
-;D: ;
-;R: sentencia_simple: asignacion
-;R: sentencia: sentencia_simple ';'
-;D: res2
-;D: =
-;D: fibonacci
-;D: (
-;D: num1
-;D: -
-;D: 2
-;R: constante_entera: TOK_CONSTANTE_ENTERA
-;R: constante: constante_entera
-;R: exp: constante
-;D: )
-;R: exp: exp '-' exp
-;R: resto_lista_expresiones: 
-;R: lista_expresiones: exp resto_lista_expresiones
-;R: exp: TOK_IDENTIFICADOR '(' lista_expresiones ')'
-;D: ;
-;R: sentencia_simple: asignacion
-;R: sentencia: sentencia_simple ';'
-;D: return
-;D: res1
-;D: +
-;D: res2
-;D: ;
-;R: exp: exp '+' exp
-;R: retorno_funcion: TOK_RETURN exp
-;R: sentencia_simple: retorno_funcion
-;R: sentencia: sentencia_simple ';'
-;D: }
-;R: sentencias: sentencia
-;R: sentencias: sentencia sentencias
-;R: sentencias: sentencia sentencias
-;R: sentencias: sentencia sentencias
-;R: sentencias: sentencia sentencias
-sentencias '}'
 ;D: scanf
+;R: declaraciones: declaracion
 ;R: funciones: 
-;R: funciones: funcion funciones
 ;D: x
+;D: ;
+;R: lectura: TOK_SCANF TOK_IDENTIFICADOR
+;R: sentencia_simple: lectura
+;R: sentencia: sentencia_simple ';'
+;D: scanf
+;D: y
 ;D: ;
 ;R: lectura: TOK_SCANF TOK_IDENTIFICADOR
 ;R: sentencia_simple: lectura
 ;R: sentencia: sentencia_simple ';'
 ;D: resultado
 ;D: =
-;D: fibonacci
-;D: (
-;D: x
-;D: )
-;R: resto_lista_expresiones: 
-;R: lista_expresiones: exp resto_lista_expresiones
-;R: exp: TOK_IDENTIFICADOR '(' lista_expresiones ')'
+;D: 0
+;R: constante_entera: TOK_CONSTANTE_ENTERA
+;R: constante: constante_entera
+;R: exp: constante
 ;D: ;
 ;R: asignacion:  TOK_IDENTIFICADOR '=' exp
 ;R: sentencia_simple: asignacion
 ;R: sentencia: sentencia_simple ';'
+;D: i
+;D: =
+;D: 0
+;R: constante_entera: TOK_CONSTANTE_ENTERA
+;R: constante: constante_entera
+;R: exp: constante
+;D: ;
+;R: asignacion:  TOK_IDENTIFICADOR '=' exp
+;R: sentencia_simple: asignacion
+;R: sentencia: sentencia_simple ';'
+;D: while
+;D: (
+;D: (
+;D: i
+;D: <
+;D: y
+;D: )
+;R: comparacion: exp '<' exp
+;R: exp: '(' comparacion ')'
+;D: )
+;D: {
+;D: resultado
+;D: =
+;D: resultado
+;D: +
+;D: x
+;D: ;
+;R: exp: exp '+' exp
+;R: asignacion:  TOK_IDENTIFICADOR '=' exp
+;R: sentencia_simple: asignacion
+;R: sentencia: sentencia_simple ';'
+;D: i
+;D: =
+;D: i
+;D: +
+;D: 1
+;R: constante_entera: TOK_CONSTANTE_ENTERA
+;R: constante: constante_entera
+;R: exp: constante
+;D: ;
+;R: exp: exp '+' exp
+;R: asignacion:  TOK_IDENTIFICADOR '=' exp
+;R: sentencia_simple: asignacion
+;R: sentencia: sentencia_simple ';'
+;D: }
+;R: sentencias: sentencia
+;R: sentencias: sentencia sentencias
+;R: bucle: TOK_WHILE '(' exp ')' '{' sentencias '}'
+;R: bloque: bucle
+;R: sentencia: bloque
 ;D: printf
 ;D: resultado
 ;D: ;
@@ -183,6 +104,9 @@ sentencias '}'
 ;R: sentencia: sentencia_simple ';'
 ;D: }
 ;R: sentencias: sentencia
+;R: sentencias: sentencia sentencias
+;R: sentencias: sentencia sentencias
+;R: sentencias: sentencia sentencias
 ;R: sentencias: sentencia sentencias
 ;R: sentencias: sentencia sentencias
 ;R: programa: TOK_MAIN '{' declaraciones funciones sentencias '}'

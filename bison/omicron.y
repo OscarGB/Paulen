@@ -634,7 +634,6 @@ asignacion: TOK_IDENTIFICADOR '=' exp
 		|
 		elemento_vector '=' exp
 		{
-			printf("HOLA ME ESCUCHAN MIS VIDAS\n");
 			fprintf(sintactico,";R: asignacion: elemento_vector '=' exp\n");
 			if ($1.tipo != $3.tipo){
 				printf("****Error semántico en lin %d: Asignacion incompatible\n", linea);
@@ -787,10 +786,6 @@ lectura: TOK_SCANF TOK_IDENTIFICADOR
 					printf("****Error semántico en lin %d: Variable local de tipo no escalar.\n", linea);
 					return -1;
 				}
-				if(s->clase != ESCALAR){
-					printf("****Error semántico en lin %d: Variable local de tipo no escalar.\n", linea);
-					return -1;
-				}
 				gc_lectura(salida, s->id, s->tipo);
 			}
 			fprintf(sintactico,";R: lectura: TOK_SCANF TOK_IDENTIFICADOR\n");
@@ -804,7 +799,6 @@ lectura: TOK_SCANF TOK_IDENTIFICADOR
 
 escritura: TOK_PRINTF exp
 		{
-			printf("VALOR_ESCRITURA:%d\n", $2.valor_entero);
 			gc_printf(salida, $2.es_direccion, $2.tipo);
 			fprintf(sintactico,";R: escritura: TOK_PRINTF exp\n");
 		}
@@ -1016,11 +1010,6 @@ exp: exp '+' exp
 			}
 			nombre_funcion = crearNombreFuncion($1.lexema, num_parametros_llamada_actual, tipos_parametros);
 			nombre_prefijo= addPrefijo("main", nombre_funcion);
-			printf("%s\n", nombre_prefijo);
-			for (int i = 0; i < num_parametros_llamada_actual; ++i)
-			{
-				printf("PARAMETROS:%d\n", tipos_parametros[i]);
-			}
 			if(buscarIdNoCualificado(simbolos, nombre_funcion, "main", &s, id_ambito)==ERROR){
 				printf("****Error semántico en lin %d: Acceso a funcion no declarada, revisar parametros o nombre de la funcion(%s).\n", linea, $1.lexema);
 				return -1;
@@ -1077,7 +1066,6 @@ identificador_clase: TOK_IDENTIFICADOR
 
 lista_expresiones: exp resto_lista_expresiones
 		{
-			printf("NOMBRE_PA:%s\n", $1.lexema);
 			fprintf(sintactico,";R: lista_expresiones: exp resto_lista_expresiones\n");
 			en_explist = 0;
 			tipos_parametros[num_parametros_llamada_actual]=$1.tipo;
@@ -1086,13 +1074,13 @@ lista_expresiones: exp resto_lista_expresiones
 		|
 		/*vacio*/
 		{
+			en_explist=0;
 			fprintf(sintactico,";R: lista_expresiones: \n");
 		}
 		;
 
 resto_lista_expresiones: ',' exp resto_lista_expresiones
 		{
-			printf("NOMBRE_PA:%s\n", $2.lexema);
 			fprintf(sintactico,";R: resto_lista_expresiones: exp resto_lista_expresiones\n");
 			tipos_parametros[num_parametros_llamada_actual]=$2.tipo;
 			num_parametros_llamada_actual++;
@@ -1230,26 +1218,19 @@ idpf : TOK_IDENTIFICADOR
 			clase_actual = ESCALAR;
 			strcpy(nombres_parametros[pos_parametro_actual], $1.lexema);
 			tipos_parametros[pos_parametro_actual] = tipo_actual;
-			printf("LOLO%d\n", tipos_parametros[pos_parametro_actual]);
 			pos_parametro_actual++;
 		  	num_parametros_actual++;
 		};
 
 identificador: TOK_IDENTIFICADOR
-		{/*REPASAR PORQUE SOLO PUEDEN SER VARIABLES PERO COMO ELLOS LO HAN IMPLEMENTADO NO PODEMOS METER CATEGORIA VARIABLE*/
+		{
 			if(simbolos->main_local != NULL){
 			nombre_actual_simbolo = addPrefijo(ht_get_name(simbolos->main_local), $1.lexema);
 				if(buscarIdNoCualificado(simbolos, $1.lexema, "main", &s, id_ambito)==ERROR){
-					if(tipo_actual == ESCALAR){
-						nuevoSimboloEnMain(simbolos, nombre_actual_simbolo, clase_actual,tipo_actual,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
-						pos_variable_local_actual++;
-						num_variables_locales_actual++;
-						free(nombre_actual_simbolo);
-					}else{
-						printf("****Error semántico en lin %d: Variable local de tipo no escalar.\n", linea);
-						free(nombre_actual_simbolo);
-						return -1;
-					}
+					nuevoSimboloEnMain(simbolos, nombre_actual_simbolo, clase_actual,tipo_actual,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,EXPOSED,0,0,0,0,0,0,0,NULL);
+					pos_variable_local_actual++;
+					num_variables_locales_actual++;
+					free(nombre_actual_simbolo);
 				}
 			} else {
 				nombre_actual_simbolo = $1.lexema;
