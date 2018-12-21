@@ -19,10 +19,10 @@ mov dword [__esp], esp
 		pop dword eax 
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
 		cmp eax, -1
-		jg near mensaje_1
+		jg near __error_rango
 		mov dword edx, _main_A1
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -32,10 +32,10 @@ mov dword [__esp], esp
 		pop dword eax 
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
 		cmp eax, -1
-		jg near mensaje_1
+		jg near __error_rango
 		mov dword edx, _main_A2
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -45,10 +45,10 @@ mov dword [__esp], esp
 		pop dword eax 
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
 		cmp eax, -1
-		jg near mensaje_1
+		jg near __error_rango
 		mov dword edx, _main_A1
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -60,18 +60,18 @@ mov dword [__esp], esp
 		call print_endofline
 		add esp, 4
 
-jmp near fin
 
-error_1: push dword mensaje_1
-	  call print_string
-	  add esp, 4
-	  jmp near fin
-
-error_2: push dword mensaje_2
-         call print_string
-         add esp, 4
-         jmp near fin
-
-fin:
-mov dword esp, [__esp]
-ret
+		;FINAL DEL PROGRAMA
+		jmp near _fin
+__error_division:
+		push mensaje_2
+		jmp near __salida_mensaje_error
+__error_rango:
+		push mensaje_1
+		jmp near __salida_mensaje_error
+__salida_mensaje_error:
+		call print_string
+		call print_endofline
+		_fin:
+		mov dword esp, [__esp]
+		ret
