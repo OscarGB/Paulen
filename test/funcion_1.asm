@@ -176,7 +176,7 @@ mov dword [__esp], esp
 		push dword _main_z
 		call scan_int
 		add esp, 4
-push dword [_main_z]
+		push dword [_main_z]
 		call _main_doble@1
 		add esp, 4*1
 		push dword eax
@@ -196,8 +196,8 @@ push dword [_main_z]
 		push dword _main_x2
 		call scan_int
 		add esp, 4
-push dword [_main_x1]
-push dword [_main_x2]
+		push dword [_main_x1]
+		push dword [_main_x2]
 		call _main_igual@1@1
 		add esp, 4*2
 		push dword eax
@@ -222,9 +222,9 @@ push dword [_main_x2]
 		push dword _main_y1
 		call scan_boolean
 		add esp, 4
-push dword [_main_x1]
-push dword [_main_x2]
-push dword [_main_y1]
+		push dword [_main_x1]
+		push dword [_main_x2]
+		push dword [_main_y1]
 		call _main_imprime@1@1@3
 		add esp, 4*3
 		push dword eax
@@ -234,18 +234,18 @@ push dword [_main_y1]
 		call print_endofline
 		add esp, 4
 
-jmp near fin
 
-error_1: push dword mensaje_1
-	  call print_string
-	  add esp, 4
-	  jmp near fin
-
-error_2: push dword mensaje_2
-         call print_string
-         add esp, 4
-         jmp near fin
-
-fin:
-mov dword esp, [__esp]
-ret
+		;FINAL DEL PROGRAMA
+		jmp near _fin
+__error_division:
+		push mensaje_2
+		jmp near __salida_mensaje_error
+__error_rango:
+		push mensaje_1
+		jmp near __salida_mensaje_error
+__salida_mensaje_error:
+		call print_string
+		call print_endofline
+		_fin:
+		mov dword esp, [__esp]
+		ret

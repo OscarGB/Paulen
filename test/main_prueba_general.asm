@@ -309,8 +309,8 @@ mov dword [__esp], esp
 		push dword _main_z
 		call scan_int
 		add esp, 4
-push dword _main_x
-push dword _main_y
+		push dword _main_x
+		push dword _main_y
 
 		; Suma
 		pop dword ebx
@@ -325,8 +325,8 @@ push dword _main_y
 		call print_endofline
 		add esp, 4
 
-push dword _main_x
-push dword _main_y
+		push dword _main_x
+		push dword _main_y
 
 		; Resta
 		pop dword ebx
@@ -340,8 +340,8 @@ push dword _main_y
 		call print_endofline
 		add esp, 4
 
-push dword _main_x
-push dword _main_y
+		push dword _main_x
+		push dword _main_y
 
 		; Multiplicacion
 		pop dword ebx
@@ -355,8 +355,8 @@ push dword _main_y
 		call print_endofline
 		add esp, 4
 
-push dword _main_x
-push dword _main_y
+		push dword _main_x
+		push dword _main_y
 
 		; Division
 		pop dword ebx
@@ -374,7 +374,7 @@ push dword _main_y
 		call print_endofline
 		add esp, 4
 
-push dword _main_x
+		push dword _main_x
 
 		; Cambio de signo
 		pop dword eax
@@ -387,9 +387,9 @@ push dword _main_x
 		call print_endofline
 		add esp, 4
 
-push dword _main_x
-push dword _main_y
-push dword _main_z
+		push dword _main_x
+		push dword _main_y
+		push dword _main_z
 
 		; Multiplicacion
 		pop dword ebx
@@ -410,8 +410,8 @@ push dword _main_z
 		call print_endofline
 		add esp, 4
 
-push dword _main_x
-push dword _main_y
+		push dword _main_x
+		push dword _main_y
 
 		; Suma
 		pop dword ebx
@@ -420,7 +420,7 @@ push dword _main_y
 		mov dword ebx, [ebx]
 		add eax, ebx
 		push dword eax
-push dword _main_z
+		push dword _main_z
 
 		; Multiplicacion
 		pop dword ebx
@@ -448,8 +448,8 @@ mov dword [_main_b], eax
 pop dword eax
 ; Efectuamos la asignacion
 mov dword [_main_c], eax
-push dword _main_a
-push dword _main_b
+		push dword _main_a
+		push dword _main_b
 
 		; Conjuncion logica
 		pop dword ebx
@@ -461,7 +461,7 @@ push dword _main_b
 pop dword eax
 ; Efectuamos la asignacion
 mov dword [_main_resultado], eax
-push dword _main_resultado
+		push dword _main_resultado
 
 		; Escritura
 		pop eax
@@ -470,8 +470,8 @@ push dword _main_resultado
 		call print_endofline
 		add esp, 4
 
-push dword _main_a
-push dword _main_b
+		push dword _main_a
+		push dword _main_b
 
 		; Disyuncion logica
 		pop dword ebx
@@ -483,7 +483,7 @@ push dword _main_b
 pop dword eax
 ; Efectuamos la asignacion
 mov dword [_main_resultado], eax
-push dword _main_resultado
+		push dword _main_resultado
 
 		; Escritura
 		pop eax
@@ -492,7 +492,7 @@ push dword _main_resultado
 		call print_endofline
 		add esp, 4
 
-push dword _main_a
+		push dword _main_a
 
 		; Negacion logica
 		pop eax
@@ -507,7 +507,7 @@ push dword _main_a
 pop dword eax
 ; Efectuamos la asignacion
 mov dword [_main_resultado], eax
-push dword _main_resultado
+		push dword _main_resultado
 
 		; Escritura
 		pop eax
@@ -516,9 +516,9 @@ push dword _main_resultado
 		call print_endofline
 		add esp, 4
 
-push dword _main_a
-push dword _main_b
-push dword _main_c
+		push dword _main_a
+		push dword _main_b
+		push dword _main_c
 
 		; Conjuncion logica
 		pop dword ebx
@@ -536,7 +536,7 @@ push dword _main_c
 pop dword eax
 ; Efectuamos la asignacion
 mov dword [_main_resultado], eax
-push dword _main_resultado
+		push dword _main_resultado
 
 		; Escritura
 		pop eax
@@ -545,8 +545,8 @@ push dword _main_resultado
 		call print_endofline
 		add esp, 4
 
-push dword _main_a
-push dword _main_b
+		push dword _main_a
+		push dword _main_b
 
 		; Conjuncion logica
 		pop dword ebx
@@ -554,7 +554,7 @@ push dword _main_b
 		mov dword eax, [eax]
 		and eax, [ebx]
 		push dword eax
-push dword _main_c
+		push dword _main_c
 
 		; Disyuncion logica
 		pop dword ebx
@@ -565,7 +565,7 @@ push dword _main_c
 pop dword eax
 ; Efectuamos la asignacion
 mov dword [_main_resultado], eax
-push dword _main_resultado
+		push dword _main_resultado
 
 		; Escritura
 		pop eax
@@ -574,7 +574,7 @@ push dword _main_resultado
 		call print_endofline
 		add esp, 4
 
-push dword _main_a
+		push dword _main_a
 
 		; Negacion logica
 		pop eax
@@ -585,7 +585,7 @@ push dword _main_a
 		__uno_15:
 		push dword 1
 		__fin_no_15:
-push dword _main_b
+		push dword _main_b
 
 		; Conjuncion logica
 		pop dword ebx
@@ -596,7 +596,7 @@ push dword _main_b
 pop dword eax
 ; Efectuamos la asignacion
 mov dword [_main_resultado], eax
-push dword _main_resultado
+		push dword _main_resultado
 
 		; Escritura
 		pop eax
@@ -605,8 +605,8 @@ push dword _main_resultado
 		call print_endofline
 		add esp, 4
 
-push dword _main_a
-push dword _main_b
+		push dword _main_a
+		push dword _main_b
 
 		; Conjuncion logica
 		pop dword ebx
@@ -628,7 +628,7 @@ push dword _main_b
 pop dword eax
 ; Efectuamos la asignacion
 mov dword [_main_resultado], eax
-push dword _main_resultado
+		push dword _main_resultado
 
 		; Escritura
 		pop eax
@@ -642,10 +642,10 @@ push dword _main_resultado
 		pop dword eax 
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
-		cmp eax, -1
-		jg near mensaje_1
+		cmp eax, 7
+		jg near __error_rango
 		mov dword edx, _main_A1
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -661,10 +661,10 @@ push dword _main_resultado
 		pop dword eax 
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
-		cmp eax, -1
-		jg near mensaje_1
+		cmp eax, 7
+		jg near __error_rango
 		mov dword edx, _main_A2
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -680,10 +680,10 @@ push dword _main_resultado
 		pop dword eax 
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
-		cmp eax, -1
-		jg near mensaje_1
+		cmp eax, 7
+		jg near __error_rango
 		mov dword edx, _main_A1
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -692,10 +692,10 @@ push dword _main_resultado
 		pop dword eax 
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
-		cmp eax, -1
-		jg near mensaje_1
+		cmp eax, 7
+		jg near __error_rango
 		mov dword edx, _main_A2
 		lea eax, [edx + eax * 4]
 		push dword eax

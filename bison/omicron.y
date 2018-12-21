@@ -366,8 +366,6 @@ clase_vector: TOK_ARRAY tipo '[' TOK_CONSTANTE_ENTERA ']'
 			fprintf(sintactico,";R: clase_vector: array tipo '[' TOK_CONSTANTE_ENTERA ']'\n");
 			tamanio_vector_actual = $4.valor_entero;
 
-			printf("%d\n", tamanio_vector_actual);
-			printf("%d\n", tipo_actual);
 			if ((tamanio_vector_actual < 1) || (tamanio_vector_actual> MAX_TAM_VECTOR)){
 				printf("****Error semantico en lin %d: El tamanio del vector excede del maximo o es menor que 1.\n", linea);
 				return -1;
@@ -673,12 +671,9 @@ elemento_vector: TOK_IDENTIFICADOR '[' exp ']'
 				return -1;
 			}
 
-			printf("%d\n", tamanio_vector_actual);
-			printf("tabla:%d\n", s->tamanio);
 			gc_escribir_elemento_vector(salida, $3.es_direccion, s->id, s->tamanio);
 			$$.es_direccion = 1;
 			$$.tipo = s->tipo;
-			printf("%s\n", $1.lexema);
 			
 		}
 		;
@@ -950,6 +945,7 @@ exp: exp '+' exp
 		constante
 		{
 			$$.tipo = $1.tipo;
+			printf("ME CAGO EN TO:%d\n", $1.tipo);
 			$$.es_direccion = $1.es_direccion;
 			fprintf(sintactico,";R: exp: constante\n");
 		}
@@ -978,10 +974,15 @@ exp: exp '+' exp
 		idf_llamada_funcion '(' lista_expresiones ')'
 		{
 			fprintf(sintactico,";R: exp: TOK_IDENTIFICADOR '(' lista_expresiones ')'\n");
-	
+			
+			
 			nombre_funcion = crearNombreFuncion($1.lexema, num_parametros_llamada_actual, tipos_parametros);
 			nombre_prefijo= addPrefijo("main", nombre_funcion);
 			printf("%s\n", nombre_prefijo);
+			for (int i = 0; i < num_parametros_llamada_actual; ++i)
+			{
+				printf("PARAMETROS:%d\n", tipos_parametros[i]);
+			}
 			if(buscarIdNoCualificado(simbolos, nombre_funcion, "main", &s, id_ambito)==ERROR){
 				printf("****Error semántico en lin %d: Acceso a funcion no declarada (%s).\n", linea, $1.lexema);
 				return -1;
@@ -1048,6 +1049,7 @@ lista_expresiones: exp resto_lista_expresiones
 
 resto_lista_expresiones: ',' exp resto_lista_expresiones
 		{
+			printf("LALA:%d\n", $2.tipo);
 			fprintf(sintactico,";R: resto_lista_expresiones: exp resto_lista_expresiones\n");
 			num_parametros_llamada_actual++;
 		}
@@ -1184,6 +1186,7 @@ idpf : TOK_IDENTIFICADOR
 			clase_actual = ESCALAR;
 			strcpy(nombres_parametros[pos_parametro_actual], $1.lexema);
 			tipos_parametros[pos_parametro_actual] = tipo_actual;
+			printf("LOLO%d\n", tipos_parametros[pos_parametro_actual]);
 			pos_parametro_actual++;
 		  	num_parametros_actual++;
 		};
@@ -1205,7 +1208,6 @@ identificador: TOK_IDENTIFICADOR
 					}
 				}
 			} else {
-				printf("IDENTIFICADOR:%d\n", tamanio_vector_actual);
 				nombre_actual_simbolo = $1.lexema;
 				nombre_actual_simbolo = addPrefijo("main", nombre_actual_simbolo);
 				if(buscarParaDeclararIdTablaSimbolosAmbitos(simbolos, nombre_actual_simbolo, &s, id_ambito)){
