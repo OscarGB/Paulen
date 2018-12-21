@@ -303,6 +303,13 @@ _set_offsets:
 	ret
 ; CREATE MS TABLE
 _create_ms_table:
+
+push _msC
+call print_int
+call print_endofline
+add esp, 4
+
+
 	mov dword [_msA], _msA1		
 	mov dword [_msA+4], _msA2		
 ; B SOBRE ESCRIBE msA1
@@ -320,8 +327,8 @@ _create_ms_table:
 	mov dword [_msC+16], _msC1		
 	mov dword [_msC+20], _msC2		
 ; SI ASUMIMOS EL ORDEN DE DECLARACION D extends B C TIENE PRIORIDAD B
-	mov dword [_msD], _BmsA1		
-	mov dword [_msD+4], _msA2		
+	mov dword [_msD], _CmsA1		
+	mov dword [_msD+4], _CmsA2		
 	mov dword [_msD+8], _msB1
 	mov dword [_msD+12], _msB2		
 	mov dword [_msD+16], _msC1		
