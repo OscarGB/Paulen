@@ -91,7 +91,6 @@
 segment .data
 	msg_error_indice_vector     db "Indice de vector fuera de rango", 0
 	msg_asignacion     db "Asignacion", 0
-	mensaje_prueba db "Me caguen tu padre", 0
 	msg_f2     db "Llamada a f2", 0
 	__auxfloat dd 0.0
 	__auxint dd 0.0

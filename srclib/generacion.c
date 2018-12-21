@@ -76,10 +76,13 @@ En el final del programa se debe:
 void escribir_fin(FILE* fpasm){
   fprintf(fpasm, "\n\t\t;FINAL DEL PROGRAMA\n");
   fprintf(fpasm, "\t\tjmp near _fin\n");
-  fprintf(fpasm, "\t\t__error_division:\n");
+  fprintf(fpasm, "__error_division:\n");
+  fprintf(fpasm, "\t\tpush mensaje_2\n");
+  fprintf(fpasm, "\t\tjmp near __salida_mensaje_error\n");
+  fprintf(fpasm, "__error_rango:\n");
   fprintf(fpasm, "\t\tpush mensaje_1\n");
   fprintf(fpasm, "\t\tjmp near __salida_mensaje_error\n");
-  fprintf(fpasm, "\t\t__salida_mensaje_error:\n");
+  fprintf(fpasm, "__salida_mensaje_error:\n");
   fprintf(fpasm, "\t\tcall print_string\n");
   fprintf(fpasm, "\t\tcall print_endofline\n");
 
@@ -501,10 +504,10 @@ void escribir_elemento_vector(FILE * fpasm,char * nombre_vector, int tam_max, in
   }
   fprintf(fpasm, "\t\t; Si el indice es menor que 0, error en tiempo de ejecucion\n");
   fprintf(fpasm, "\t\tcmp eax,0\n");
-  fprintf(fpasm, "\t\tjl near mensaje_1\n");
+  fprintf(fpasm, "\t\tjl near __error_rango\n");
   fprintf(fpasm, "\t\t; Si el indice es mayor de lo permitido, error en tiempo de ejecucion\n");
   fprintf(fpasm, "\t\tcmp eax, %d\n", tam_max-1);
-  fprintf(fpasm, "\t\tjg near mensaje_1\n");
+  fprintf(fpasm, "\t\tjg near __error_rango\n");
   fprintf(fpasm, "\t\tmov dword edx, _%s\n", nombre_vector);
   fprintf(fpasm, "\t\tlea eax, [edx + eax * 4]\n");
   fprintf(fpasm, "\t\tpush dword eax\n");
