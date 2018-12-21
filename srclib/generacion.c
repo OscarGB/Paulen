@@ -572,28 +572,6 @@ void ifthenelse_fin( FILE * salida, int etiqueta){
   fprintf(salida, "\t\t__endifthen_else_%d:\n", etiqueta);
 }
 
-
-void asignarDestinoEnPila(FILE* file, int es_variable) {
-  fprintf(file, "\t\t; Asignamos a la parte superior de la pila\n");
-  /*
-    pop eax
-    pop ebx
-    if es_variable = 0:
-      mov [ebx], eax
-    else:
-      mov eax, [eax]
-      mov [ebx], eax
-  */
-  fprintf(file, "\t\tpop eax\n\t\tpop ebx\n");
-  if(es_variable == 0){
-    fprintf(file, "\t\tmov [eax], ebx\n");
-  }
-  else {
-    fprintf(file, "\t\tmov ebx, [ebx]\n\t\tmov [eax], ebx\n");
-  }
-}
-
-
 void discardPila (FILE * fd_asm){
   fprintf(fd_asm, "\t\t; Liberamos la posicion de memoria de arriba de la pila\n");
   fprintf(fd_asm, "\t\tpop eax\n\t\tpush dword [eax]\n");

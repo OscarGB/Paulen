@@ -32,7 +32,6 @@ _main_factorial@o2:
 		mov dword [eax], _msC
 		lea eax, [ebp-4*2]
 		push dword eax
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -47,7 +46,6 @@ _main_factorial@o2:
 		mov dword ebx, [_offset_aiC2]
 		lea eax, [eax+ebx]
 		push eax
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -78,7 +76,6 @@ _main_factorial@o2:
 		mov dword ebx, [_offset_aiC2]
 		lea eax, [eax+ebx]
 		push eax
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -103,7 +100,6 @@ _main_factorial@o2:
 		push dword 100
 		lea eax, [ebp-4*1]
 		push dword eax
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -128,7 +124,6 @@ _main_factorial@o2:
 		mov dword ebx, [_offset_aiC2]
 		lea eax, [eax+ebx]
 		push eax
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -169,7 +164,6 @@ mov dword [__esp], esp
 
 		; Guarda el operando c1 en la pila
 		push dword _c1
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -185,7 +179,6 @@ mov dword [__esp], esp
 		mov dword ebx, [_offset_aiC2]
 		lea eax, [eax+ebx]
 		push eax
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -264,7 +257,6 @@ mov dword [__esp], esp
 
 		; Guarda el operando d1 en la pila
 		push dword _d1
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -283,7 +275,6 @@ mov dword [__esp], esp
 		mov dword ebx, [_offset_aiD2]
 		lea eax, [eax+ebx]
 		push eax
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -299,7 +290,6 @@ mov dword [__esp], esp
 
 		; Guarda el operando c1 en la pila
 		push dword _c1
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov ebx, [ebx]
@@ -316,7 +306,6 @@ mov dword [__esp], esp
 		mov dword ebx, [_offset_aiC2]
 		lea eax, [eax+ebx]
 		push eax
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -326,7 +315,6 @@ mov dword [__esp], esp
 
 		; Guarda el operando m en la pila
 		push dword _m
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -441,7 +429,6 @@ mov dword [__esp], esp
 
 		; Guarda el operando m en la pila
 		push dword _m
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -496,7 +483,6 @@ mov dword [__esp], esp
 
 		; Guarda el operando m en la pila
 		push dword _m
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -550,7 +536,6 @@ mov dword [__esp], esp
 		mov dword edx, _vector_int
 		lea eax, [edx + eax * 4]
 		push dword eax
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -593,7 +578,6 @@ mov dword [__esp], esp
 
 		; Guarda el operando m en la pila
 		push dword _m
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -616,7 +600,6 @@ mov dword [__esp], esp
 
 		; Guarda el operando m en la pila
 		push dword _m
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov ebx, [ebx]
@@ -661,7 +644,6 @@ mov dword [__esp], esp
 		mov dword edx, _Vobjs
 		lea eax, [edx + eax * 4]
 		push dword eax
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -685,7 +667,6 @@ mov dword [__esp], esp
 		mov dword edx, _Vobjs
 		lea eax, [edx + eax * 4]
 		push dword eax
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -709,7 +690,6 @@ mov dword [__esp], esp
 		mov dword edx, _Vobjs
 		lea eax, [edx + eax * 4]
 		push dword eax
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -719,7 +699,6 @@ mov dword [__esp], esp
 
 		; Guarda el operando m en la pila
 		push dword _m
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -818,7 +797,6 @@ mov dword [__esp], esp
 
 		; Guarda el operando m en la pila
 		push dword _m
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -830,7 +808,6 @@ mov dword [__esp], esp
 
 		; Guarda el operando m en la pila
 		push dword _m
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -903,7 +880,6 @@ mov dword [__esp], esp
 
 		; Guarda el operando m en la pila
 		push dword _m
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -943,7 +919,6 @@ mov dword [__esp], esp
 		mov dword edx, _Vobjs
 		lea eax, [edx + eax * 4]
 		push dword eax
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov ebx, [ebx]
@@ -957,7 +932,6 @@ mov dword [__esp], esp
 
 		; Guarda el operando c3 en la pila
 		push dword _c3
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov [eax], ebx
@@ -990,7 +964,6 @@ mov dword [__esp], esp
 		mov dword ebx, [_offset_aiC2]
 		lea eax, [eax+ebx]
 		push eax
-		; Asignamos a la parte superior de la pila
 		pop eax
 		pop ebx
 		mov ebx, [ebx]
