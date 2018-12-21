@@ -63,7 +63,6 @@ int process_line(FILE * f){
 	else if(strcmp(tok, "insertar_tsa_main") == 0){
 		printf("%s\n", to_print);
 		printf("\n=================== main =================\n\n");
-		printf("FALTA LLENAR ESTE TROZO\n\n");
 		tok = strtok(NULL, " \t\n");
 		tok1 = strtok(NULL, " \t\n");
 		categoria = atoi(tok1);
@@ -82,7 +81,6 @@ int process_line(FILE * f){
 		printf("%s\n", to_print);
 		tok = strtok(NULL, " \t\n");
 		printf("\n=================== %s =================\n\n", tok);
-		printf("FALTA LLENAR ESTE TROZO\n\n");
 		nombre = strtok(NULL, " \t\n");
 		tok1 = strtok(NULL, " \t\n");
 		categoria = atoi(tok1);
@@ -102,7 +100,6 @@ int process_line(FILE * f){
 		tok = strtok(NULL, " \t\n");
 		nombre = strtok(NULL, " \t\n");
 		printf("\n=================== %s =================\n\n", nombre);
-		printf("FALTA LLENAR ESTE TROZO\n\n");
 		tok1 = strtok(NULL, " \t\n");
 		categoria = atoi(tok1);
 		tok1 = strtok(NULL, " \t\n");
@@ -118,7 +115,6 @@ int process_line(FILE * f){
 		printf("%s\n", to_print);
 		tok = strtok(NULL, " \t\n");
 		printf("\n=================== %s =================\n\n", tok);
-		printf("FALTA LLENAR ESTE TROZO\n\n");
 		tok1 = strtok(NULL, " \t\n");
 		tipo_basico = atoi(tok1);
 		nuevoSimboloEnMain(simbolos,tok,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NULL);

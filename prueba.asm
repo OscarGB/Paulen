@@ -220,7 +220,7 @@ mov dword [__esp], esp
 		add esp, 4*1
 		push dword eax
 
-		; Asignacion de a pila a c2
+		; Asignacion de pila a c2
 		pop dword eax
 		mov dword [_c2], eax
 
@@ -529,10 +529,10 @@ mov dword [__esp], esp
 		mov dword eax , [eax]
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
 		cmp eax, 3
-		jg near mensaje_1
+		jg near __error_rango
 		mov dword edx, _vector_int
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -547,10 +547,10 @@ mov dword [__esp], esp
 		mov dword eax , [eax]
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
 		cmp eax, 3
-		jg near mensaje_1
+		jg near __error_rango
 		mov dword edx, _vector_int
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -590,10 +590,10 @@ mov dword [__esp], esp
 		pop dword eax 
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
 		cmp eax, 3
-		jg near mensaje_1
+		jg near __error_rango
 		mov dword edx, _vector_int
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -637,10 +637,10 @@ mov dword [__esp], esp
 		pop dword eax 
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
 		cmp eax, 2
-		jg near mensaje_1
+		jg near __error_rango
 		mov dword edx, _Vobjs
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -660,10 +660,10 @@ mov dword [__esp], esp
 		pop dword eax 
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
 		cmp eax, 2
-		jg near mensaje_1
+		jg near __error_rango
 		mov dword edx, _Vobjs
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -683,10 +683,10 @@ mov dword [__esp], esp
 		pop dword eax 
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
 		cmp eax, 2
-		jg near mensaje_1
+		jg near __error_rango
 		mov dword edx, _Vobjs
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -743,10 +743,10 @@ mov dword [__esp], esp
 		mov dword eax , [eax]
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
 		cmp eax, 2
-		jg near mensaje_1
+		jg near __error_rango
 		mov dword edx, _Vobjs
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -766,10 +766,10 @@ mov dword [__esp], esp
 		mov dword eax , [eax]
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
 		cmp eax, 2
-		jg near mensaje_1
+		jg near __error_rango
 		mov dword edx, _Vobjs
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -852,10 +852,10 @@ mov dword [__esp], esp
 		mov dword eax , [eax]
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
 		cmp eax, 2
-		jg near mensaje_1
+		jg near __error_rango
 		mov dword edx, _Vobjs
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -912,10 +912,10 @@ mov dword [__esp], esp
 		pop dword eax 
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
 		cmp eax, 2
-		jg near mensaje_1
+		jg near __error_rango
 		mov dword edx, _Vobjs
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -942,10 +942,10 @@ mov dword [__esp], esp
 		pop dword eax 
 		; Si el indice es menor que 0, error en tiempo de ejecucion
 		cmp eax,0
-		jl near mensaje_1
+		jl near __error_rango
 		; Si el indice es mayor de lo permitido, error en tiempo de ejecucion
 		cmp eax, 2
-		jg near mensaje_1
+		jg near __error_rango
 		mov dword edx, _Vobjs
 		lea eax, [edx + eax * 4]
 		push dword eax
@@ -1026,10 +1026,13 @@ mov dword [__esp], esp
 
 		;FINAL DEL PROGRAMA
 		jmp near _fin
-		__error_division:
+__error_division:
+		push mensaje_2
+		jmp near __salida_mensaje_error
+__error_rango:
 		push mensaje_1
 		jmp near __salida_mensaje_error
-		__salida_mensaje_error:
+__salida_mensaje_error:
 		call print_string
 		call print_endofline
 		_fin:
