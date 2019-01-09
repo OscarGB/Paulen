@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include "generacion.h"
-
 int main(int argc, char ** argv)
 {
     FILE * fd_asm;
@@ -19,28 +16,29 @@ int main(int argc, char ** argv)
     escribir_cabecera_bss(fd_asm);
     
     // int m;
-    declarar_variable(fd_asm,"m", 1);
+    declarar_variable(fd_asm,"m", 1, 1);
     // {D} d1;
-    declarar_variable(fd_asm, "d1", 1);
+    declarar_variable(fd_asm, "d1", -3, 1);
     // {C} c1;
-    declarar_variable(fd_asm, "c1", 1);
+    declarar_variable(fd_asm, "c1",  -2,  1);
 
     // {C} c2;
-    declarar_variable(fd_asm, "c2", 1);
+    declarar_variable(fd_asm, "c2",  -2,  1);
 
     // {C} c3;
-    declarar_variable(fd_asm, "c3", 1);
+    declarar_variable(fd_asm, "c3",  -2,  1);
 
 
     // int [4] vector_int ;
-    declarar_variable(fd_asm, "vector_int", 4);
+    declarar_variable(fd_asm, "vector_int",  1, 4);
 
     // {A} [3] Vobjs;
-    declarar_variable(fd_asm, "Vobjs", 3);
+    declarar_variable(fd_asm, "Vobjs",  1, 3);
 
     escribir_segmento_codigo(fd_asm);
     fprintf(fd_asm,"\textern  _msA1, _msA2,  _msB1, _msB2, _msC1, _msC2, _msD1, _msD2, _BmsA1, _CmsA1, _CmsA2, _no_defined_method, _mnsA1, _mnsB1, _mnsC1, _mnsD1, _set_offsets, _create_ms_table, _offset_msA1, _offset_msA2, _offset_msB1, _offset_msB2, _offset_msC1, _offset_msC2, _offset_msD1,     _offset_msD2, _offset_aiA1, _offset_aiA2, _offset_aiB1, _offset_aiB2, _offset_aiC1, _offset_aiC2, _offset_aiD1, _offset_aiD2, _msA, _msB, _msC, _msD, _acA1, _acB1, _acC1, _acD1\n");
-    fprintf(fd_asm,"\textern malloc, free\n\textern scan_int, print_int, scan_float, print_float, scan_boolean, print_boolean\n\textern print_endofline, print_blank, print_string\n\textern alfa_malloc, alfa_free, ld_float\n");
+
+
 
 
     // {C} factorial({C} parC)
@@ -127,13 +125,14 @@ int main(int argc, char ** argv)
 
 // c1.msA1();
     escribir_operando(fd_asm,"c1",1);
-    llamarMetodoSobreescribibleCualificadoInstanciaPila(fd_asm, "msA1");
+    llamarMetodoSobreescribibleCualificadoInstanciaPila
+           (fd_asm, "msA1");
 
 
 // c2 = factorial(c1);
     escribir_operando(fd_asm,"c1",1);
     operandoEnPilaAArgumento(fd_asm,1);
-    llamarFuncion(fd_asm,"main_factorial@o2",1);
+    llamarFuncion(fd_asm,"_main_factorial@o2",1);
     asignar(fd_asm,"c2",0);
 
 // discard c1;
@@ -517,7 +516,7 @@ int main(int argc, char ** argv)
 // discard d1; 
 
     escribir_operando(fd_asm,"d1",1);
-    discardPila(fd_asm);
+    discardPila(fd_asm,"eax");
 
     escribir_fin(fd_asm);
     fclose(fd_asm);    
