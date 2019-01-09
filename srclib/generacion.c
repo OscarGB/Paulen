@@ -50,6 +50,8 @@ void escribir_segmento_codigo(FILE* fpasm){
   fprintf(fpasm, "\nsegment .text\n");
   fprintf(fpasm, "global main\n");
   fprintf(fpasm, "extern print_int, print_boolean, print_string, print_blank, print_endofline, scan_int, scan_boolean\n");
+  fprintf(fpasm,"extern malloc, free\n\textern scan_int, print_int, scan_float, print_float, scan_boolean, print_boolean\n\textern print_endofline, print_blank, print_string\n\textern alfa_malloc, alfa_free, ld_float\n");
+
 }
 
 
