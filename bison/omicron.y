@@ -1374,7 +1374,7 @@ void escribe_cabecera (FILE * salida){
 	return ;
 }
 
-void escribe_variables (FILE * salida, int tipo, char* nombre, int tamanio){
+void escribe_variables (FILE * salida, char* nombre, int tipo, int tamanio){
 	declarar_variable(salida, nombre, tipo, tamanio);
 }
 
