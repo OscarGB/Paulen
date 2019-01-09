@@ -69,7 +69,7 @@ void eliminaSimbolos(simbolos_p simbolos){
 	free(simbolos);
 }
 
-/*Inserta una clase en el gafo
+/*Inserta una clase en el grafo
 abrirClase() y abrirClaseHeredaN(), para una clase que no hereda, poner numparents a 0 y parents a NULL*/
 void nuevaClase(simbolos_p simbolos, char** parents, int numparents, char* name){
 	node_p padres[numparents];

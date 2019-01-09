@@ -6,57 +6,19 @@ segment .bss
 __esp resd 1
 _main_y resd 1
 _main_resultado resd 1
-_main_i resd 1
 _main_x resd 1
 
 segment .text
 global main
 extern print_int, print_boolean, print_string, print_blank, print_endofline, scan_int, scan_boolean
-
-; PROCEDIMIENTO PRINCIPAL
-main:
-mov dword [__esp], esp
-
-		; Lectura
-		push dword _main_x
-		call scan_int
-		add esp, 4
-
-		; Lectura
-		push dword _main_y
-		call scan_int
-		add esp, 4
-		push dword 0
-
-		; Asignacion de pila a main_resultado
-		pop dword eax
-		mov dword [_main_resultado], eax
-		push dword 0
-
-		; Asignacion de pila a main_i
-		pop dword eax
-		mov dword [_main_i], eax
-		inicio_while1:
-		push dword _main_i
-		push dword _main_y
-
-		; Comparacion de menor
-		pop dword ebx
-		pop dword eax
-		mov eax, dword [eax]
-		mov ebx, dword [ebx]
-		cmp eax, ebx
-		jl __menor_1
-		push dword 0
-		jmp __fin_menor_1
-		__menor_1:
-		push dword 1
-		__fin_menor_1:
-		pop eax
-		cmp eax, 0
-		je near fin_while1
-		push dword _main_resultado
-		push dword _main_x
+_main_suma@1@1:
+		push ebp
+		mov ebp, esp
+		sub esp, 4*0
+		lea eax, [ebp+4+4*2]
+		push dword eax
+		lea eax, [ebp+4+4*1]
+		push dword eax
 
 		; Suma
 		pop dword ebx
@@ -65,25 +27,87 @@ mov dword [__esp], esp
 		mov dword ebx, [ebx]
 		add eax, ebx
 		push dword eax
+		pop dword eax
+		mov dword esp, ebp
+		pop dword ebp
+		ret
+
+; PROCEDIMIENTO PRINCIPAL
+main:
+mov dword [__esp], esp
+		push dword 1
+
+		; Asignacion de pila a main_x
+		pop dword eax
+		mov dword [_main_x], eax
+		push dword 3
+
+		; Asignacion de pila a main_y
+		pop dword eax
+		mov dword [_main_y], eax
+		push dword [_main_x]
+		push dword [_main_y]
+		call _main_suma@1@1
+		add esp, 4*2
+		push dword eax
 
 		; Asignacion de pila a main_resultado
 		pop dword eax
 		mov dword [_main_resultado], eax
-		push dword _main_i
-		push dword 1
+		push dword _main_resultado
 
-		; Suma
-		pop dword ebx
-		pop dword eax
-		mov dword eax, [eax]
-		add eax, ebx
+		; Escritura
+		pop eax
+		push dword [eax]
+		call print_int
+		call print_endofline
+		add esp, 4
+
+		push dword [_main_x]
+		push dword 1
+		call _main_suma@1@1
+		add esp, 4*2
 		push dword eax
 
-		; Asignacion de pila a main_i
+		; Asignacion de pila a main_resultado
 		pop dword eax
-		mov dword [_main_i], eax
-		jmp near inicio_while1
-		fin_while1:
+		mov dword [_main_resultado], eax
+		push dword _main_resultado
+
+		; Escritura
+		pop eax
+		push dword [eax]
+		call print_int
+		call print_endofline
+		add esp, 4
+
+		push dword 10
+		push dword [_main_y]
+		call _main_suma@1@1
+		add esp, 4*2
+		push dword eax
+
+		; Asignacion de pila a main_resultado
+		pop dword eax
+		mov dword [_main_resultado], eax
+		push dword _main_resultado
+
+		; Escritura
+		pop eax
+		push dword [eax]
+		call print_int
+		call print_endofline
+		add esp, 4
+
+		push dword 3
+		push dword 5
+		call _main_suma@1@1
+		add esp, 4*2
+		push dword eax
+
+		; Asignacion de pila a main_resultado
+		pop dword eax
+		mov dword [_main_resultado], eax
 		push dword _main_resultado
 
 		; Escritura

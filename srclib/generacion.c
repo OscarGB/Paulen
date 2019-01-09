@@ -157,6 +157,38 @@ void restar(FILE* fpasm, int es_variable_1, int es_variable_2){
   fprintf(fpasm, "\t\tpush dword eax\n");
 }
 
+void exponencial(FILE* fpasm, int es_variable_1, int es_variable_2, int etiqueta_exponencial){
+  fprintf(fpasm, "\n\t\t; Exponencial\n");
+  fprintf(fpasm, "\t\tpop dword ebx\n");
+  fprintf(fpasm, "\t\tpop dword eax\n");
+  if(es_variable_1){
+    fprintf(fpasm, "\t\tmov dword eax, [eax]\n");
+  }
+  if(es_variable_2){
+    fprintf(fpasm, "\t\tmov dword ebx, [ebx]\n");
+  }
+  fprintf(fpasm, "\t\tmov dword ecx, eax\n");
+  fprintf(fpasm, "\t\tcmp ebx, 0\n");
+  fprintf(fpasm, "\t\tje __es_uno_%d\n", etiqueta_exponencial);
+  fprintf(fpasm, "\t\tjmp __no_es_uno_%d\n", etiqueta_exponencial);
+
+  fprintf(fpasm, "\t\t__es_uno_%d:\n", etiqueta_exponencial);
+  fprintf(fpasm, "\t\tmov eax, 1\n");
+  fprintf(fpasm, "\t\tjmp __fin_exp_%d\n", etiqueta_exponencial);
+  
+  fprintf(fpasm, "\t\t__no_es_uno_%d:\n", etiqueta_exponencial);
+  fprintf(fpasm, "\t\tcmp ebx, 1\n");
+  fprintf(fpasm, "\t\tje __elevado_a_uno_%d\n", etiqueta_exponencial);
+  fprintf(fpasm, "\t\timul dword ecx\n");
+  fprintf(fpasm, "\t\tdec ebx\n");
+  fprintf(fpasm, "\t\tjmp __no_es_uno_%d\n", etiqueta_exponencial);
+  
+  fprintf(fpasm, "\t\t__elevado_a_uno_%d:\n", etiqueta_exponencial);
+  fprintf(fpasm, "\t\tjmp __fin_exp_%d\n", etiqueta_exponencial);
+  
+  fprintf(fpasm, "\t\t__fin_exp_%d:\n", etiqueta_exponencial);
+  fprintf(fpasm, "\t\tpush dword eax\n");
+}
 
 void multiplicar(FILE* fpasm, int es_variable_1, int es_variable_2){
   fprintf(fpasm, "\n\t\t; Multiplicacion\n");

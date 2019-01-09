@@ -50,9 +50,11 @@
 
 /* ESTOS NO APARECERAN SI NO HAY PUNTEROS, FLOAT, CONJUNTOS, SWITCH, FOR */
 
+#define TOK_EXP 1001 /*Para el examen es la operacion elevado*/
 #define TOK_FOR	300
 #define TOK_SWITCH 301
 #define TOK_CASE 302
+#define TOK_BREAK 1002
 #define TOK_DEFAULT 303
 #define TOK_FLOAT 304
 #define TOK_MALLOC 305

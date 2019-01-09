@@ -43,10 +43,17 @@ int tamanio_vector_actual =0;
 char* nombre_prefijo;
 int flag_if=0;
 
+int etiqueta_exponencial = 0;
+char switch_var[256];
+int case_cont = 0;
+int switch_etiqueta;
+int ultimo;
+
 void escribe_cabecera (FILE * salida);
 void escribe_variables (FILE * salida, char* nombre, int tamanio);
 void gc_suma_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2);
 void gc_resta_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2);
+void gc_exponencial_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta_exponencial);
 void gc_division_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2);
 void gc_producto_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2);
 void gc_negacion_entero(FILE *salida, int es_direccion_op1);
@@ -129,6 +136,7 @@ void yyerror();
 %token TOK_SWITCH
 %token TOK_CASE
 %token TOK_DEFAULT
+%token TOK_BREAK
 %token TOK_FLOAT
 %token TOK_MALLOC
 %token TOK_CPRINTF
@@ -179,6 +187,12 @@ void yyerror();
 %type <atributos> if_exp
 %type <atributos> if_exp_sentencias
 %type <atributos> bucle
+%type <atributos> for
+%type <atributos> switch
+%type <atributos> for_inicio
+%type <atributos> for_medio
+%type <atributos> switch_ini
+%type <atributos> casos
 %type <atributos> while_exp
 %type <atributos> while
 %type <atributos> lectura
@@ -194,7 +208,7 @@ void yyerror();
 
 %left '+' '-' TOK_OR
 %left '*' '/' TOK_AND
-%right MENOSU '!'
+%right MENOSU '!' TOK_EXP
 
 %start programa
 
@@ -595,7 +609,100 @@ bloque: condicional
 		{
 			fprintf(sintactico,";R: bloque: bucle\n");
 		}
+		|
+		for
+		{
+			fprintf(sintactico,";R: bloque: for\n");
+		}
+		|
+		switch
+		{
+			fprintf(sintactico,";R: bloque: switch\n");
+		}
 		;
+
+
+
+for: for_medio sentencias '}'
+	    {
+	        for_final(salida, addPrefijo("main", $1.lexema) ,$1.etiqueta);
+    	}
+		;    
+
+
+for_medio: for_inicio ';' comparacion ';' TOK_IDENTIFICADOR '+' '+' ')' '{'
+    	{
+	        if ($3.es_direccion == 1 || $3.tipo != BOOLEAN) {
+	            printf("****Error semántico en lin %d: Bucle con condicion de tipo int (%s)\n", linea, $1.lexema);
+
+	        }
+
+	        if (buscarIdNoCualificado(simbolos, $3.lexema, "main", &s, id_ambito)) {
+	            $5.tipo = s->tipo;
+	        }
+	        else {
+	            printf("****Error semántico en lin %d: Acceso a variable no declarada (%s)\n", linea, $1.lexema);
+	        }
+
+	        if ($5.tipo != ENTERO) {
+	            printf("****Error semántico en lin %d: Indice de bucle no entero (%s)\n", linea, $5.lexema);
+	        }
+
+	        strcpy($$.lexema, $1.lexema);
+	        $$.etiqueta = $1.etiqueta;
+	        for_medio(salida, $3.es_direccion, $1.etiqueta);
+	    }
+	    ;
+
+for_inicio: TOK_FOR '(' asignacion
+    	{
+        	strcpy($$.lexema, $3.lexema);
+        	for_ini(salida, etiqueta);
+        	$$.etiqueta = etiqueta;
+	        etiqueta++;
+    	}
+
+
+switch: switch_ini casos'}'
+   		 {   
+    	    switch_fin(salida, switch_etiqueta);
+   		 }
+
+switch_ini: TOK_SWITCH '(' TOK_IDENTIFICADOR ')' '{'
+    	{
+	        if (buscarIdNoCualificado(simbolos, $3.lexema, "main", &s, id_ambito)==ERROR) {
+	            printf("****Error semántico en lin %d: Acceso a variable no declarada (%s)\n", linea, $3.lexema);
+	        }
+	        case_cont = 0;
+	        strcpy (switch_var, $3.lexema);
+	        switch_etiqueta = etiqueta;
+	        etiqueta ++;
+	        switch_ini(salida);
+    	}
+
+casos: caso casos
+	    {
+	    }
+	    |
+	    caso
+	    {
+	    }
+  
+caso: cabecera final_caso
+	    {
+	    } 
+
+cabecera: TOK_CASE constante_entera ':'
+	    {
+	        case_cont ++;
+	        escribir_operando(salida, addPrefijo("main",switch_var), 1);
+	        switch_caso(salida, switch_var, switch_etiqueta, case_cont, ultimo);
+	    }
+
+final_caso: sentencias TOK_BREAK ';'
+	    {
+	        switch_fin_caso(salida, switch_etiqueta, case_cont);
+	    }
 
 asignacion: TOK_IDENTIFICADOR '=' exp
 		{
@@ -858,6 +965,19 @@ exp: exp '+' exp
 			$$.es_direccion = 0;
 			$$.tipo = INT;
 			fprintf(sintactico,";R: exp: exp '-' exp\n");
+		}
+		|
+		exp TOK_EXP exp
+		{
+			if($1.tipo != INT || $3.tipo != INT){
+				printf("****Error semántico en lin %d: Operacion aritmetica con operandos boolean.\n", linea);
+				return -1;
+			}
+			fprintf(sintactico,";R: exp: exp '^' exp\n");
+			$$.es_direccion = 0;
+			$$.tipo = INT;
+			gc_exponencial_enteros(salida, $1.es_direccion, $3.es_direccion, etiqueta_exponencial);
+			etiqueta_exponencial ++;
 		}
 		|
 		exp '/' exp
@@ -1273,6 +1393,13 @@ void gc_resta_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2) 
 	return;
 }
 
+
+void gc_exponencial_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta_exponencial){
+	exponencial(salida, es_direccion_op1, es_direccion_op2, etiqueta_exponencial);
+	return;
+}
+
+
 void gc_division_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2) {
 	dividir(salida, es_direccion_op1, es_direccion_op2);
 	return;
@@ -1458,6 +1585,81 @@ void gc_while_inicio(FILE * salida,int  etiqueta){
 
 void gc_while_exp_pila (FILE * salida, int exp_es_variable, int etiqueta){
 	while_exp_pila (salida, exp_es_variable, etiqueta);
+}
+
+
+void for_ini(FILE *fpasm, int etiqueta)
+{
+	if (!fpasm)
+	{
+		printf("Error del fichero (elevar)\n");
+		return;
+	}
+
+	fprintf(fpasm, "for_%d:\n", etiqueta);
+	return;
+}
+
+void for_medio(FILE *fpasm, int es_variable, int etiqueta)
+{
+	if (!fpasm)
+	{
+		return;
+	}
+
+	fprintf(fpasm, "\tpop eax\n");
+	if (es_variable)
+	{
+		fprintf(fpasm, "\tmov eax, [eax]\n");
+	}
+	fprintf(fpasm, "\tcmp eax, 0\n");
+	fprintf(fpasm, "\tje near fin_for_%d\n", etiqueta);
+}
+
+void for_final(FILE *fpasm, char *indice ,int etiqueta)
+{
+	if (!fpasm)
+	{
+		return;
+	}
+	fprintf(fpasm, "\tmov eax, [_%s]\n\tadd eax, 1\n\t mov [_%s], eax\n", indice, indice);
+	fprintf(fpasm, "\tjmp for_%d\nfin_for_%d:\n", etiqueta, etiqueta);
+	return;
+}
+
+void switch_fin(FILE *fpasm, int etiqueta) {
+	if (!fpasm)
+	{
+		return;
+	}
+
+	fprintf(fpasm, "fin_switch_%d:\n", etiqueta);
+}
+void switch_ini(FILE *fpasm) {
+	if (!fpasm)
+	{
+		return;
+	}
+	fprintf(fpasm, ";Switch\n");
+}
+void switch_caso(FILE *fpasm, char *switch_var, int etiqueta, int case_cont, int ultimo){
+	if (!fpasm)
+	{
+		return;
+	}
+	fprintf(fpasm, "\tpop ecx\n\tpop eax\n");
+	//Siempre es una variable ( se controla antes)
+	fprintf(fpasm, "\tmov ecx, [ecx]\n");
+
+	if (ultimo == 0)
+		fprintf(fpasm, "\tcmp eax, ecx\n\tjne near switch_%d_case_%d\n", etiqueta, case_cont);
+	else
+		fprintf(fpasm, "\tcmp eax, ecx\n\tjne near fin_switch_%d\n", etiqueta);
+
+}
+
+void switch_fin_caso(FILE *fpasm, int etiqueta, int case_cont){
+	fprintf(fpasm, "\tjmp fin_switch_%d\nswitch_%d_case_%d:\n", etiqueta, etiqueta, case_cont);
 }
 
 void yyerror(const char * s) {

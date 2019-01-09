@@ -135,6 +135,36 @@ while {
 	return TOK_WHILE;
 }
 
+for {
+	fprintf(sintactico, ";D: for\n");
+	columna+=yyleng;
+	return TOK_FOR;
+}
+
+switch {
+	fprintf(sintactico, ";D: switch\n");
+	columna+=yyleng;
+	return TOK_SWITCH;
+}
+
+break { 
+	fprintf(sintactico, ";D: break\n");
+	columna += yyleng;
+	return TOK_BREAK;
+}
+
+case { 
+	fprintf(sintactico, ";D: case\n");
+	columna += yyleng;
+	return TOK_CASE;
+}
+
+default { 
+	fprintf(sintactico, ";D: default\n");
+	columna += yyleng;
+	return TOK_DEFAULT;
+}
+
 scanf {
 	fprintf(sintactico, ";D: scanf\n");
 	columna+=yyleng;
@@ -317,6 +347,11 @@ true {
 	fprintf(sintactico, ";D: ->\n");
 	columna+=yyleng;
 	return TOK_FLECHA;
+}
+"^" {
+	fprintf(sintactico, ";D: ^\n");
+	columna+=yyleng;
+	return TOK_EXP;
 }
 
 {IDENTIFICADOR} {

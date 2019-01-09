@@ -80,6 +80,7 @@ Se guarda el resultado en la pila
 */
 void sumar(FILE* fpasm, int es_variable_1, int es_variable_2);
 void restar(FILE* fpasm, int es_variable_1, int es_variable_2);
+void exponencial(FILE* fpasm, int es_variable_1, int es_variable_2, int etiqueta_exponencial);
 void multiplicar(FILE* fpasm, int es_variable_1, int es_variable_2);
 void dividir(FILE* fpasm, int es_variable_1, int es_variable_2);
 void o(FILE* fpasm, int es_variable_1, int es_variable_2);

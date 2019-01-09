@@ -7,8 +7,6 @@
 /* Function to create a graph with n vertices; Creates both directed and undirected graphs*/
 graph_p createGraph(char* input)
 {
-
-
     graph_p graph = (graph_p)malloc(sizeof(graph_t));
     if(!graph) {
         exit(1);
