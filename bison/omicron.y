@@ -50,7 +50,7 @@ int switch_etiqueta;
 int ultimo;
 
 void escribe_cabecera (FILE * salida);
-void escribe_variables (FILE * salida, int tipo, char* nombre, int tamanio);
+void escribe_variables (FILE * salida, char* nombre, int tipo, int tamanio);
 void gc_suma_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2);
 void gc_resta_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2);
 void gc_exponencial_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta_exponencial);

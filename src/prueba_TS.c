@@ -112,10 +112,16 @@ int process_line(FILE * f){
 		iniciaLocalEnClase(simbolos,tok,nombre,categoria,tipo_acceso,tipo_miembro,0);
 	}
 	else if(strcmp(tok, "abrir_ambito_tsa_main") == 0){
+		char auxrg[1000];
 		printf("%s\n", to_print);
 		tok = strtok(NULL, " \t\n");
-		printf("\n=================== %s =================\n\n", tok);
 		tok1 = strtok(NULL, " \t\n");
+		strcpy(auxrg, tok);
+		printf("AUXRG:%s\n", auxrg);
+		tok = strtok(auxrg, "_");
+		printf("TOKKKK:%s\n", tok);		
+		tok = strtok(NULL, "_\t\n");
+		printf("\n=================== %s =================\n\n", tok);
 		tipo_basico = atoi(tok1);
 		nuevoSimboloEnMain(simbolos,tok,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,NULL);
 		iniciaLocal(simbolos,tok);
