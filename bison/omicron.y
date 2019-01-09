@@ -50,7 +50,7 @@ int switch_etiqueta;
 int ultimo;
 
 void escribe_cabecera (FILE * salida);
-void escribe_variables (FILE * salida, char* nombre, int tamanio);
+void escribe_variables (FILE * salida, int tipo, char* nombre, int tamanio);
 void gc_suma_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2);
 void gc_resta_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2);
 void gc_exponencial_enteros(FILE *salida, int es_direccion_op1, int es_direccion_op2, int etiqueta_exponencial);
@@ -226,7 +226,7 @@ escritura_TS: {
 			simbolos_main = (simbolo_p *)ht_get_values(simbolos->main_principal);
 			for(int i=0;simbolos_main[i]!=NULL;i++){
 				nombre_actual_simbolo = simbolos_main[i]->nombre;
-				escribe_variables(salida, nombre_actual_simbolo, simbolos_main[i]->tamanio > 0 ? simbolos_main[i]->tamanio : 1);
+				escribe_variables(salida, nombre_actual_simbolo, simbolos_main[i]->tipo, simbolos_main[i]->tamanio > 0 ? simbolos_main[i]->tamanio : 1);
 				free(nombre_actual_simbolo);
 			}
 			escribe_cabecera(salida);
@@ -1374,8 +1374,8 @@ void escribe_cabecera (FILE * salida){
 	return ;
 }
 
-void escribe_variables (FILE * salida, char* nombre, int tamanio){
-	declarar_variable(salida, nombre, tamanio);
+void escribe_variables (FILE * salida, int tipo, char* nombre, int tamanio){
+	declarar_variable(salida, nombre, tipo, tamanio);
 }
 
 void imprimir_error(FILE * salida){

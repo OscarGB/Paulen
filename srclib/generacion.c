@@ -14,7 +14,7 @@ Con seguridad sabes que deberás reservar una variable entera para guardar el pu
 
 void escribir_cabecera_bss(FILE* fpasm){
   fprintf(fpasm, "\nsegment .bss\n");
-  declarar_variable(fpasm, "_esp", 1);
+  declarar_variable(fpasm, "_esp",0, 1);
 }
 
 
@@ -37,7 +37,7 @@ tipo puede ser ENTERO o BOOLEANO (observa la declaración de las constantes del 
 Esta misma función se invocará cuando en el compilador se declaren vectores, por eso se adjunta un argumento final (tamano) que para esta primera práctica siempre recibirá el valor 1.
 */
 
-void declarar_variable(FILE* fpasm,  char* nombre, int tamano){
+void declarar_variable(FILE* fpasm,  char* nombre, int tipo, int tamano){
   fprintf(fpasm, "_%s resd %d\n", nombre, tamano);
 }
 
